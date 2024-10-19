@@ -1,17 +1,21 @@
 import SwiftUI
+import TabularData
 
+/* ###################################################################################################################################### */
+// MARK: - Main Content View -
+/* ###################################################################################################################################### */
+/**
+ */
 struct RCVST_ContentView: View {
+    @State var dataFrame: DataFrame?
+    
+    /* ################################################################## */
+    /**
+     */
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Text(self.dataFrame.debugDescription)
         }
         .padding()
     }
-}
-
-#Preview {
-    RCVST_ContentView()
 }
