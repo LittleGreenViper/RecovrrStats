@@ -7,14 +7,17 @@ import TabularData
 /**
  */
 struct RCVST_ContentView: View {
-    @State var dataFrame: DataFrame?
-    
+    /* ################################################################## */
+    /**
+     */
+    @ObservedObject var data = RCVST_DataProvider()
+
     /* ################################################################## */
     /**
      */
     var body: some View {
         VStack {
-            Text(self.dataFrame.debugDescription)
+            Text(self.data.debugDescription)
         }
         .padding()
     }
