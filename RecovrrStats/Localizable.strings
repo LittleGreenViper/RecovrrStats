@@ -1,1 +1,26 @@
+/*
+ © Copyright 2024, Little Green Viper Software Development LLC
+*/
+
+//**********************************************    **********************************************************
+// --------------------------------------------      ------------------------------------------------------- *
+//|  DO NOT MODIFY ON THIS SIDE OF THE EQUALS  |    |   MODIFY THE TEXT ON THIS SIDE TO THE LOCAL LANGUAGE  |*
+// --------------------------------------------      ------------------------------------------------------- *
+//**********************************************    **********************************************************
+
+"SLUG-COLUMN-NAME-sample_date"              =   "Sample Date";
+"SLUG-COLUMN-NAME-total_users"              =   "Total Users";
+"SLUG-COLUMN-NAME-new_users"                =   "New Users";
+"SLUG-COLUMN-NAME-never_set_location"       =   "Never Set Location";
+"SLUG-COLUMN-NAME-total_requests"           =   "Total Requests";
+"SLUG-COLUMN-NAME-accepted_requests"        =   "Accepted Requests";
+"SLUG-COLUMN-NAME-rejected_requests"        =   "Rejected Requests";
+"SLUG-COLUMN-NAME-open_requests"            =   "Open Requests";
+"SLUG-COLUMN-NAME-active_1"                 =   "Active Within 24 Hours";
+"SLUG-COLUMN-NAME-active_7"                 =   "Active Within 1 Week";
+"SLUG-COLUMN-NAME-active_30"                =   "Active Within 30 Days";
+"SLUG-COLUMN-NAME-active_90"                =   "Active Within 90 Days";
+"SLUG-COLUMN-NAME-active_avg"               =   "Average Last Active Days";
+"SLUG-COLUMN-NAME-deleted_active"           =   "Admin Deleted Active Users";
+"SLUG-COLUMN-NAME-deleted_inactive"         =   "Admin Deleted Inactive Users";
 

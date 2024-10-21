@@ -1,3 +1,7 @@
+/*
+ © Copyright 2024, Little Green Viper Software Development LLC
+*/
+
 import SwiftUI
 import TabularData
 
@@ -16,9 +20,21 @@ struct RCVST_ContentView: View {
     /**
      */
     var body: some View {
-        VStack {
-            Text(self.data.debugDescription)
+        GeometryReader { inGeometry in
+            ScrollView {
+                VStack {
+                        Text(self.data.debugDescription)
+                        .lineLimit(nil)
+                }
+                .padding()
+                .frame(
+                    minWidth: inGeometry.size.width,
+                    maxWidth: inGeometry.size.width,
+                    minHeight: inGeometry.size.height,
+                    maxHeight: .infinity,
+                    alignment: .topLeading
+                )
+            }
         }
-        .padding()
     }
 }

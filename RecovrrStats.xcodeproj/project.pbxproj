@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D433ED262CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox in Frameworks */ = {isa = PBXBuildFile; productRef = D433ED252CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox */; };
 		D4484A472CBEA80B0019BC0E /* Warnings.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = D4484A452CBEA80B0019BC0E /* Warnings.xcconfig */; };
 /* End PBXBuildFile section */
 
@@ -81,6 +82,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D433ED262CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,6 +103,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D433ED242CC704FB00E7AA4A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		D4484A462CBEA80B0019BC0E /* Meta */ = {
 			isa = PBXGroup;
 			children = (
@@ -116,6 +125,7 @@
 				D4F14D882CBEA585000C482E /* RecovrrStats */,
 				D4F14D992CBEA586000C482E /* RecovrrStatsTests */,
 				D4F14DA32CBEA586000C482E /* RecovrrStatsUITests */,
+				D433ED242CC704FB00E7AA4A /* Frameworks */,
 				D4F14D872CBEA585000C482E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -150,6 +160,7 @@
 			);
 			name = "Recovrr Stats";
 			packageProductDependencies = (
+				D433ED252CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox */,
 			);
 			productName = RecovrrStats;
 			productReference = D4F14D862CBEA585000C482E /* Recovrr Stats.app */;
@@ -233,6 +244,9 @@
 			);
 			mainGroup = D4F14D7D2CBEA585000C482E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D433ED232CC7049C00E7AA4A /* XCRemoteSwiftPackageReference "RVS_Generic_Swift_Toolbox" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D4F14D872CBEA585000C482E /* Products */;
 			projectDirPath = "";
@@ -605,6 +619,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D433ED232CC7049C00E7AA4A /* XCRemoteSwiftPackageReference "RVS_Generic_Swift_Toolbox" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RiftValleySoftware/RVS_Generic_Swift_Toolbox";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.14.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D433ED252CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D433ED232CC7049C00E7AA4A /* XCRemoteSwiftPackageReference "RVS_Generic_Swift_Toolbox" */;
+			productName = RVS_Generic_Swift_Toolbox;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D4F14D7E2CBEA585000C482E /* Project object */;
 }

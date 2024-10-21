@@ -1,3 +1,7 @@
+/*
+ © Copyright 2024, Little Green Viper Software Development LLC
+*/
+
 import SwiftUI
 import TabularData
 
