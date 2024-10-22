@@ -175,9 +175,14 @@ class RCVST_DataProvider: ObservableObject {
 /* ###################################################################################################################################### */
 extension RCVST_DataProvider: CustomDebugStringConvertible {
     var debugDescription: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .short
+        
+        let dateRangeString = "\n\t" + dateFormatter.string(from: dateRange.lowerBound) + "\n\t\t\tto\n\t" + dateFormatter.string(from: dateRange.upperBound)
         let returnStringArray = ["Columns:\n\t\(Columns.allCases.map(\.localizedString).joined(separator: "\n\t"))",
                                  "Number Of Samples: \(numberOfRows)",
-                                 "Date Range: \(dateRange.description)"
+                                 "Date Range: \(dateRangeString)"
         ]
         
         return returnStringArray.joined(separator: "\n\n")
