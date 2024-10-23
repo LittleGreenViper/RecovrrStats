@@ -22,81 +22,97 @@ class RCVST_DataProvider: ObservableObject {
     enum Columns: String, CaseIterable {
         /* ############################################################## */
         /**
+         The date that this sample was taken.
          */
         case sample_date
 
         /* ############################################################## */
         /**
+         The current total number of users (both active and new), in the server. It does not include signups.
          */
         case total_users
 
         /* ############################################################## */
         /**
+         The current number of users that have never signed in.
          */
         case new_users
 
         /* ############################################################## */
         /**
+         The current number of users (both active and new), that have a nil location (never set one).
          */
         case never_set_location
 
         /* ############################################################## */
         /**
+         The cumulative total number of signup requests.
          */
         case total_requests
 
         /* ############################################################## */
         /**
+         The cumulative total number of signup requests approved by the administrators.
          */
         case accepted_requests
 
         /* ############################################################## */
         /**
+         The cumulative total number of signup requests rejected by the administrators.
          */
         case rejected_requests
 
         /* ############################################################## */
         /**
+         The current number of signup requests that have not been addressed by the administrators.
          */
         case open_requests
 
         /* ############################################################## */
         /**
+         The current number of active (not new) users that have signed in, within the last 24 hours.
          */
         case active_1
 
         /* ############################################################## */
         /**
+         The current number of active (not new) users that have signed in, within the last 7 days.
          */
         case active_7
 
         /* ############################################################## */
         /**
+         The current number of active (not new) users that have signed in, within the last 30 days.
          */
         case active_30
 
         /* ############################################################## */
         /**
+         The current number of active (not new) users that have signed in, within the last 90 days.
          */
         case active_90
 
         /* ############################################################## */
         /**
+         The current simple average last activity period for all active users, in days.
          */
         case active_avg
 
         /* ############################################################## */
         /**
+         The cumulative number of active users that have been deleted by the administrators.
          */
         case deleted_active
 
         /* ############################################################## */
         /**
+         The cumulative number of new users that have been deleted by the administrators.
          */
         case deleted_inactive
         
         /* ############################################################## */
         /**
+         The column name, localized.
          */
         var localizedString: String { "SLUG-COLUMN-NAME-\(rawValue)".localizedVariant }
     }
@@ -174,6 +190,10 @@ class RCVST_DataProvider: ObservableObject {
 // MARK: CustomDebugStringConvertible Conformance
 /* ###################################################################################################################################### */
 extension RCVST_DataProvider: CustomDebugStringConvertible {
+    /* ################################################################## */
+    /**
+     This string summarizes the data frame.
+     */
     var debugDescription: String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .short
