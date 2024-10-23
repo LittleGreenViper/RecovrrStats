@@ -30,23 +30,24 @@
 
 /* Begin PBXFileReference section */
 		D4484A452CBEA80B0019BC0E /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Warnings.xcconfig; sourceTree = "<group>"; };
-		D4F14D862CBEA585000C482E /* Recovrr Stats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Recovrr Stats.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4A62DD52CC9372D001DD8A9 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
+		D4F14D862CBEA585000C482E /* RecovrrStats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RecovrrStats.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4F14D962CBEA586000C482E /* RecovrrStatsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RecovrrStatsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4F14DA02CBEA586000C482E /* RecovrrStatsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RecovrrStatsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		D4F14DB62CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "Recovrr Stats" target */ = {
+		D4F14DB62CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "RecovrrStats" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Localizable.strings,
 			);
-			target = D4F14D852CBEA585000C482E /* Recovrr Stats */;
+			target = D4F14D852CBEA585000C482E /* RecovrrStats */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		D4F14DB72CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "Compile Sources" phase from "Recovrr Stats" target */ = {
+		D4F14DB72CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "Compile Sources" phase from "RecovrrStats" target */ = {
 			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
 			buildPhase = D4F14D822CBEA585000C482E /* Sources */;
 			membershipExceptions = (
@@ -59,8 +60,8 @@
 		D4F14D882CBEA585000C482E /* RecovrrStats */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				D4F14DB62CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "Recovrr Stats" target */,
-				D4F14DB72CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "Compile Sources" phase from "Recovrr Stats" target */,
+				D4F14DB62CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "RecovrrStats" target */,
+				D4F14DB72CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "Compile Sources" phase from "RecovrrStats" target */,
 			);
 			path = RecovrrStats;
 			sourceTree = "<group>";
@@ -121,6 +122,7 @@
 		D4F14D7D2CBEA585000C482E = {
 			isa = PBXGroup;
 			children = (
+				D4A62DD52CC9372D001DD8A9 /* .swiftlint.yml */,
 				D4484A462CBEA80B0019BC0E /* Meta */,
 				D4F14D882CBEA585000C482E /* RecovrrStats */,
 				D4F14D992CBEA586000C482E /* RecovrrStatsTests */,
@@ -133,7 +135,7 @@
 		D4F14D872CBEA585000C482E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D4F14D862CBEA585000C482E /* Recovrr Stats.app */,
+				D4F14D862CBEA585000C482E /* RecovrrStats.app */,
 				D4F14D962CBEA586000C482E /* RecovrrStatsTests.xctest */,
 				D4F14DA02CBEA586000C482E /* RecovrrStatsUITests.xctest */,
 			);
@@ -143,10 +145,11 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		D4F14D852CBEA585000C482E /* Recovrr Stats */ = {
+		D4F14D852CBEA585000C482E /* RecovrrStats */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D4F14DAA2CBEA586000C482E /* Build configuration list for PBXNativeTarget "Recovrr Stats" */;
+			buildConfigurationList = D4F14DAA2CBEA586000C482E /* Build configuration list for PBXNativeTarget "RecovrrStats" */;
 			buildPhases = (
+				D4A62DD42CC935F2001DD8A9 /* SwiftLint */,
 				D4F14D822CBEA585000C482E /* Sources */,
 				D4F14D832CBEA585000C482E /* Frameworks */,
 				D4F14D842CBEA585000C482E /* Resources */,
@@ -158,12 +161,12 @@
 			fileSystemSynchronizedGroups = (
 				D4F14D882CBEA585000C482E /* RecovrrStats */,
 			);
-			name = "Recovrr Stats";
+			name = RecovrrStats;
 			packageProductDependencies = (
 				D433ED252CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox */,
 			);
 			productName = RecovrrStats;
-			productReference = D4F14D862CBEA585000C482E /* Recovrr Stats.app */;
+			productReference = D4F14D862CBEA585000C482E /* RecovrrStats.app */;
 			productType = "com.apple.product-type.application";
 		};
 		D4F14D952CBEA586000C482E /* RecovrrStatsTests */ = {
@@ -252,7 +255,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				D4F14D852CBEA585000C482E /* Recovrr Stats */,
+				D4F14D852CBEA585000C482E /* RecovrrStats */,
 				D4F14D952CBEA586000C482E /* RecovrrStatsTests */,
 				D4F14D9F2CBEA586000C482E /* RecovrrStatsUITests */,
 			);
@@ -284,6 +287,28 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		D4A62DD42CC935F2001DD8A9 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if command -v swiftlint 2>&1 >/dev/null\nthen\n    cd ${PROJECT_DIR}\n    swiftlint\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		D4F14D822CBEA585000C482E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -311,12 +336,12 @@
 /* Begin PBXTargetDependency section */
 		D4F14D982CBEA586000C482E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = D4F14D852CBEA585000C482E /* Recovrr Stats */;
+			target = D4F14D852CBEA585000C482E /* RecovrrStats */;
 			targetProxy = D4F14D972CBEA586000C482E /* PBXContainerItemProxy */;
 		};
 		D4F14DA22CBEA586000C482E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = D4F14D852CBEA585000C482E /* Recovrr Stats */;
+			target = D4F14D852CBEA585000C482E /* RecovrrStats */;
 			targetProxy = D4F14DA12CBEA586000C482E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -453,6 +478,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"RecovrrStats/Preview Content\"";
 				DEVELOPMENT_TEAM = P53V4JS928;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -484,6 +510,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"RecovrrStats/Preview Content\"";
 				DEVELOPMENT_TEAM = P53V4JS928;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -591,7 +618,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D4F14DAA2CBEA586000C482E /* Build configuration list for PBXNativeTarget "Recovrr Stats" */ = {
+		D4F14DAA2CBEA586000C482E /* Build configuration list for PBXNativeTarget "RecovrrStats" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D4F14DAB2CBEA586000C482E /* Debug */,
