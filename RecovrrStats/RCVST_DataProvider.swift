@@ -137,7 +137,7 @@ class RCVST_DataProvider: ObservableObject {
         fetchStats {
             guard let stats = $0 else { return }
             // We need to publish the change in the main thread.
-            DispatchQueue.main.async { self.statusDataFrame = stats }
+            self.statusDataFrame = stats
         }
     }
     
@@ -145,7 +145,7 @@ class RCVST_DataProvider: ObservableObject {
     /**
      This fetches the current stats file, and delivers it as a dataframe.
      
-     - parameter completion: A simple completion proc, with a single argument of dataframe, containing the stats. This can be called in non-main threads.
+     - parameter completion: A simple completion proc, with a single argument of dataframe, containing the stats. This is always called in the main thread.
      */
     func fetchStats(completion inCompletion: ((DataFrame?) -> Void)?) {
         guard let url = URL(string: Self._g_statsURLString)
@@ -159,12 +159,12 @@ class RCVST_DataProvider: ObservableObject {
                 var dataFrame = try DataFrame(contentsOfCSVFile: url)
                 // We convert the integer timestamp to a more usable Date instance.
                 dataFrame.transformColumn(Columns.sample_date.rawValue) { (inUnixTime: Int) -> Date in Date(timeIntervalSince1970: TimeInterval(inUnixTime)) }
-                inCompletion?(dataFrame)
+                DispatchQueue.main.async { inCompletion?(dataFrame) }
             } catch {
                 #if DEBUG
                     print("Data Frame Initialization Error: \(error.localizedDescription)")
                 #endif
-                inCompletion?(nil)
+                DispatchQueue.main.async { inCompletion?(nil) }
             }
         }
     }
