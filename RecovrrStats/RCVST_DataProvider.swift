@@ -147,6 +147,46 @@ class RCVST_DataProvider: ObservableObject {
     
     /* ################################################################## */
     /**
+     */
+    var formattedStartDate: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .none
+        return dateFormatter.string(from: dateRange.lowerBound)
+    }
+    
+    /* ################################################################## */
+    /**
+     */
+    var formattedEndDate: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .none
+        return dateFormatter.string(from: dateRange.upperBound)
+    }
+    
+    /* ################################################################## */
+    /**
+     */
+    var formattedStartDateTime: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .short
+        return dateFormatter.string(from: dateRange.lowerBound)
+    }
+    
+    /* ################################################################## */
+    /**
+     */
+    var formattedEndDateTime: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .short
+        return dateFormatter.string(from: dateRange.upperBound)
+    }
+
+    /* ################################################################## */
+    /**
      Upon initialization, we go out, and fetch the stats file.
      */
     required init() {
@@ -195,11 +235,7 @@ extension RCVST_DataProvider: CustomDebugStringConvertible {
      This string summarizes the data frame.
      */
     var debugDescription: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-        dateFormatter.timeStyle = .short
-        
-        let dateRangeString = "\n\t" + dateFormatter.string(from: dateRange.lowerBound) + "\n\t\t\tto\n\t" + dateFormatter.string(from: dateRange.upperBound)
+        let dateRangeString = "\n\t\(formattedStartDateTime)\n\t\t\tto\n\t\(formattedEndDateTime)"
         let returnStringArray = ["Columns:\n\t\(Columns.allCases.map(\.localizedString).joined(separator: "\n\t"))",
                                  "Number Of Samples: \(numberOfRows)",
                                  "Date Range: \(dateRangeString)"

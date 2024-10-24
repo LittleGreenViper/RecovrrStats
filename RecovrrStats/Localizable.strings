@@ -24,3 +24,4 @@
 "SLUG-COLUMN-NAME-deleted_active"           =   "Admin Deleted Active Users";
 "SLUG-COLUMN-NAME-deleted_inactive"         =   "Admin Deleted Inactive Users";
 
+"SLUG-HEADER-FORMAT"                        =   "%d Samples, Taken Between %@ and %@";

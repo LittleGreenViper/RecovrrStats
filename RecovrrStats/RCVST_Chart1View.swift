@@ -4,27 +4,29 @@
 
 import SwiftUI
 import TabularData
+import Charts
 
 /* ###################################################################################################################################### */
 // MARK: - Main Content View -
 /* ###################################################################################################################################### */
 /**
  */
-struct RCVST_ContentView: View {
+struct RCVST_Chart1View: View {
     /* ################################################################## */
     /**
+     This is the actual dataframe wrapper for the stats.
      */
-    @ObservedObject var data = RCVST_DataProvider()
+    @State var data: RCVST_DataProvider
 
     /* ################################################################## */
     /**
+     This is the layout for this screen.
      */
     var body: some View {
         GeometryReader { inGeometry in
             ScrollView {
                 VStack {
-                        Text(self.data.debugDescription)
-                        .lineLimit(nil)
+                    Text("HELO WRLD")
                 }
                 .padding()
                 .frame(

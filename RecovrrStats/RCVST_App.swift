@@ -20,7 +20,7 @@ struct RCVST_App: App {
      */
     var body: some Scene {
         WindowGroup {
-            RCVST_ContentView()
+            RCVST_InitialContentView()
         }
     }
 }
