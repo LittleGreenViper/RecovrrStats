@@ -52,7 +52,7 @@ struct RootStackView: View {
      */
     var body: some View {
         NavigationStack {
-            Text(String(format: "SLUG-HEADER-FORMAT".localizedVariant, data.numberOfRows, data.formattedStartDate, data.formattedEndDate))
+            Text(String(format: "SLUG-HEADER-FORMAT".localizedVariant, data.count, data.formattedStartDate, data.formattedEndDate))
             List(ChartTypes.allCases, id: \.self) { inChartType in
                 NavigationLink(inChartType.rawValue, value: inChartType)
             }
