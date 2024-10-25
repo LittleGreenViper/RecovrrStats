@@ -7,78 +7,6 @@ import TabularData
 import Charts
 
 /* ###################################################################################################################################### */
-// MARK: - Adds Chart Plottable Stuff -
-/* ###################################################################################################################################### */
-public extension RCVST_DataProvider.Row {
-    /* ############################################################################################################################## */
-    // MARK: This is used to refine the total, by the types of users.
-    /* ############################################################################################################################## */
-    /**
-     
-     */
-    struct UserType {
-        /* ########################################################################################################################## */
-        // MARK: This is used to define the types of users.
-        /* ########################################################################################################################## */
-        /**
-         
-         */
-        enum UserTypes: String {
-            /* ###################################################### */
-            /**
-             */
-            case active
-            
-            /* ###################################################### */
-            /**
-             */
-            case new
-        }
-        
-        /* ########################################################## */
-        /**
-         */
-        let category: UserTypes
-        
-        /* ########################################################## */
-        /**
-         */
-        let value: Int
-        
-        /* ########################################################## */
-        /**
-         */
-        let group: Int
-    }
-    
-    /* ############################################################## */
-    /**
-     */
-    var userTypes: [UserType] {
-        [UserType(category: .active, value: activeUsers, group: 1),
-         UserType(category: .new, value: newUsers, group: 2)]
-    }
-}
-
-/* ###################################################################################################################################### */
-// MARK: - Adds Chart Plottable Stuff -
-/* ###################################################################################################################################### */
-public extension RCVST_DataProvider {
-    /* ############################################################## */
-    /**
-     */
-    var plottableUserData: [Date: [Row.UserType]] {
-        reduce([Date: [Row.UserType]]()) { current, next in
-            guard let key = next.sampleDate else { return current }
-            var new = current
-            new[key] = next.userTypes
-            
-            return new
-        }
-    }
-}
-
-/* ###################################################################################################################################### */
 // MARK: - Main Content View -
 /* ###################################################################################################################################### */
 /**
@@ -98,13 +26,24 @@ struct RCVST_Chart1View: View {
         GeometryReader { inGeometry in
             ScrollView {
                 VStack {
+                    Chart {
+                        ForEach(data.userTypePlottable, id: \.id) { inRowData in
+                            ForEach(inRowData.data, id: \.userType) { inUserTypeData in
+                                BarMark(
+                                    x: .value("Date", inRowData.date),
+                                    y: .value("Users", inUserTypeData.value)
+                                )
+                                .foregroundStyle(by: .value("User Type", inUserTypeData.userType.localizedString))
+                            }
+                        }
+                    }
                 }
                 .padding()
                 .frame(
                     minWidth: inGeometry.size.width,
                     maxWidth: inGeometry.size.width,
-                    minHeight: inGeometry.size.height,
-                    maxHeight: .infinity,
+                    minHeight: 300,
+                    maxHeight: 300,
                     alignment: .topLeading
                 )
             }

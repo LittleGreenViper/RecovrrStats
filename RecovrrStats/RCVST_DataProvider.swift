@@ -12,7 +12,7 @@ import RVS_Generic_Swift_Toolbox
 /**
  This class reads in and processes the stats data.
  */
-final public class RCVST_DataProvider: ObservableObject {
+public class RCVST_DataProvider: ObservableObject {
     /* ################################################################## */
     /**
      The URL string to the stats file.
@@ -184,15 +184,9 @@ extension RCVST_DataProvider {
 /* ###################################################################################################################################### */
 // MARK: The Public Data Row Nested Class
 /* ###################################################################################################################################### */
-extension RCVST_DataProvider {
+public extension RCVST_DataProvider {
     /// This provides a simple interface to the data for each row.
-    public struct Row: Identifiable {
-        /* ############################################################## */
-        /**
-         The ID that needs to be provided, to satisfy Identifiable.
-         */
-        public var id = UUID()
-        
+    struct Row {
         // MARK: Previous Sample Access (Private)
         
         /* ############################################################## */
@@ -517,7 +511,7 @@ public extension RCVST_DataProvider {
     /**
      This returns every row, as an instance of ``Row``.
      */
-    var rows: [Row] { rows() }
+    var allRows: [Row] { rows() }
     
     /* ################################################################## */
     /**
@@ -598,4 +592,65 @@ extension RCVST_DataProvider: RandomAccessCollection {
     /**
      */
     public var endIndex: Int { count - 1 }
+}
+
+/* ###################################################################################################################################### */
+// MARK: - Adds Chart Plottable Stuff -
+/* ###################################################################################################################################### */
+public extension RCVST_DataProvider {
+    /* ################################################################## */
+    /**
+     */
+    struct RowUserTypesPlottableData: Identifiable {
+        public var id = UUID()
+        let userType: UserTypes
+        let value: Int
+    }
+    
+    /* ################################################################## */
+    /**
+     */
+    struct RowPlottableData: Identifiable {
+        public var id = UUID()
+        let date: Date
+        let data: [RowUserTypesPlottableData]
+    }
+    
+    /* ################################################################################################################################## */
+    // MARK: This is used to define the types of users.
+    /* ################################################################################################################################## */
+    /**
+     This enum defines the user types we provide separately.
+     */
+    enum UserTypes: String {
+        /* ###################################################### */
+        /**
+         Active users (have lkogged in, at least once)
+         */
+        case active
+        
+        /* ###################################################### */
+        /**
+         New users (have never logged in)
+         */
+        case new
+        
+        /* ############################################################## */
+        /**
+         The column name, localized.
+         */
+        var localizedString: String { "SLUG-USER-COLUMN-NAME-\(rawValue)".localizedVariant }
+    }
+
+    /* ############################################################## */
+    /**
+     */
+    var userTypePlottable: [RowPlottableData] {
+        allRows.compactMap { inRow in
+            guard let date = inRow.sampleDate else { return nil }
+            let activeUsers = RowUserTypesPlottableData(userType: .active, value: inRow.activeUsers)
+            let newUsers = RowUserTypesPlottableData(userType: .new, value: inRow.newUsers)
+            return RowPlottableData(date: date, data: [activeUsers, newUsers])
+        }
+    }
 }

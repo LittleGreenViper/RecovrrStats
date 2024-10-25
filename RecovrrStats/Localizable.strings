@@ -23,5 +23,7 @@
 "SLUG-COLUMN-NAME-active_avg"               =   "Average Last Active Days";
 "SLUG-COLUMN-NAME-deleted_active"           =   "Admin Deleted Active Users";
 "SLUG-COLUMN-NAME-deleted_inactive"         =   "Admin Deleted Inactive Users";
+"SLUG-USER-COLUMN-NAME-active"              =   "Active Users";
+"SLUG-USER-COLUMN-NAME-new"                 =   "New Users";
 
 "SLUG-HEADER-FORMAT"                        =   "%d Samples, Taken Between %@ and %@";
