@@ -12,14 +12,44 @@ import RVS_Generic_Swift_Toolbox
 /**
  This class reads in and processes the stats data.
  */
-class RCVST_DataProvider: ObservableObject {
-    /* ################################################################################################################################## */
-    // MARK: Column Identifier Enum
-    /* ################################################################################################################################## */
+final public class RCVST_DataProvider: ObservableObject {
+    /* ################################################################## */
     /**
-     This enum provides the column name strings.
+     The URL string to the stats file.
      */
-    enum Columns: String, CaseIterable {
+    private static let _g_statsURLString = "https://recovrr.org/recovrr/log/stats.csv"
+    
+    /* ################################################################## */
+    /**
+     This stores the dataframe info.
+     */
+    @Published var statusDataFrame: DataFrame? {
+        didSet {
+            #if DEBUG
+                print(debugDescription)
+            #endif
+        }
+    }
+
+    /* ################################################################## */
+    /**
+     Upon initialization, we go out, and fetch the stats file.
+     */
+    required init() {
+        _fetchStats {
+            guard let stats = $0 else { return }
+            // We need to publish the change in the main thread.
+            self.statusDataFrame = stats
+        }
+    }
+}
+
+/* ###################################################################################################################################### */
+// MARK: Private Column Identifier Enum
+/* ###################################################################################################################################### */
+extension RCVST_DataProvider {
+    /// This provides enums for internal use.
+    private enum _Columns: String, CaseIterable {
         /* ############################################################## */
         /**
          The date that this sample was taken.
@@ -116,52 +146,54 @@ class RCVST_DataProvider: ObservableObject {
          */
         var localizedString: String { "SLUG-COLUMN-NAME-\(rawValue)".localizedVariant }
     }
-    
-    /* ################################################################## */
-    /**
-     The URL string to the stats file.
-     */
-    private static let _g_statsURLString = "https://recovrr.org/recovrr/log/stats.csv"
-    
-    /* ################################################################## */
-    /**
-     This stores the dataframe info.
-     */
-    @Published var statusDataFrame: DataFrame?
+}
 
+/* ###################################################################################################################################### */
+// MARK: Private Instance Methods
+/* ###################################################################################################################################### */
+extension RCVST_DataProvider {
     /* ################################################################## */
     /**
-     Upon initialization, we go out, and fetch the stats file.
+     This fetches the current stats file, and delivers it as a dataframe.
+     
+     - parameter completion: A simple completion proc, with a single argument of dataframe, containing the stats. This is always called in the main thread.
      */
-    required init() {
-        _fetchStats {
-            guard let stats = $0 else { return }
-            // We need to publish the change in the main thread.
-            self.statusDataFrame = stats
+    private func _fetchStats(completion inCompletion: ((DataFrame?) -> Void)?) {
+        guard let url = URL(string: Self._g_statsURLString)
+        else {
+            inCompletion?(nil)
+            return
+        }
+        // We don't need to do this in the main thread.
+        DispatchQueue.global().async {
+            do {
+                var dataFrame = try DataFrame(contentsOfCSVFile: url)
+                // We convert the integer timestamp to a more usable Date instance.
+                dataFrame.transformColumn(_Columns.sample_date.rawValue) { (inUnixTime: Int) -> Date in Date(timeIntervalSince1970: TimeInterval(inUnixTime)) }
+                DispatchQueue.main.async { inCompletion?(dataFrame) }
+            } catch {
+                #if DEBUG
+                    print("Data Frame Initialization Error: \(error.localizedDescription)")
+                #endif
+                DispatchQueue.main.async { inCompletion?(nil) }
+            }
         }
     }
 }
 
 /* ###################################################################################################################################### */
-// MARK: The Data Row Nested Class
+// MARK: The Public Data Row Nested Class
 /* ###################################################################################################################################### */
 extension RCVST_DataProvider {
-    struct Row {
-        // MARK: Stored Properties
-        
+    /// This provides a simple interface to the data for each row.
+    public struct Row: Identifiable {
         /* ############################################################## */
         /**
-         The main data container that "owns" this row.
+         The ID that needs to be provided, to satisfy Identifiable.
          */
-        weak var dataProvider: RCVST_DataProvider?
+        public var id = UUID()
         
-        /* ############################################################## */
-        /**
-         The 0-based row index for this row. This is against the total rows in the data provider, not a subset.
-         */
-        let rowIndex: Int
-        
-        // MARK: Previous Sample Access
+        // MARK: Previous Sample Access (Private)
         
         /* ############################################################## */
         /**
@@ -229,97 +261,123 @@ extension RCVST_DataProvider {
          */
         private var _previousDeletedInactive: Int { _previousRowData?[14] as? Int ?? 0 }
 
+        // MARK: Public Stored Properties
+        
+        /* ############################################################## */
+        /**
+         The main data container that "owns" this row.
+         */
+        public weak var dataProvider: RCVST_DataProvider?
+        
+        /* ############################################################## */
+        /**
+         The 0-based row index for this row. This is against the total rows in the data provider, not a subset.
+         */
+        public let rowIndex: Int
+        
+        /* ############################################################## */
+        /**
+         Default initializer.
+         
+         - parameter dataProvider: The instance that "owns" this row.
+         - parameter rowIndex: The 0-based index of the row (in terms of the entire dataset, not a subset).
+         */
+        public init(dataProvider inDataProvider: RCVST_DataProvider, rowIndex inRowIndex: Int) {
+            dataProvider = inDataProvider
+            rowIndex = inRowIndex
+        }
+        
         // MARK: Raw Data
         
         /* ############################################################## */
         /**
          The date the sample was taken. Nil, if error.
          */
-        var sampleDate: Date? { _rowData?[0] as? Date }
+        public var sampleDate: Date? { _rowData?[0] as? Date }
         
         /* ############################################################## */
         /**
          The total number of users (both active and inactive), at the time the sample was taken.
          */
-        var totalUsers: Int { _rowData?[1] as? Int ?? 0 }
+        public var totalUsers: Int { _rowData?[1] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The total number of new (inactive) users, at the time the sample was taken.
          */
-        var newUsers: Int { _rowData?[2] as? Int ?? 0 }
+        public var newUsers: Int { _rowData?[2] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The current number of users (both active and new), that have a nil location (never set one).
          */
-        var neverSetLocation: Int { _rowData?[3] as? Int ?? 0 }
+        public var neverSetLocation: Int { _rowData?[3] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The cumulative total number of signup requests.
          */
-        var totalRequests: Int { _rowData?[4] as? Int ?? 0 }
+        public var totalRequests: Int { _rowData?[4] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The cumulative total number of signup requests approved by the administrators.
          */
-        var acceptedRequests: Int { _rowData?[5] as? Int ?? 0 }
+        public var acceptedRequests: Int { _rowData?[5] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The cumulative total number of signup requests rejected by the administrators.
          */
-        var rejectedRequests: Int { _rowData?[6] as? Int ?? 0 }
+        public var rejectedRequests: Int { _rowData?[6] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The current number of signup requests that have not been addressed by the administrators.
          */
-        var openRequests: Int { _rowData?[7] as? Int ?? 0 }
+        public var openRequests: Int { _rowData?[7] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The current number of active (not new) users that have signed in, within the last 24 hours.
          */
-        var activeInLast24Hours: Int { _rowData?[8] as? Int ?? 0 }
+        public var activeInLast24Hours: Int { _rowData?[8] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The current number of active (not new) users that have signed in, within the last 7 days.
          */
-        var activeInLastWeek: Int { _rowData?[9] as? Int ?? 0 }
+        public var activeInLastWeek: Int { _rowData?[9] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The current number of active (not new) users that have signed in, within the last 30 days.
          */
-        var activeInLast30Days: Int { _rowData?[10] as? Int ?? 0 }
+        public var activeInLast30Days: Int { _rowData?[10] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The current number of active (not new) users that have signed in, within the last 90 days.
          */
-        var activeInLast90Days: Int { _rowData?[11] as? Int ?? 0 }
+        public var activeInLast90Days: Int { _rowData?[11] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The current simple average last activity period for all active users, in days.
          */
-        var averageLastActiveInDays: Int { _rowData?[12] as? Int ?? 0 }
+        public var averageLastActiveInDays: Int { _rowData?[12] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The cumulative number of active users that have been deleted by the administrators.
          */
-        var deletedActive: Int { _rowData?[13] as? Int ?? 0 }
+        public var deletedActive: Int { _rowData?[13] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The cumulative number of new users that have been deleted by the administrators.
          */
-        var deletedInactive: Int { _rowData?[14] as? Int ?? 0 }
+        public var deletedInactive: Int { _rowData?[14] as? Int ?? 0 }
 
         // MARK: Interpreted Data
 
@@ -327,74 +385,74 @@ extension RCVST_DataProvider {
         /**
          The total number of active users, at the time the sample was taken.
          */
-        var activeUsers: Int { totalUsers - newUsers }
+        public var activeUsers: Int { totalUsers - newUsers }
 
         /* ############################################################## */
         /**
          The change in the total number of users. Positive is users added, negative is users removed.
          */
-        var changeInTotalUsers: Int { totalUsers - _previousTotalUsers }
+        public var changeInTotalUsers: Int { totalUsers - _previousTotalUsers }
 
         /* ############################################################## */
         /**
          The change in the total number of inactive users. Positive is users added, negative is users removed.
          */
-        var changeInNewUsers: Int { newUsers - _previousNewUsers }
+        public var changeInNewUsers: Int { newUsers - _previousNewUsers }
 
         /* ############################################################## */
         /**
          The change in the total number of inactive users. Positive is users added, negative is users removed.
          */
-        var changeInActiveUsers: Int { activeUsers - _previousActiveUsers }
+        public var changeInActiveUsers: Int { activeUsers - _previousActiveUsers }
 
         /* ############################################################## */
         /**
          The change in the number of users (both active and new), that have a nil location.
          */
-        var changeInNeverSetLocation: Int { neverSetLocation - _previousNeverSetLocation }
+        public var changeInNeverSetLocation: Int { neverSetLocation - _previousNeverSetLocation }
 
         /* ############################################################## */
         /**
          The number of signup requests since the last sample.
          */
-        var newRequests: Int { totalRequests - _previousTotalRequests }
+        public var newRequests: Int { totalRequests - _previousTotalRequests }
 
         /* ############################################################## */
         /**
          The number of signup requests approved by the administrators since the last sample.
          */
-        var newAcceptedRequests: Int { acceptedRequests - _previousAcceptedRequests }
+        public var newAcceptedRequests: Int { acceptedRequests - _previousAcceptedRequests }
 
         /* ############################################################## */
         /**
          The number of signup requests rejected by the administrators since the last sample.
          */
-        var newRejectedRequests: Int { rejectedRequests - _previousRejectedRequests }
+        public var newRejectedRequests: Int { rejectedRequests - _previousRejectedRequests }
 
         /* ############################################################## */
         /**
          The number of active users deleted by the administrators since the last sample.
          */
-        var newDeletedActive: Int { deletedActive - _previousDeletedActive }
+        public var newDeletedActive: Int { deletedActive - _previousDeletedActive }
 
         /* ############################################################## */
         /**
          The number of inactive users deleted by the administrators since the last sample.
          */
-        var newDeletedInactive: Int { deletedInactive - _previousDeletedInactive }
+        public var newDeletedInactive: Int { deletedInactive - _previousDeletedInactive }
 
         /* ############################################################## */
         /**
          The number of users that have deleted themselves (as opposed to being deleted by admins), since the last sample.
          */
-        var newSelfDeletedActive: Int { max (0, changeInActiveUsers - newDeletedActive) }
+        public var newSelfDeletedActive: Int { Swift.max(0, changeInActiveUsers - newDeletedActive) }
     }
 }
 
 /* ###################################################################################################################################### */
-// MARK: Computed Properties
+// MARK: Public Computed Properties
 /* ###################################################################################################################################### */
-extension RCVST_DataProvider {
+public extension RCVST_DataProvider {
     /* ################################################################## */
     /**
      The total number of samples.
@@ -406,8 +464,8 @@ extension RCVST_DataProvider {
      The range, in dates, of the samples.
      */
     var dateRange: ClosedRange<Date> {
-        let startDate = statusDataFrame?.rows.first?[Columns.sample_date.rawValue] as? Date ?? Date()
-        let endDate = statusDataFrame?.rows.last?[Columns.sample_date.rawValue] as? Date ?? Date()
+        let startDate = statusDataFrame?.rows.first?[_Columns.sample_date.rawValue] as? Date ?? .now
+        let endDate = statusDataFrame?.rows.last?[_Columns.sample_date.rawValue] as? Date ?? .now
         return startDate...endDate
     }
     
@@ -457,27 +515,36 @@ extension RCVST_DataProvider {
     
     /* ################################################################## */
     /**
+     This returns every row, as an instance of ``Row``.
+     */
+    var rows: [Row] { rows() }
+    
+    /* ################################################################## */
+    /**
      This simply access a single row by its 0-based index.
      
      - parameter inIndex: The 0-based row index (0..<count)
      
-     - returns: An instance of Row, set up to access that row's data.
+     - returns: An instance of ``Row``, set up to access that row's data.
      */
     subscript(_ inIndex: Int) -> Row { Row(dataProvider: self, rowIndex: inIndex) }
-    
+}
+
+/* ###################################################################################################################################### */
+// MARK: Public Instance Methods
+/* ###################################################################################################################################### */
+public extension RCVST_DataProvider {
     /* ################################################################## */
     /**
      This returns all the samples between two dates.
      
-     - parameter startDate: The first date (inclusive)
-     - parameter endDate: The last date (inclusive). Optional. If not provided, then we assume today.
+     - parameter startDate: The first date (inclusive). Optional. If not provided, then all rows until `endDate` will be returned.
+     - parameter endDate: The last date (inclusive). Optional. If not provided, then we assume everything until the last.
      
      - returns: An array of Row instances, with the filtered rows. They are ordered from earliest to latest.
      */
-    func rows(startDate inStartDate: Date, endDate inEndDate: Date = .now) -> [Row] {
-        guard inEndDate > inStartDate,
-              dateRange.contains(inStartDate),
-              dateRange.contains(inEndDate),
+    func rows(startDate inStartDate: Date = .distantPast, endDate inEndDate: Date = .distantFuture) -> [Row] {
+        guard inEndDate >= inStartDate,
               let dataFrameRows = statusDataFrame?.rows,
               !dataFrameRows.isEmpty
         else { return [] }
@@ -500,39 +567,6 @@ extension RCVST_DataProvider {
 }
 
 /* ###################################################################################################################################### */
-// MARK: Private Instance Methods
-/* ###################################################################################################################################### */
-extension RCVST_DataProvider {
-    /* ################################################################## */
-    /**
-     This fetches the current stats file, and delivers it as a dataframe.
-     
-     - parameter completion: A simple completion proc, with a single argument of dataframe, containing the stats. This is always called in the main thread.
-     */
-    private func _fetchStats(completion inCompletion: ((DataFrame?) -> Void)?) {
-        guard let url = URL(string: Self._g_statsURLString)
-        else {
-            inCompletion?(nil)
-            return
-        }
-        // We don't need to do this in the main thread.
-        DispatchQueue.global().async {
-            do {
-                var dataFrame = try DataFrame(contentsOfCSVFile: url)
-                // We convert the integer timestamp to a more usable Date instance.
-                dataFrame.transformColumn(Columns.sample_date.rawValue) { (inUnixTime: Int) -> Date in Date(timeIntervalSince1970: TimeInterval(inUnixTime)) }
-                DispatchQueue.main.async { inCompletion?(dataFrame) }
-            } catch {
-                #if DEBUG
-                    print("Data Frame Initialization Error: \(error.localizedDescription)")
-                #endif
-                DispatchQueue.main.async { inCompletion?(nil) }
-            }
-        }
-    }
-}
-
-/* ###################################################################################################################################### */
 // MARK: CustomDebugStringConvertible Conformance
 /* ###################################################################################################################################### */
 extension RCVST_DataProvider: CustomDebugStringConvertible {
@@ -540,13 +574,28 @@ extension RCVST_DataProvider: CustomDebugStringConvertible {
     /**
      This string summarizes the data frame.
      */
-    var debugDescription: String {
+    public var debugDescription: String {
         let dateRangeString = "\n\t\(formattedStartDateTime)\n\t\t\tto\n\t\(formattedEndDateTime)"
-        let returnStringArray = ["Columns:\n\t\(Columns.allCases.map(\.localizedString).joined(separator: "\n\t"))",
+        let returnStringArray = ["Columns:\n\t\(_Columns.allCases.map(\.localizedString).joined(separator: "\n\t"))",
                                  "Number Of Samples: \(count)",
                                  "Date Range: \(dateRangeString)"
         ]
         
         return returnStringArray.joined(separator: "\n\n")
     }
+}
+
+/* ###################################################################################################################################### */
+// MARK: RandomAccessCollection Conformance
+/* ###################################################################################################################################### */
+extension RCVST_DataProvider: RandomAccessCollection {
+    /* ################################################################## */
+    /**
+     */
+    public var startIndex: Int { 0 }
+    
+    /* ################################################################## */
+    /**
+     */
+    public var endIndex: Int { count - 1 }
 }
