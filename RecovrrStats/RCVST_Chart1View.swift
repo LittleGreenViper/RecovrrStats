@@ -46,6 +46,7 @@ struct RCVST_Chart1View: View {
 // MARK: - User Type Bar Chart -
 /* ###################################################################################################################################### */
 /**
+ This displays a simple bar chart of the users, segeregated by the type of user.
  */
 struct UserTypesChart: View {
     /* ################################################################## */
@@ -59,18 +60,32 @@ struct UserTypesChart: View {
      */
     var body: some View {
         GroupBox("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) {
-            Chart {
-                ForEach(data, id: \.id) { inRowData in
-                    ForEach(inRowData.data, id: \.userType) { inUserTypeData in
-                        BarMark(
-                            x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date),
-                            y: .value("SLUG-BAR-CHART-USER-TYPES-Y".localizedVariant, inUserTypeData.value)
-                        )
-                        .offset(x: -4, y: 0)
-                        .foregroundStyle(by: .value("SLUG-BAR-CHART-USER-TYPES-LEGEND".localizedVariant, inUserTypeData.userType.localizedString))
-                    }
+        Chart(data) { inRowData in
+                ForEach(inRowData.data, id: \.userType) { inUserTypeData in
+                    BarMark(
+                        x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date),
+                        y: .value("SLUG-BAR-CHART-USER-TYPES-Y".localizedVariant, inUserTypeData.value)
+                    )
+                    .foregroundStyle(by: .value("SLUG-BAR-CHART-USER-TYPES-LEGEND".localizedVariant, inUserTypeData.userType.localizedString))
                 }
             }
         }
+        .chartYAxisLabel("Users", spacing: 12)
+        .chartYAxis {
+            AxisMarks(preset: .aligned, position: .leading) { _ in
+                AxisTick()
+                AxisGridLine()
+                AxisValueLabel(anchor: .trailing)
+            }
+        }
+        .chartXAxisLabel("Date", alignment: .bottom)
+        .chartXAxis {
+            AxisMarks(preset: .aligned, position: .bottom) { _ in
+                AxisTick()
+                AxisGridLine()
+                AxisValueLabel()
+            }
+        }
+        .padding()
     }
 }
