@@ -27,3 +27,8 @@
 "SLUG-USER-COLUMN-NAME-new"                 =   "New Users";
 
 "SLUG-HEADER-FORMAT"                        =   "%d Samples, Taken Between %@ and %@";
+
+"SLUG-BAR-CHART-USER-TYPES-X"               =   "Date";
+"SLUG-BAR-CHART-USER-TYPES-Y"               =   "Users";
+"SLUG-BAR-CHART-USER-TYPES-LEGEND"          =   "User Types";
+"SLUG-USER-TOTALS-CHART-TITLE"              =   "Types Of Users";

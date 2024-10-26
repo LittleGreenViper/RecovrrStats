@@ -170,6 +170,9 @@ extension RCVST_DataProvider {
                 var dataFrame = try DataFrame(contentsOfCSVFile: url)
                 // We convert the integer timestamp to a more usable Date instance.
                 dataFrame.transformColumn(_Columns.sample_date.rawValue) { (inUnixTime: Int) -> Date in Date(timeIntervalSince1970: TimeInterval(inUnixTime)) }
+                #if DEBUG
+                    print("Data Frame Successfully Initialized: \(dataFrame.debugDescription)")
+                #endif
                 DispatchQueue.main.async { inCompletion?(dataFrame) }
             } catch {
                 #if DEBUG
