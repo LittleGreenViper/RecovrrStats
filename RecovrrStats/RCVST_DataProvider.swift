@@ -588,11 +588,13 @@ extension RCVST_DataProvider: CustomDebugStringConvertible {
 extension RCVST_DataProvider: RandomAccessCollection {
     /* ################################################################## */
     /**
+     This is pretty straightforward. We start at 0.
      */
     public var startIndex: Int { 0 }
     
     /* ################################################################## */
     /**
+     The last index is the 0-based count (count - 1).
      */
     public var endIndex: Int { count - 1 }
 }
@@ -601,8 +603,11 @@ extension RCVST_DataProvider: RandomAccessCollection {
 // MARK: - Adds Chart Plottable Stuff -
 /* ###################################################################################################################################### */
 public extension RCVST_DataProvider {
-    /* ################################################################## */
+    /* ################################################################################################################################## */
+    // MARK: A Single Data Point
+    /* ################################################################################################################################## */
     /**
+     This struct is one data point (count of user types).
      */
     struct RowUserTypesPlottableData: Identifiable {
         public var id = UUID()
@@ -610,13 +615,54 @@ public extension RCVST_DataProvider {
         let value: Int
     }
     
-    /* ################################################################## */
+    /* ################################################################################################################################## */
+    // MARK: A Collection of Data Points For One Sample.
+    /* ################################################################################################################################## */
     /**
+     This is a class, because that makes it automatically identifiable, and also makes it simple for us to select/deselect it, in the chart.
      */
-    struct RowPlottableData: Identifiable {
-        public var id = UUID()
+    class RowPlottableData: Identifiable {
+        /* ############################################################## */
+        /**
+         The date the sample was taken.
+         */
         let date: Date
+
+        /* ############################################################## */
+        /**
+         The totals of the types of users, for this sample.
+         */
         let data: [RowUserTypesPlottableData]
+
+        /* ############################################################## */
+        /**
+         True, if the sample is selected in the chart.
+         */
+        var isSelected: Bool
+        
+        /* ############################################################## */
+        /**
+         Initializer
+         
+         - parameter date: The sample date. Optional. Default is .distantPast.
+         - parameter data: The totals of the types of users. Optional. Default is an empty array.
+         - parameter isSelected: True, if the sample is selected in the chart. Optional. Default is false.
+         */
+        init(date inDate: Date = .distantPast, data inData: [RowUserTypesPlottableData] = [], isSelected inIsSelected: Bool = false) {
+            date = inDate
+            data = inData
+            isSelected = inIsSelected
+        }
+        
+        /* ############################################################## */
+        /**
+         This just directly sets the selection.
+         
+         - parameter isSelected: True, if the sample is selected in the chart.
+         */
+        func setSelection(isSelected inIsSelected: Bool) {
+            isSelected = inIsSelected
+        }
     }
     
     /* ################################################################################################################################## */
@@ -628,7 +674,7 @@ public extension RCVST_DataProvider {
     enum UserTypes: String {
         /* ###################################################### */
         /**
-         Active users (have lkogged in, at least once)
+         Active users (have logged in, at least once)
          */
         case active
         
@@ -647,15 +693,14 @@ public extension RCVST_DataProvider {
 
     /* ############################################################## */
     /**
+     This returns all the samples in a simplified manner for user types (new and active), suitable for plotting in a chart.
      */
     var userTypePlottable: [RowPlottableData] {
-        let ret: [RowPlottableData] = allRows.compactMap { inRow in
+        allRows.compactMap { inRow in
             guard let date = inRow.sampleDate else { return nil }
             let activeUsers = RowUserTypesPlottableData(userType: .active, value: inRow.activeUsers)
             let newUsers = RowUserTypesPlottableData(userType: .new, value: inRow.newUsers)
             return RowPlottableData(date: date, data: [activeUsers, newUsers])
         }
-
-        return ret
     }
 }
