@@ -657,10 +657,10 @@ public extension RCVST_DataProvider {
         }
         
         // This forces the bar chart to give more breathing room to the axis labels.
-        if let first = ret.first?.date.addingTimeInterval(-43200),
-           let last = ret.last?.date.addingTimeInterval(43200) {
-            ret.insert(RCVST_DataProvider.RowPlottableData(date: first, data: []), at: 0)
-            ret.append(RCVST_DataProvider.RowPlottableData(date: last, data: []))
+        if let first = ret.first?.date.addingTimeInterval(-21600),
+           let last = ret.last?.date.addingTimeInterval(21600) {
+            ret.insert(RCVST_DataProvider.RowPlottableData(date: first, data: [RowUserTypesPlottableData(userType: .active, value: 0)]), at: 0)
+            ret.append(RCVST_DataProvider.RowPlottableData(date: last, data: [RowUserTypesPlottableData(userType: .active, value: 0)]))
         }
 
         return ret

@@ -33,7 +33,7 @@ struct RCVST_Chart1View: View {
                 .frame(
                     minWidth: inGeometry.size.width,
                     maxWidth: inGeometry.size.width,
-                    minHeight: inGeometry.size.height / 2,
+                    minHeight: inGeometry.size.width,
                     maxHeight: .infinity,
                     alignment: .topLeading
                 )
