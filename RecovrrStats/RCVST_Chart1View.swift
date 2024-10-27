@@ -70,18 +70,16 @@ struct UserTypesChart: View {
                 }
             }
         }
-        .chartYAxisLabel("Users", spacing: 12)
+        .chartYAxisLabel("SLUG-BAR-CHART-Y-AXIS-LABEL".localizedVariant, spacing: 12)
         .chartYAxis {
             AxisMarks(preset: .aligned, position: .leading) { _ in
-                AxisTick()
                 AxisGridLine()
-                AxisValueLabel(anchor: .trailing)
+                AxisValueLabel(anchor: .trailing, horizontalSpacing: 8)
             }
         }
-        .chartXAxisLabel("Date", alignment: .bottom)
+        .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-LABEL".localizedVariant, alignment: .bottom)
         .chartXAxis {
             AxisMarks(preset: .aligned, position: .bottom) { _ in
-                AxisTick()
                 AxisGridLine()
                 AxisValueLabel()
             }

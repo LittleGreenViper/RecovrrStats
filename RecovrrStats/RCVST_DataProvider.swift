@@ -649,18 +649,11 @@ public extension RCVST_DataProvider {
     /**
      */
     var userTypePlottable: [RowPlottableData] {
-        var ret: [RowPlottableData] = allRows.compactMap { inRow in
+        let ret: [RowPlottableData] = allRows.compactMap { inRow in
             guard let date = inRow.sampleDate else { return nil }
             let activeUsers = RowUserTypesPlottableData(userType: .active, value: inRow.activeUsers)
             let newUsers = RowUserTypesPlottableData(userType: .new, value: inRow.newUsers)
             return RowPlottableData(date: date, data: [activeUsers, newUsers])
-        }
-        
-        // This forces the bar chart to give more breathing room to the axis labels.
-        if let first = ret.first?.date.addingTimeInterval(-21600),
-           let last = ret.last?.date.addingTimeInterval(21600) {
-            ret.insert(RCVST_DataProvider.RowPlottableData(date: first, data: [RowUserTypesPlottableData(userType: .active, value: 0)]), at: 0)
-            ret.append(RCVST_DataProvider.RowPlottableData(date: last, data: [RowUserTypesPlottableData(userType: .active, value: 0)]))
         }
 
         return ret

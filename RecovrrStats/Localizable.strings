@@ -32,3 +32,5 @@
 "SLUG-BAR-CHART-USER-TYPES-Y"               =   "Users";
 "SLUG-BAR-CHART-USER-TYPES-LEGEND"          =   "User Types";
 "SLUG-USER-TOTALS-CHART-TITLE"              =   "Types Of Users";
+"SLUG-BAR-CHART-Y-AXIS-LABEL"               =   "Users";
+"SLUG-BAR-CHART-X-AXIS-LABEL"               =   "Date";
