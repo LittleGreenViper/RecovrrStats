@@ -54,11 +54,27 @@ struct UserTypesChart: View {
      The segregated user type data.
      */
     @State var data: [RCVST_DataProvider.RowPlottableData]
-    
+
+    @State private var _offset = CGSize.zero
+
+    // whether it is currently being dragged or not
+    @State private var _isDragging = false
+
     /* ################################################################## */
     /**
      */
     var body: some View {
+        let dragGesture = DragGesture()
+            .onChanged { value in
+                _offset = value.translation
+                print("Offset: \(_offset)")
+            }
+            .onEnded { _ in
+                withAnimation {
+                    _offset = .zero
+                    _isDragging = false
+                }
+            }
         GroupBox("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) {
         Chart(data) { inRowData in
                 ForEach(inRowData.data, id: \.userType) { inUserTypeData in
@@ -66,10 +82,11 @@ struct UserTypesChart: View {
                         x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date),
                         y: .value("SLUG-BAR-CHART-USER-TYPES-Y".localizedVariant, inUserTypeData.value)
                     )
-                    .foregroundStyle(by: .value("SLUG-BAR-CHART-USER-TYPES-LEGEND".localizedVariant, inUserTypeData.userType.localizedString))
+                    .foregroundStyle(by: .value("SLUG-BAR-CHART-USER-TYPES-LEGEND".localizedVariant, inUserTypeData.displayColor))
                 }
             }
         }
+        .chartForegroundStyleScale(["SLUG-ACTIVE-LEGEND-LABEL".localizedVariant: .green, "SLUG-NEW-LEGEND-LABEL".localizedVariant: .yellow, "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red])
         .chartYAxisLabel("SLUG-BAR-CHART-Y-AXIS-LABEL".localizedVariant, spacing: 12)
         .chartYAxis {
             AxisMarks(preset: .aligned, position: .leading) { _ in
@@ -84,6 +101,7 @@ struct UserTypesChart: View {
                 AxisValueLabel()
             }
         }
+        .gesture(dragGesture)
         .padding()
     }
 }

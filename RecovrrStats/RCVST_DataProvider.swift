@@ -610,9 +610,36 @@ public extension RCVST_DataProvider {
      This struct is one data point (count of user types).
      */
     struct RowUserTypesPlottableData: Identifiable {
+        /* ############################################################## */
+        /**
+         */
         public var id = UUID()
+
+        /* ############################################################## */
+        /**
+         */
         let userType: UserTypes
+
+        /* ############################################################## */
+        /**
+         */
         let value: Int
+        
+        /* ############################################################## */
+        /**
+         */
+        weak var myContainer: RowPlottableData?
+        
+        /* ############################################################## */
+        /**
+         */
+        var displayColor: String {
+            guard !(myContainer?.isSelected ?? false) else { return "SLUG-SELECTED-LEGEND-LABEL".localizedVariant }
+            switch userType {
+            case .active: return "SLUG-ACTIVE-LEGEND-LABEL".localizedVariant
+            case .new: return "SLUG-NEW-LEGEND-LABEL".localizedVariant
+            }
+        }
     }
     
     /* ################################################################################################################################## */
@@ -632,7 +659,13 @@ public extension RCVST_DataProvider {
         /**
          The totals of the types of users, for this sample.
          */
-        let data: [RowUserTypesPlottableData]
+        var data: [RowUserTypesPlottableData] {
+            didSet {
+                for var item in data {
+                    item.myContainer = self
+                }
+            }
+        }
 
         /* ############################################################## */
         /**
@@ -700,7 +733,9 @@ public extension RCVST_DataProvider {
             guard let date = inRow.sampleDate else { return nil }
             let activeUsers = RowUserTypesPlottableData(userType: .active, value: inRow.activeUsers)
             let newUsers = RowUserTypesPlottableData(userType: .new, value: inRow.newUsers)
-            return RowPlottableData(date: date, data: [activeUsers, newUsers])
+            let ret = RowPlottableData(date: date, data: [activeUsers, newUsers])
+            
+            return ret
         }
     }
 }

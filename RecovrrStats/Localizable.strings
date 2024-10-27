@@ -34,3 +34,7 @@
 "SLUG-USER-TOTALS-CHART-TITLE"              =   "Types Of Users";
 "SLUG-BAR-CHART-Y-AXIS-LABEL"               =   "Users";
 "SLUG-BAR-CHART-X-AXIS-LABEL"               =   "Date";
+
+"SLUG-ACTIVE-LEGEND-LABEL"                  =   "Active";
+"SLUG-NEW-LEGEND-LABEL"                     =   "New";
+"SLUG-SELECTED-LEGEND-LABEL"                =   "Selected";
