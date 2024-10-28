@@ -628,13 +628,7 @@ public extension RCVST_DataProvider {
         /* ############################################################## */
         /**
          */
-        weak var myContainer: RowPlottableData?
-        
-        /* ############################################################## */
-        /**
-         */
         var displayColor: String {
-            guard !(myContainer?.isSelected ?? false) else { return "SLUG-SELECTED-LEGEND-LABEL".localizedVariant }
             switch userType {
             case .active: return "SLUG-ACTIVE-LEGEND-LABEL".localizedVariant
             case .new: return "SLUG-NEW-LEGEND-LABEL".localizedVariant
@@ -659,13 +653,7 @@ public extension RCVST_DataProvider {
         /**
          The totals of the types of users, for this sample.
          */
-        var data: [RowUserTypesPlottableData] {
-            didSet {
-                for var item in data {
-                    item.myContainer = self
-                }
-            }
-        }
+        var data: [RowUserTypesPlottableData]
 
         /* ############################################################## */
         /**
