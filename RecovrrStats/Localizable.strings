@@ -40,4 +40,4 @@
 "SLUG-ACTIVE-LEGEND-LABEL"                  =   "Active";
 "SLUG-NEW-LEGEND-LABEL"                     =   "New";
 "SLUG-SELECTED-LEGEND-LABEL"                =   "Selected";
-"SLUG-USER-TYPES-DESC-STRING-FORMAT"        =   "%@: Active: %d, New: %d";
+"SLUG-USER-TYPES-DESC-STRING-FORMAT"        =   "%@: Active: %d, New: %d, Total: %d";

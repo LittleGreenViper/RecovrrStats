@@ -173,7 +173,7 @@ struct UserTypesChart: View {
      The main chart body.
      */
     var body: some View {
-        let numberOfXValues = TimeInterval(5)
+        let numberOfXValues = TimeInterval(4)
         // This gives us "breathing room" around the X-axis.
         let minimumDate = data.first?.date.addingTimeInterval(-43200) ?? .now
         let maximumDate = data.last?.date.addingTimeInterval(43200) ?? .now
@@ -189,7 +189,8 @@ struct UserTypesChart: View {
             // This displays the value of the selected bar.
             Text(_selectedValuesString)
                 .minimumScaleFactor(0.5)
-                .font(.callout)
+                .font(.subheadline)
+                .foregroundStyle(.red)
             // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
             Chart(data) { inRowData in
                 ForEach(inRowData.data, id: \.userType) { inUserTypeData in
@@ -245,7 +246,8 @@ struct UserTypesChart: View {
                                             _selectedValuesString = String(format: "SLUG-USER-TYPES-DESC-STRING-FORMAT".localizedVariant,
                                                                            dateFormatter.string(from: newValue.date),
                                                                            newValue.data[0].value,
-                                                                           newValue.data[1].value
+                                                                           newValue.data[1].value,
+                                                                           newValue.data[0].value + newValue.data[1].value
                                             )
                                             if newValue.date != _selectedValue?.date {
                                                 _triggerHaptic()
