@@ -53,9 +53,9 @@ struct RootStackView: View {
     var body: some View {
         NavigationStack {
             Text(String(format: "SLUG-HEADER-FORMAT".localizedVariant, data.count, data.formattedStartDate, data.formattedEndDate))
-            List(ChartTypes.allCases, id: \.self) { inChartType in NavigationLink(inChartType.rawValue, value: inChartType) }
+            List(ChartTypes.allCases, id: \.self) { inChartType in NavigationLink("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant, value: inChartType) }
             .navigationDestination(for: ChartTypes.self) { _ in RCVST_Chart1View(data: data) }
-            .navigationTitle("Charts")
+            .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
         }
     }
 }

@@ -35,7 +35,9 @@
 "SLUG-BAR-CHART-Y-AXIS-LABEL"               =   "Users";
 "SLUG-BAR-CHART-X-AXIS-LABEL"               =   "Date";
 
+"SLUG-MAIN-SCREEN-TITLE"                    =   "Recovrr Stats";
+
 "SLUG-ACTIVE-LEGEND-LABEL"                  =   "Active";
 "SLUG-NEW-LEGEND-LABEL"                     =   "New";
 "SLUG-SELECTED-LEGEND-LABEL"                =   "Selected";
-"SLUG-USER-TYPES-DESC-STRING-FORMAT"        =   "Active: %d, New: %d";
+"SLUG-USER-TYPES-DESC-STRING-FORMAT"        =   "%@: Active: %d, New: %d";
