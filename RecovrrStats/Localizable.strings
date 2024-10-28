@@ -25,6 +25,9 @@
 "SLUG-COLUMN-NAME-deleted_inactive"         =   "Admin Deleted Inactive Users";
 "SLUG-USER-COLUMN-NAME-active"              =   "Active Users";
 "SLUG-USER-COLUMN-NAME-new"                 =   "New Users";
+"SLUG-SIGNUP-COLUMN-NAME-openSignups"       =   "Open Signups";
+"SLUG-SIGNUP-COLUMN-NAME-rejectedSignups"   =   "Rejected Signups";
+"SLUG-SIGNUP-COLUMN-NAME-acceptedSignups"   =   "Accepted Signups";
 
 "SLUG-HEADER-FORMAT"                        =   "%d Samples, Taken Between %@ and %@";
 
@@ -41,3 +44,7 @@
 "SLUG-NEW-LEGEND-LABEL"                     =   "New";
 "SLUG-SELECTED-LEGEND-LABEL"                =   "Selected";
 "SLUG-USER-TYPES-DESC-STRING-FORMAT"        =   "%@: Active: %d, New: %d, Total: %d";
+
+"SLUG-OPEN-SIGNUP-LEGEND-LABEL"             =   "Open";
+"SLUG-REJECTED-SIGNUP-LEGEND-LABEL"         =   "Rejected";
+"SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL"         =   "Accepted";

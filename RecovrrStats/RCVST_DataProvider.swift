@@ -600,92 +600,9 @@ extension RCVST_DataProvider: RandomAccessCollection {
 }
 
 /* ###################################################################################################################################### */
-// MARK: - Adds Chart Plottable Stuff -
+// MARK: - Adds Chart Plottable Stuff For User Types -
 /* ###################################################################################################################################### */
 public extension RCVST_DataProvider {
-    /* ################################################################################################################################## */
-    // MARK: A Single Data Point
-    /* ################################################################################################################################## */
-    /**
-     This struct is one data point (count of user types).
-     */
-    struct RowUserTypesPlottableData: Identifiable {
-        /* ############################################################## */
-        /**
-         */
-        public var id = UUID()
-
-        /* ############################################################## */
-        /**
-         */
-        let userType: UserTypes
-
-        /* ############################################################## */
-        /**
-         */
-        let value: Int
-        
-        /* ############################################################## */
-        /**
-         */
-        var displayColor: String {
-            switch userType {
-            case .active: return "SLUG-ACTIVE-LEGEND-LABEL".localizedVariant
-            case .new: return "SLUG-NEW-LEGEND-LABEL".localizedVariant
-            }
-        }
-    }
-    
-    /* ################################################################################################################################## */
-    // MARK: A Collection of Data Points For One Sample.
-    /* ################################################################################################################################## */
-    /**
-     This is a class, because that makes it automatically identifiable, and also makes it simple for us to select/deselect it, in the chart.
-     */
-    class RowPlottableData: Identifiable {
-        /* ############################################################## */
-        /**
-         The date the sample was taken.
-         */
-        let date: Date
-
-        /* ############################################################## */
-        /**
-         The totals of the types of users, for this sample.
-         */
-        var data: [RowUserTypesPlottableData]
-
-        /* ############################################################## */
-        /**
-         True, if the sample is selected in the chart.
-         */
-        var isSelected: Bool
-        
-        /* ############################################################## */
-        /**
-         Initializer
-         
-         - parameter date: The sample date. Optional. Default is .distantPast.
-         - parameter data: The totals of the types of users. Optional. Default is an empty array.
-         - parameter isSelected: True, if the sample is selected in the chart. Optional. Default is false.
-         */
-        init(date inDate: Date = .distantPast, data inData: [RowUserTypesPlottableData] = [], isSelected inIsSelected: Bool = false) {
-            date = inDate
-            data = inData
-            isSelected = inIsSelected
-        }
-        
-        /* ############################################################## */
-        /**
-         This just directly sets the selection.
-         
-         - parameter isSelected: True, if the sample is selected in the chart.
-         */
-        func setSelection(isSelected inIsSelected: Bool) {
-            isSelected = inIsSelected
-        }
-    }
-    
     /* ################################################################################################################################## */
     // MARK: This is used to define the types of users.
     /* ################################################################################################################################## */
@@ -704,24 +621,228 @@ public extension RCVST_DataProvider {
          New users (have never logged in)
          */
         case new
-        
+
         /* ############################################################## */
         /**
          The column name, localized.
          */
         var localizedString: String { "SLUG-USER-COLUMN-NAME-\(rawValue)".localizedVariant }
     }
+    
+    /* ################################################################################################################################## */
+    // MARK: A Single User Data Point
+    /* ################################################################################################################################## */
+    /**
+     This struct is one data point (count of user types).
+     */
+    struct RowUserTypesPlottableData: Identifiable {
+        /* ############################################################## */
+        /**
+         Make me identifiable.
+         */
+        public var id = UUID()
 
+        /* ############################################################## */
+        /**
+         The type of user being tracked.
+         */
+        let userType: UserTypes
+
+        /* ############################################################## */
+        /**
+         The number of users that fit this type.
+         */
+        let value: Int
+        
+        /* ############################################################## */
+        /**
+         A string that can be used as a legend key
+         */
+        var descriptionString: String {
+            switch userType {
+            case .active: return "SLUG-ACTIVE-LEGEND-LABEL".localizedVariant
+            case .new: return "SLUG-NEW-LEGEND-LABEL".localizedVariant
+            }
+        }
+    }
+    
+    /* ################################################################################################################################## */
+    // MARK: A Collection of Data Points For One User Types Sample.
+    /* ################################################################################################################################## */
+    /**
+     This provides user type totals for one date.
+     */
+    struct RowUserPlottableData: Identifiable {
+        /* ############################################################## */
+        /**
+         Make me identifiable.
+         */
+        public var id = UUID()
+
+        /* ############################################################## */
+        /**
+         The date the sample was taken.
+         */
+        let date: Date
+
+        /* ############################################################## */
+        /**
+         The totals of the types of users, for this sample.
+         */
+        var data: [RowUserTypesPlottableData]
+        
+        /* ############################################################## */
+        /**
+         Initializer
+         
+         - parameter date: The sample date. Optional. Default is .distantPast.
+         - parameter data: The totals of the types of users. Optional. Default is an empty array.
+         */
+        init(date inDate: Date = .distantPast, data inData: [RowUserTypesPlottableData] = []) {
+            date = inDate
+            data = inData
+        }
+    }
+    
     /* ############################################################## */
     /**
      This returns all the samples in a simplified manner for user types (new and active), suitable for plotting in a chart.
      */
-    var userTypePlottable: [RowPlottableData] {
+    var userTypePlottable: [RowUserPlottableData] {
         allRows.compactMap { inRow in
             guard let date = inRow.sampleDate else { return nil }
             let activeUsers = RowUserTypesPlottableData(userType: .active, value: inRow.activeUsers)
             let newUsers = RowUserTypesPlottableData(userType: .new, value: inRow.newUsers)
-            let ret = RowPlottableData(date: date, data: [activeUsers, newUsers])
+            let ret = RowUserPlottableData(date: date, data: [activeUsers, newUsers])
+            
+            return ret
+        }
+    }
+}
+
+/* ###################################################################################################################################### */
+// MARK: - Adds Chart Plottable Stuff For Signup Types -
+/* ###################################################################################################################################### */
+public extension RCVST_DataProvider {
+    /* ################################################################################################################################## */
+    // MARK: This is used to define the types of signups, and their resolutions.
+    /* ################################################################################################################################## */
+    /**
+     This enum defines the signup types we provide separately.
+     */
+    enum SignupTypes: String {
+        /* ############################################################## */
+        /**
+         Signups that have not been addressed.
+         */
+        case openSignups
+        
+        /* ############################################################## */
+        /**
+         Signups that have been rejected.
+         */
+        case rejectedSignups
+        
+        /* ############################################################## */
+        /**
+         Signups that have been accepted.
+         */
+        case acceptedSignups
+
+        /* ############################################################## */
+        /**
+         The column name, localized.
+         */
+        var localizedString: String { "SLUG-SIGNUP-COLUMN-NAME-\(rawValue)".localizedVariant }
+    }
+    
+    /* ################################################################################################################################## */
+    // MARK: A Single Signup Data Point
+    /* ################################################################################################################################## */
+    /**
+     This struct is one data point (count of signup types).
+     */
+    struct RowSignupTypesPlottableData: Identifiable {
+        /* ############################################################## */
+        /**
+         Make me identifiable.
+         */
+        public var id = UUID()
+
+        /* ############################################################## */
+        /**
+         The type of signup being tracked.
+         */
+        let signupType: SignupTypes
+
+        /* ############################################################## */
+        /**
+         The number of signups that fit this type.
+         */
+        let value: Int
+        
+        /* ############################################################## */
+        /**
+         A string that can be used as a legend key
+         */
+        var descriptionString: String {
+            switch signupType {
+            case .openSignups: return "SLUG-OPEN-SIGNUP-LEGEND-LABEL".localizedVariant
+            case .rejectedSignups: return "SLUG-REJECTED-SIGNUP-LEGEND-LABEL".localizedVariant
+            case .acceptedSignups: return "SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL".localizedVariant
+            }
+        }
+    }
+    
+    /* ################################################################################################################################## */
+    // MARK: A Collection of Data Points For One Signup Types Sample.
+    /* ################################################################################################################################## */
+    /**
+     This provides signup type totals for one date.
+     */
+    struct RowSignupPlottableData: Identifiable {
+        /* ############################################################## */
+        /**
+         Make me identifiable.
+         */
+        public var id = UUID()
+
+        /* ############################################################## */
+        /**
+         The date the sample was taken.
+         */
+        let date: Date
+
+        /* ############################################################## */
+        /**
+         The totals of the types of signups, for this sample.
+         */
+        var data: [RowSignupTypesPlottableData]
+        
+        /* ############################################################## */
+        /**
+         Initializer
+         
+         - parameter date: The sample date. Optional. Default is .distantPast.
+         - parameter data: The totals of the types of signups. Optional. Default is an empty array.
+         */
+        init(date inDate: Date = .distantPast, data inData: [RowSignupTypesPlottableData] = []) {
+            date = inDate
+            data = inData
+        }
+    }
+    
+    /* ############################################################## */
+    /**
+     This returns all the samples in a simplified manner for signup types, suitable for plotting in a chart.
+     */
+    var signupTypePlottable: [RowSignupPlottableData] {
+        allRows.compactMap { inRow in
+            guard let date = inRow.sampleDate else { return nil }
+            let openSignups = RowSignupTypesPlottableData(signupType: .openSignups, value: inRow.openRequests)
+            let rejectedSignups = RowSignupTypesPlottableData(signupType: .rejectedSignups, value: inRow.rejectedRequests)
+            let acceptedSignups = RowSignupTypesPlottableData(signupType: .acceptedSignups, value: inRow.acceptedRequests)
+            let ret = RowSignupPlottableData(date: date, data: [openSignups, rejectedSignups, acceptedSignups])
             
             return ret
         }

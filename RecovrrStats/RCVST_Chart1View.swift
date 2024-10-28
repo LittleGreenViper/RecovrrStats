@@ -26,7 +26,7 @@ extension Date {
 /* ###################################################################################################################################### */
 // MARK: - Array Extension For Our Data Type -
 /* ###################################################################################################################################### */
-extension Array where Element == RCVST_DataProvider.RowPlottableData {
+extension Array where Element == RCVST_DataProvider.RowUserPlottableData {
     /* ################################################################## */
     /**
      This returns the sample closest to the given date.
@@ -35,8 +35,8 @@ extension Array where Element == RCVST_DataProvider.RowPlottableData {
      
      - returns: The sample that is closest to (above or below) the given date.
      */
-    func nearestTo(_ inDate: Date) -> RCVST_DataProvider.RowPlottableData? {
-        var ret: RCVST_DataProvider.RowPlottableData?
+    func nearestTo(_ inDate: Date) -> RCVST_DataProvider.RowUserPlottableData? {
+        var ret: RCVST_DataProvider.RowUserPlottableData?
         
         forEach {
             guard let retTemp = ret else {
@@ -104,7 +104,7 @@ struct UserTypesChart: View {
     /**
      The segregated user type data.
      */
-    @State var data: [RCVST_DataProvider.RowPlottableData]
+    @State var data: [RCVST_DataProvider.RowUserPlottableData]
 
     /* ################################################################## */
     /**
@@ -116,7 +116,7 @@ struct UserTypesChart: View {
     /**
      The value being selected by the user, while dragging.
      */
-    @State private var _selectedValue: RCVST_DataProvider.RowPlottableData?
+    @State private var _selectedValue: RCVST_DataProvider.RowUserPlottableData?
 
     /* ################################################################## */
     /**
@@ -131,7 +131,7 @@ struct UserTypesChart: View {
      - parameter inRowData: The selected bar.
      - returns: True, if the bar is being selected.
      */
-    private func _isLineDragged(_ inRowData: RCVST_DataProvider.RowPlottableData) -> Bool {
+    private func _isLineDragged(_ inRowData: RCVST_DataProvider.RowUserPlottableData) -> Bool {
         _isDragging && inRowData.date == _selectedValue?.date
     }
     
@@ -199,7 +199,7 @@ struct UserTypesChart: View {
                         y: .value("SLUG-BAR-CHART-USER-TYPES-Y".localizedVariant, inUserTypeData.value)
                     )
                     .foregroundStyle(by: .value("SLUG-BAR-CHART-USER-TYPES-LEGEND".localizedVariant,
-                                                _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inUserTypeData.displayColor)
+                                                _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inUserTypeData.descriptionString)
                     )
                 }
             }
