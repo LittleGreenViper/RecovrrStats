@@ -50,7 +50,7 @@ struct RootStackView: View {
     /**
      This is the actual dataframe wrapper for the stats.
      */
-    @ObservedObject var data: RCVST_DataProvider
+    @State var data: RCVST_DataProvider
 
     /* ################################################################## */
     /**

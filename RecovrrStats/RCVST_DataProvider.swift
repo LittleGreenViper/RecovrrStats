@@ -35,7 +35,7 @@ public class RCVST_DataProvider: ObservableObject {
     /**
      Upon initialization, we go out, and fetch the stats file.
      */
-    required init() {
+    required init(_ inNoLookup: Bool = false) {
         _fetchStats {
             guard let stats = $0 else { return }
             // We need to publish the change in the main thread.
@@ -711,8 +711,12 @@ public extension RCVST_DataProvider {
     var userTypePlottable: [RowUserPlottableData] {
         var ret = [RowUserPlottableData]()
         
-        for index in stride(from: 1, to: allRows.count, by: 2) {
-            let dailySample = allRows[index]
+        let rows = allRows
+        
+        guard !rows.isEmpty else { return ret }
+
+        for index in stride(from: 1, to: rows.count, by: 2) {
+            let dailySample = rows[index]
             guard let date = dailySample.sampleDate else { break }
             let activeUsers = RowUserTypesPlottableData(userType: .active, value: dailySample.activeUsers)
             let newUsers = RowUserTypesPlottableData(userType: .new, value: dailySample.newUsers)
@@ -836,9 +840,13 @@ public extension RCVST_DataProvider {
     var signupTypePlottable: [RowSignupPlottableData] {
         var ret = [RowSignupPlottableData]()
         
-        for index in stride(from: 1, to: allRows.count, by: 2) {
-            let sample1 = allRows[index - 1]
-            let sample2 = allRows[index]
+        let rows = allRows
+        
+        guard !rows.isEmpty else { return ret }
+
+        for index in stride(from: 1, to: rows.count, by: 2) {
+            let sample1 = rows[index - 1]
+            let sample2 = rows[index]
             guard let date = sample1.sampleDate else { break }
             let rejectedSignups = RowSignupTypesPlottableData(signupType: .rejectedSignups, value: sample1.newRejectedRequests + sample2.newRejectedRequests)
             let acceptedSignups = RowSignupTypesPlottableData(signupType: .acceptedSignups, value: sample1.newAcceptedRequests + sample2.newAcceptedRequests)
