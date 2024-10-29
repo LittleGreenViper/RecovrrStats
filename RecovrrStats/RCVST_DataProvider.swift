@@ -836,9 +836,9 @@ public extension RCVST_DataProvider {
     var signupTypePlottable: [RowSignupPlottableData] {
         var ret = [RowSignupPlottableData]()
         
-        for index in stride(from: 0, to: allRows.count - 1, by: 2) {
-            let sample1 = allRows[index]
-            let sample2 = allRows[index + 1]
+        for index in stride(from: 1, to: allRows.count, by: 2) {
+            let sample1 = allRows[index - 1]
+            let sample2 = allRows[index]
             guard let date = sample1.sampleDate else { break }
             let rejectedSignups = RowSignupTypesPlottableData(signupType: .rejectedSignups, value: sample1.newRejectedRequests + sample2.newRejectedRequests)
             let acceptedSignups = RowSignupTypesPlottableData(signupType: .acceptedSignups, value: sample1.newAcceptedRequests + sample2.newAcceptedRequests)
