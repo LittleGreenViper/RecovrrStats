@@ -711,12 +711,11 @@ public extension RCVST_DataProvider {
     var userTypePlottable: [RowUserPlottableData] {
         var ret = [RowUserPlottableData]()
         
-        for index in stride(from: 0, to: allRows.count - 1, by: 2) {
-            let sample1 = allRows[index]
-            let sample2 = allRows[index + 1]
-            guard let date = sample1.sampleDate else { break }
-            let activeUsers = RowUserTypesPlottableData(userType: .active, value: sample1.activeUsers + sample2.activeUsers)
-            let newUsers = RowUserTypesPlottableData(userType: .new, value: sample1.newUsers + sample2.newUsers)
+        for index in stride(from: 1, to: allRows.count, by: 2) {
+            let dailySample = allRows[index]
+            guard let date = dailySample.sampleDate else { break }
+            let activeUsers = RowUserTypesPlottableData(userType: .active, value: dailySample.activeUsers)
+            let newUsers = RowUserTypesPlottableData(userType: .new, value: dailySample.newUsers)
             ret.append(RowUserPlottableData(date: date, data: [activeUsers, newUsers]))
         }
         
