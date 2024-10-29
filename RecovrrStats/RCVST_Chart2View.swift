@@ -193,7 +193,6 @@ struct SignupTypesChart: View {
 
             .chartForegroundStyleScale(["SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL".localizedVariant: .green,
                                         "SLUG-REJECTED-SIGNUP-LEGEND-LABEL".localizedVariant: .orange,
-                                        "SLUG-OPEN-SIGNUP-LEGEND-LABEL".localizedVariant: .blue,
                                         "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
                                        ])
             // We leave the Y-axis almost default, except that we want it on the left.
@@ -235,8 +234,7 @@ struct SignupTypesChart: View {
                                                                            dateFormatter.string(from: newValue.date),
                                                                            newValue.data[0].value,
                                                                            newValue.data[1].value,
-                                                                           newValue.data[2].value,
-                                                                           newValue.data[0].value + newValue.data[1].value + newValue.data[2].value
+                                                                           newValue.data[0].value + newValue.data[1].value
                                             )
                                             if newValue.date != _selectedValue?.date {
                                                 _triggerHaptic()

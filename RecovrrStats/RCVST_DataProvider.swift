@@ -709,14 +709,18 @@ public extension RCVST_DataProvider {
      This returns all the samples in a simplified manner for user types (new and active), suitable for plotting in a chart.
      */
     var userTypePlottable: [RowUserPlottableData] {
-        allRows.compactMap { inRow in
-            guard let date = inRow.sampleDate else { return nil }
-            let activeUsers = RowUserTypesPlottableData(userType: .active, value: inRow.activeUsers)
-            let newUsers = RowUserTypesPlottableData(userType: .new, value: inRow.newUsers)
-            let ret = RowUserPlottableData(date: date, data: [activeUsers, newUsers])
-            
-            return ret
+        var ret = [RowUserPlottableData]()
+        
+        for index in stride(from: 0, to: allRows.count - 1, by: 2) {
+            let sample1 = allRows[index]
+            let sample2 = allRows[index + 1]
+            guard let date = sample1.sampleDate else { break }
+            let activeUsers = RowUserTypesPlottableData(userType: .active, value: sample1.activeUsers + sample2.activeUsers)
+            let newUsers = RowUserTypesPlottableData(userType: .new, value: sample1.newUsers + sample2.newUsers)
+            ret.append(RowUserPlottableData(date: date, data: [activeUsers, newUsers]))
         }
+        
+        return ret
     }
 }
 
@@ -731,12 +735,6 @@ public extension RCVST_DataProvider {
      This enum defines the signup types we provide separately.
      */
     enum SignupTypes: String {
-        /* ############################################################## */
-        /**
-         Signups that have not been addressed.
-         */
-        case openSignups
-        
         /* ############################################################## */
         /**
          Signups that have been rejected.
@@ -787,7 +785,6 @@ public extension RCVST_DataProvider {
          */
         var descriptionString: String {
             switch signupType {
-            case .openSignups: return "SLUG-OPEN-SIGNUP-LEGEND-LABEL".localizedVariant
             case .rejectedSignups: return "SLUG-REJECTED-SIGNUP-LEGEND-LABEL".localizedVariant
             case .acceptedSignups: return "SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL".localizedVariant
             }
@@ -835,16 +832,20 @@ public extension RCVST_DataProvider {
     /* ############################################################## */
     /**
      This returns all the samples in a simplified manner for signup types, suitable for plotting in a chart.
+     This combines two samples into one (we sample every twelve hours, so this makes it daily).
      */
     var signupTypePlottable: [RowSignupPlottableData] {
-        allRows.compactMap { inRow in
-            guard let date = inRow.sampleDate else { return nil }
-            let openSignups = RowSignupTypesPlottableData(signupType: .openSignups, value: inRow.openRequests)
-            let rejectedSignups = RowSignupTypesPlottableData(signupType: .rejectedSignups, value: inRow.rejectedRequests)
-            let acceptedSignups = RowSignupTypesPlottableData(signupType: .acceptedSignups, value: inRow.acceptedRequests)
-            let ret = RowSignupPlottableData(date: date, data: [acceptedSignups, rejectedSignups, openSignups])
-            
-            return ret
+        var ret = [RowSignupPlottableData]()
+        
+        for index in stride(from: 0, to: allRows.count - 1, by: 2) {
+            let sample1 = allRows[index]
+            let sample2 = allRows[index + 1]
+            guard let date = sample1.sampleDate else { break }
+            let rejectedSignups = RowSignupTypesPlottableData(signupType: .rejectedSignups, value: sample1.newRejectedRequests + sample2.newRejectedRequests)
+            let acceptedSignups = RowSignupTypesPlottableData(signupType: .acceptedSignups, value: sample1.newAcceptedRequests + sample2.newAcceptedRequests)
+            ret.append(RowSignupPlottableData(date: date, data: [acceptedSignups, rejectedSignups]))
         }
+        
+        return ret
     }
 }

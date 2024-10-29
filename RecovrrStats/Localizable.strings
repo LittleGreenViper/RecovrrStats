@@ -42,13 +42,10 @@
 "SLUG-BAR-CHART-Y-AXIS-LABEL"               =   "Users";
 "SLUG-BAR-CHART-X-AXIS-LABEL"               =   "Date";
 
-"SLUG-SIGNUP-TOTALS-CHART-TITLE"            =   "Signup Totals";
-"SLUG-SIGNUP-TYPES-DESC-STRING-FORMAT"      =   "%@: Accepted: %d, Rejected: %d, Open: %d, Total: %d";
-"SLUG-OPEN-SIGNUP-LEGEND-LABEL"             =   "Open";
+"SLUG-SIGNUP-TOTALS-CHART-TITLE"            =   "Signup Activity";
+"SLUG-SIGNUP-TYPES-DESC-STRING-FORMAT"      =   "%@: Accepted: %d, Rejected: %d, Total: %d";
 "SLUG-REJECTED-SIGNUP-LEGEND-LABEL"         =   "Rejected";
 "SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL"         =   "Accepted";
-"SLUG-OPEN-SIGNUP-LEGEND-LABEL"             =   "Open";
-"SLUG-SIGNUP-COLUMN-NAME-openSignups"       =   "Open Signups";
 "SLUG-SIGNUP-COLUMN-NAME-rejectedSignups"   =   "Rejected Signups";
 "SLUG-SIGNUP-COLUMN-NAME-acceptedSignups"   =   "Accepted Signups";
 "SLUG-BAR-CHART-SIGNUP-TYPES-Y"             =   "Signups";
