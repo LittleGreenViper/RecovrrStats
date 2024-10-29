@@ -11,7 +11,7 @@ import CoreHaptics
 /* ###################################################################################################################################### */
 // MARK: - Array Extension For Our Data Type -
 /* ###################################################################################################################################### */
-extension Array where Element == RCVST_DataProvider.RowUserPlottableData {
+extension Array where Element == RCVST_DataProvider.RowSignupPlottableData {
     /* ################################################################## */
     /**
      This returns the sample closest to the given date.
@@ -20,8 +20,8 @@ extension Array where Element == RCVST_DataProvider.RowUserPlottableData {
      
      - returns: The sample that is closest to (above or below) the given date.
      */
-    func nearestTo(_ inDate: Date) -> RCVST_DataProvider.RowUserPlottableData? {
-        var ret: RCVST_DataProvider.RowUserPlottableData?
+    func nearestTo(_ inDate: Date) -> RCVST_DataProvider.RowSignupPlottableData? {
+        var ret: RCVST_DataProvider.RowSignupPlottableData?
         
         forEach {
             guard let retTemp = ret else {
@@ -40,10 +40,10 @@ extension Array where Element == RCVST_DataProvider.RowUserPlottableData {
 // MARK: - Main Content View -
 /* ###################################################################################################################################### */
 /**
- This displays a chart, with the different user types, over time.
+ This displays a chart, with the different signup states, over time.
  It is selectable, and dragging your finger across the chart, shows exact numbers.
  */
-struct RCVST_Chart1View: View {
+struct RCVST_Chart2View: View {
     /* ################################################################## */
     /**
      This is the actual dataframe wrapper for the stats.
@@ -58,7 +58,7 @@ struct RCVST_Chart1View: View {
         GeometryReader { inGeometry in
             ScrollView {
                 VStack {
-                    UserTypesChart(data: data.userTypePlottable)
+                    SignupTypesChart(data: data.signupTypePlottable)
                 }
                 .padding()
                 .frame(
@@ -79,7 +79,7 @@ struct RCVST_Chart1View: View {
 /**
  This displays a simple bar chart of the users, segeregated by the type of user.
  */
-struct UserTypesChart: View {
+struct SignupTypesChart: View {
     /* ################################################################## */
     /**
      This is used to give us haptic feedback for dragging.
@@ -90,7 +90,7 @@ struct UserTypesChart: View {
     /**
      The segregated user type data.
      */
-    @State var data: [RCVST_DataProvider.RowUserPlottableData]
+    @State var data: [RCVST_DataProvider.RowSignupPlottableData]
 
     /* ################################################################## */
     /**
@@ -102,7 +102,7 @@ struct UserTypesChart: View {
     /**
      The value being selected by the user, while dragging.
      */
-    @State private var _selectedValue: RCVST_DataProvider.RowUserPlottableData?
+    @State private var _selectedValue: RCVST_DataProvider.RowSignupPlottableData?
 
     /* ################################################################## */
     /**
@@ -117,7 +117,7 @@ struct UserTypesChart: View {
      - parameter inRowData: The selected bar.
      - returns: True, if the bar is being selected.
      */
-    private func _isLineDragged(_ inRowData: RCVST_DataProvider.RowUserPlottableData) -> Bool {
+    private func _isLineDragged(_ inRowData: RCVST_DataProvider.RowSignupPlottableData) -> Bool {
         _isDragging && inRowData.date == _selectedValue?.date
     }
     
@@ -171,7 +171,7 @@ struct UserTypesChart: View {
         let dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
         
         // It is surrounded by a standard group box.
-        GroupBox("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) {
+        GroupBox("SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant) {
             // This displays the value of the selected bar.
             Text(_selectedValuesString)
                 .minimumScaleFactor(0.5)
@@ -180,23 +180,24 @@ struct UserTypesChart: View {
                 .foregroundStyle(.red)
             // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
             Chart(data) { inRowData in
-                ForEach(inRowData.data, id: \.userType) { inUserTypeData in
+                ForEach(inRowData.data, id: \.signupType) { inSignupTypeData in
                     BarMark(
-                        x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date),
-                        y: .value("SLUG-BAR-CHART-USER-TYPES-Y".localizedVariant, inUserTypeData.value)
+                        x: .value("SLUG-BAR-CHART-SIGNUP-TYPES-X".localizedVariant, inRowData.date),
+                        y: .value("SLUG-BAR-CHART-SIGNUP-TYPES-Y".localizedVariant, inSignupTypeData.value)
                     )
-                    .foregroundStyle(by: .value("SLUG-BAR-CHART-USER-TYPES-LEGEND".localizedVariant,
-                                                _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inUserTypeData.descriptionString)
+                    .foregroundStyle(by: .value("SLUG-BAR-CHART-SIGNUP-TYPES-LEGEND".localizedVariant,
+                                                _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inSignupTypeData.descriptionString)
                     )
                 }
             }
-            // These define the three items in the legend, as well as the colors we'll use in the bars.
-            .chartForegroundStyleScale(["SLUG-ACTIVE-LEGEND-LABEL".localizedVariant: .green,
-                                        "SLUG-NEW-LEGEND-LABEL".localizedVariant: .blue,
+
+            .chartForegroundStyleScale(["SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL".localizedVariant: .green,
+                                        "SLUG-REJECTED-SIGNUP-LEGEND-LABEL".localizedVariant: .orange,
+                                        "SLUG-OPEN-SIGNUP-LEGEND-LABEL".localizedVariant: .blue,
                                         "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
                                        ])
             // We leave the Y-axis almost default, except that we want it on the left.
-            .chartYAxisLabel("SLUG-BAR-CHART-Y-AXIS-LABEL".localizedVariant, spacing: 12)
+            .chartYAxisLabel("SLUG-BAR-CHART-Y-AXIS-SIGNUP-LABEL".localizedVariant, spacing: 12)
             .chartYAxis {
                 AxisMarks(preset: .aligned, position: .leading) { _ in
                     AxisTick()
@@ -206,7 +207,7 @@ struct UserTypesChart: View {
             }
             // We customize the X-axis, to only have a few sections.
             .chartXScale(domain: [minimumDate, maximumDate])
-            .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-LABEL".localizedVariant, alignment: .top)
+            .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-SIGNUP-LABEL".localizedVariant, alignment: .top)
             .chartXAxis {
                 AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in
                     AxisTick(length: 8)
@@ -230,11 +231,12 @@ struct UserTypesChart: View {
                                         let currentX = max(0, min(chart.plotSize.width, value.location.x - geometry[frame].origin.x))
                                         guard let date = chart.value(atX: currentX, as: Date.self) else { return }
                                         if let newValue = data.nearestTo(date) {
-                                            _selectedValuesString = String(format: "SLUG-USER-TYPES-DESC-STRING-FORMAT".localizedVariant,
+                                            _selectedValuesString = String(format: "SLUG-SIGNUP-TYPES-DESC-STRING-FORMAT".localizedVariant,
                                                                            dateFormatter.string(from: newValue.date),
                                                                            newValue.data[0].value,
                                                                            newValue.data[1].value,
-                                                                           newValue.data[0].value + newValue.data[1].value
+                                                                           newValue.data[2].value,
+                                                                           newValue.data[0].value + newValue.data[1].value + newValue.data[2].value
                                             )
                                             if newValue.date != _selectedValue?.date {
                                                 _triggerHaptic()

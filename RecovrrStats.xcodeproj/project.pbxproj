@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		D433ED262CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox in Frameworks */ = {isa = PBXBuildFile; productRef = D433ED252CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox */; };
-		D4484A472CBEA80B0019BC0E /* Warnings.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = D4484A452CBEA80B0019BC0E /* Warnings.xcconfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -131,7 +130,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 1600;
+				LastUpgradeCheck = 1610;
 				TargetAttributes = {
 					D4F14D852CBEA585000C482E = {
 						CreatedOnToolsVersion = 16.0;
@@ -165,7 +164,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D4484A472CBEA80B0019BC0E /* Warnings.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

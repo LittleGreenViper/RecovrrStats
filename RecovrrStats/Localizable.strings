@@ -23,28 +23,36 @@
 "SLUG-COLUMN-NAME-active_avg"               =   "Average Last Active Days";
 "SLUG-COLUMN-NAME-deleted_active"           =   "Admin Deleted Active Users";
 "SLUG-COLUMN-NAME-deleted_inactive"         =   "Admin Deleted Inactive Users";
-"SLUG-USER-COLUMN-NAME-active"              =   "Active Users";
-"SLUG-USER-COLUMN-NAME-new"                 =   "New Users";
-"SLUG-SIGNUP-COLUMN-NAME-openSignups"       =   "Open Signups";
-"SLUG-SIGNUP-COLUMN-NAME-rejectedSignups"   =   "Rejected Signups";
-"SLUG-SIGNUP-COLUMN-NAME-acceptedSignups"   =   "Accepted Signups";
 
 "SLUG-HEADER-FORMAT"                        =   "%d Samples, Taken Between %@ and %@";
 
+"SLUG-MAIN-SCREEN-TITLE"                    =   "Recovrr Stats";
+
+"SLUG-SELECTED-LEGEND-LABEL"                =   "Selected";
+
+"SLUG-USER-TOTALS-CHART-TITLE"              =   "User Type Totals";
+"SLUG-USER-TYPES-DESC-STRING-FORMAT"        =   "%@: Active: %d, New: %d, Total: %d";
+"SLUG-ACTIVE-LEGEND-LABEL"                  =   "Active";
+"SLUG-NEW-LEGEND-LABEL"                     =   "New";
+"SLUG-USER-COLUMN-NAME-active"              =   "Active Users";
+"SLUG-USER-COLUMN-NAME-new"                 =   "New Users";
 "SLUG-BAR-CHART-USER-TYPES-X"               =   "Date";
 "SLUG-BAR-CHART-USER-TYPES-Y"               =   "Users";
 "SLUG-BAR-CHART-USER-TYPES-LEGEND"          =   "User Types";
-"SLUG-USER-TOTALS-CHART-TITLE"              =   "Types Of Users";
 "SLUG-BAR-CHART-Y-AXIS-LABEL"               =   "Users";
 "SLUG-BAR-CHART-X-AXIS-LABEL"               =   "Date";
 
-"SLUG-MAIN-SCREEN-TITLE"                    =   "Recovrr Stats";
-
-"SLUG-ACTIVE-LEGEND-LABEL"                  =   "Active";
-"SLUG-NEW-LEGEND-LABEL"                     =   "New";
-"SLUG-SELECTED-LEGEND-LABEL"                =   "Selected";
-"SLUG-USER-TYPES-DESC-STRING-FORMAT"        =   "%@: Active: %d, New: %d, Total: %d";
-
+"SLUG-SIGNUP-TOTALS-CHART-TITLE"            =   "Signup Totals";
+"SLUG-SIGNUP-TYPES-DESC-STRING-FORMAT"      =   "%@: Accepted: %d, Rejected: %d, Open: %d, Total: %d";
 "SLUG-OPEN-SIGNUP-LEGEND-LABEL"             =   "Open";
 "SLUG-REJECTED-SIGNUP-LEGEND-LABEL"         =   "Rejected";
 "SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL"         =   "Accepted";
+"SLUG-OPEN-SIGNUP-LEGEND-LABEL"             =   "Open";
+"SLUG-SIGNUP-COLUMN-NAME-openSignups"       =   "Open Signups";
+"SLUG-SIGNUP-COLUMN-NAME-rejectedSignups"   =   "Rejected Signups";
+"SLUG-SIGNUP-COLUMN-NAME-acceptedSignups"   =   "Accepted Signups";
+"SLUG-BAR-CHART-SIGNUP-TYPES-Y"             =   "Signups";
+"SLUG-BAR-CHART-SIGNUP-TYPES-X"             =   "Date";
+"SLUG-BAR-CHART-SIGNUP-TYPES-LEGEND"        =   "Signup Status";
+"SLUG-BAR-CHART-Y-AXIS-SIGNUP-LABEL"        =   "Signups";
+"SLUG-BAR-CHART-X-AXIS-SIGNUP-LABEL"        =   "Date";

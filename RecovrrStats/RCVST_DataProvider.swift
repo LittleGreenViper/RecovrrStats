@@ -842,7 +842,7 @@ public extension RCVST_DataProvider {
             let openSignups = RowSignupTypesPlottableData(signupType: .openSignups, value: inRow.openRequests)
             let rejectedSignups = RowSignupTypesPlottableData(signupType: .rejectedSignups, value: inRow.rejectedRequests)
             let acceptedSignups = RowSignupTypesPlottableData(signupType: .acceptedSignups, value: inRow.acceptedRequests)
-            let ret = RowSignupPlottableData(date: date, data: [openSignups, rejectedSignups, acceptedSignups])
+            let ret = RowSignupPlottableData(date: date, data: [acceptedSignups, rejectedSignups, openSignups])
             
             return ret
         }

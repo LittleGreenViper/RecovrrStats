@@ -39,6 +39,11 @@ struct RootStackView: View {
         /**
          */
         case userTotals = "User Totals"
+        
+        /* ############################################################## */
+        /**
+         */
+        case signupTotals = "Signup Totals"
     }
 
     /* ################################################################## */
@@ -53,8 +58,10 @@ struct RootStackView: View {
     var body: some View {
         NavigationStack {
             Text(String(format: "SLUG-HEADER-FORMAT".localizedVariant, data.count, data.formattedStartDate, data.formattedEndDate))
-            List(ChartTypes.allCases, id: \.self) { inChartType in NavigationLink("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant, value: inChartType) }
-            .navigationDestination(for: ChartTypes.self) { _ in RCVST_Chart1View(data: data) }
+            List {
+                NavigationLink("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart1View(data: data) }
+                NavigationLink("SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart2View(data: data) }
+            }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
         }
     }
