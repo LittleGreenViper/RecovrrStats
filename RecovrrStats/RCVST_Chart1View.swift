@@ -190,6 +190,7 @@ struct UserTypesChart: View {
                     )
                 }
             }
+            .onAppear { _prepareHaptics() }
             // These define the three items in the legend, as well as the colors we'll use in the bars.
             .chartForegroundStyleScale(["SLUG-ACTIVE-LEGEND-LABEL".localizedVariant: .green,
                                         "SLUG-NEW-LEGEND-LABEL".localizedVariant: .blue,
@@ -253,11 +254,11 @@ struct UserTypesChart: View {
                                 }
                         )
                 }
-                .onAppear { _prepareHaptics() }
             }
             .padding([.trailing], 20)
             .padding([.leading, .top, .bottom], 8)
         }
+        // This is so the user has room to scroll, if the chart is off the screen.
         .padding([.leading, .trailing], 20)
     }
 }

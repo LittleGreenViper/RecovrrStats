@@ -190,7 +190,7 @@ struct SignupTypesChart: View {
                     )
                 }
             }
-
+            .onAppear { _prepareHaptics() }
             .chartForegroundStyleScale(["SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL".localizedVariant: .green,
                                         "SLUG-REJECTED-SIGNUP-LEGEND-LABEL".localizedVariant: .orange,
                                         "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
@@ -253,11 +253,11 @@ struct SignupTypesChart: View {
                                 }
                         )
                 }
-                .onAppear { _prepareHaptics() }
             }
             .padding([.trailing], 20)
             .padding([.leading, .top, .bottom], 8)
         }
+        // This is so the user has room to scroll, if the chart is off the screen.
         .padding([.leading, .trailing], 20)
     }
 }
