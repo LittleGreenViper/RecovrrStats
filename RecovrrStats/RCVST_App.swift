@@ -51,7 +51,7 @@ struct RCVST_App: App {
          */
         WindowGroup { RCVST_InitialContentView(data: data) }
         // Forces updates, whenever we become active.
-            .onChange(of: _scenePhase, initial: true) {
+        .onChange(of: _scenePhase, initial: true) {
             if .active == _scenePhase {
                 data = RCVST_DataProvider()
             }

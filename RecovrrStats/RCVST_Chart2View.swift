@@ -253,10 +253,11 @@ struct SignupTypesChart: View {
                                 }
                         )
                 }
+                .onAppear { _prepareHaptics() }
             }
             .padding([.trailing], 20)
             .padding([.leading, .top, .bottom], 8)
         }
-        .onAppear { _prepareHaptics() }
+        .padding([.leading, .trailing], 20)
     }
 }
