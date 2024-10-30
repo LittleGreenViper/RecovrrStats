@@ -82,10 +82,10 @@ struct RCVST_Chart2View: View {
 struct SignupTypesChart: View {
     /* ################################################################## */
     /**
-     This is used to give us haptic feedback for dragging.
+     Tracks scene activity.
      */
-    @State private var _hapticEngine: CHHapticEngine?
-    
+    @Environment(\.scenePhase) private var _scenePhase
+
     /* ################################################################## */
     /**
      The segregated user type data.
@@ -112,6 +112,12 @@ struct SignupTypesChart: View {
 
     /* ################################################################## */
     /**
+     This is used to give us haptic feedback for dragging.
+     */
+    @State var hapticEngine: CHHapticEngine?
+
+    /* ################################################################## */
+    /**
      This returns whether or not the selected data bar is being dragged.
      
      - parameter inRowData: The selected bar.
@@ -120,19 +126,19 @@ struct SignupTypesChart: View {
     private func _isLineDragged(_ inRowData: RCVST_DataProvider.RowSignupPlottableData) -> Bool {
         _isDragging && inRowData.date == _selectedValue?.date
     }
-    
+
     /* ################################################################## */
     /**
      This prepares our haptic engine.
      */
-    private func _prepareHaptics() {
+    func _prepareHaptics() {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics,
-              let hapticEngine = try? CHHapticEngine()
+              let hapticEngineTemp = try? CHHapticEngine()
         else { return }
         
-        _hapticEngine = hapticEngine
+        hapticEngine = hapticEngineTemp
         
-        try? hapticEngine.start()
+        try? hapticEngine?.start()
     }
 
     /* ################################################################## */
@@ -148,7 +154,7 @@ struct SignupTypesChart: View {
         events.append(event)
 
         guard let pattern = try? CHHapticPattern(events: events, parameters: []),
-              let player = try? _hapticEngine?.makePlayer(with: pattern)
+              let player = try? hapticEngine?.makePlayer(with: pattern)
         else { return }
         
         try? player.start(atTime: 0)
@@ -190,7 +196,6 @@ struct SignupTypesChart: View {
                     )
                 }
             }
-            .onAppear { _prepareHaptics() }
             .chartForegroundStyleScale(["SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL".localizedVariant: .green,
                                         "SLUG-REJECTED-SIGNUP-LEGEND-LABEL".localizedVariant: .orange,
                                         "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
@@ -259,5 +264,11 @@ struct SignupTypesChart: View {
         }
         // This is so the user has room to scroll, if the chart is off the screen.
         .padding([.leading, .trailing], 20)
+        // This makes sure the haptics are set up, every time we are activated.
+        .onChange(of: _scenePhase, initial: true) {
+            if .active == _scenePhase {
+                _prepareHaptics()
+            }
+        }
     }
 }

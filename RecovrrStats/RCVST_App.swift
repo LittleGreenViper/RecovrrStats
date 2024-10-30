@@ -39,17 +39,19 @@ struct RCVST_App: App {
      The initial app screen.
      */
     var body: some Scene {
-        /* ################################################################## */
+        /* ############################################################## */
         /**
          This is the actual dataframe wrapper for the stats.
          */
         @ObservedObject var data = RCVST_DataProvider()
         
-        /* ################################################################## */
+        /* ############################################################## */
         /**
          The main scene screen.
          */
-        WindowGroup { RCVST_InitialContentView(data: data) }
+        WindowGroup {
+            RCVST_InitialContentView(data: data)
+        }
         // Forces updates, whenever we become active.
         .onChange(of: _scenePhase, initial: true) {
             if .active == _scenePhase {

@@ -23,19 +23,13 @@ public class RCVST_DataProvider: ObservableObject {
     /**
      This stores the dataframe info.
      */
-    @Published var statusDataFrame: DataFrame? {
-        didSet {
-            #if DEBUG
-                print(debugDescription)
-            #endif
-        }
-    }
+    @Published var statusDataFrame: DataFrame?
 
     /* ################################################################## */
     /**
      Upon initialization, we go out, and fetch the stats file.
      */
-    required init(_ inNoLookup: Bool = false) {
+    required init() {
         _fetchStats {
             guard let stats = $0 else { return }
             // We need to publish the change in the main thread.
@@ -170,9 +164,6 @@ extension RCVST_DataProvider {
                 var dataFrame = try DataFrame(contentsOfCSVFile: url)
                 // We convert the integer timestamp to a more usable Date instance.
                 dataFrame.transformColumn(_Columns.sample_date.rawValue) { (inUnixTime: Int) -> Date in Date(timeIntervalSince1970: TimeInterval(inUnixTime)) }
-                #if DEBUG
-                    print("Data Frame Successfully Initialized: \(dataFrame.debugDescription)")
-                #endif
                 DispatchQueue.main.async { inCompletion?(dataFrame) }
             } catch {
                 #if DEBUG

@@ -82,10 +82,10 @@ struct RCVST_Chart1View: View {
 struct UserTypesChart: View {
     /* ################################################################## */
     /**
-     This is used to give us haptic feedback for dragging.
+     Tracks scene activity.
      */
-    @State private var _hapticEngine: CHHapticEngine?
-    
+    @Environment(\.scenePhase) private var _scenePhase
+
     /* ################################################################## */
     /**
      The segregated user type data.
@@ -123,17 +123,9 @@ struct UserTypesChart: View {
     
     /* ################################################################## */
     /**
-     This prepares our haptic engine.
+     This is used to give us haptic feedback for dragging.
      */
-    private func _prepareHaptics() {
-        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics,
-              let hapticEngine = try? CHHapticEngine()
-        else { return }
-        
-        _hapticEngine = hapticEngine
-        
-        try? hapticEngine.start()
-    }
+    @State var hapticEngine: CHHapticEngine?
 
     /* ################################################################## */
     /**
@@ -148,12 +140,26 @@ struct UserTypesChart: View {
         events.append(event)
 
         guard let pattern = try? CHHapticPattern(events: events, parameters: []),
-              let player = try? _hapticEngine?.makePlayer(with: pattern)
+              let player = try? hapticEngine?.makePlayer(with: pattern)
         else { return }
         
         try? player.start(atTime: 0)
     }
-    
+
+    /* ################################################################## */
+    /**
+     This prepares our haptic engine.
+     */
+    func _prepareHaptics() {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics,
+              let hapticEngineTemp = try? CHHapticEngine()
+        else { return }
+        
+        hapticEngine = hapticEngineTemp
+        
+        try? hapticEngine?.start()
+    }
+
     /* ################################################################## */
     /**
      The main chart body.
@@ -190,7 +196,6 @@ struct UserTypesChart: View {
                     )
                 }
             }
-            .onAppear { _prepareHaptics() }
             // These define the three items in the legend, as well as the colors we'll use in the bars.
             .chartForegroundStyleScale(["SLUG-ACTIVE-LEGEND-LABEL".localizedVariant: .green,
                                         "SLUG-NEW-LEGEND-LABEL".localizedVariant: .blue,
@@ -260,5 +265,11 @@ struct UserTypesChart: View {
         }
         // This is so the user has room to scroll, if the chart is off the screen.
         .padding([.leading, .trailing], 20)
+        // This makes sure the haptics are set up, every time we are activated.
+        .onChange(of: _scenePhase, initial: true) {
+            if .active == _scenePhase {
+                _prepareHaptics()
+            }
+        }
     }
 }

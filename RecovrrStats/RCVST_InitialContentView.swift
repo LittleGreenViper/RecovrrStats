@@ -23,7 +23,6 @@ struct RCVST_InitialContentView: View {
      */
     var body: some View {
         RootStackView(data: data)
-            .navigationDestination(for: RootStackView.ChartTypes.self) { _ in RCVST_Chart1View(data: data) }
             .navigationBarTitleDisplayMode(.large)
     }
 }
@@ -57,7 +56,6 @@ struct RootStackView: View {
      */
     var body: some View {
         NavigationStack {
-            Text(String(format: "SLUG-HEADER-FORMAT".localizedVariant, data.count, data.formattedStartDate, data.formattedEndDate))
             List {
                 NavigationLink("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart1View(data: data) }
                 NavigationLink("SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart2View(data: data) }
