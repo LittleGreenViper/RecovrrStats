@@ -7,35 +7,23 @@ import TabularData
 import Charts
 import RVS_Generic_Swift_Toolbox
 import CoreHaptics
+import Combine
 
 /* ###################################################################################################################################### */
-// MARK: - Array Extension For Our Data Type -
+// MARK: - Add A Formatted Date Output -
 /* ###################################################################################################################################### */
-//extension Array where Element == RCVST_DataProvider.RowSignupPlottableData {
-//    /* ################################################################## */
-//    /**
-//     This returns the sample closest to the given date.
-//     
-//     - parameter inDate: The date we want to compare against.
-//     
-//     - returns: The sample that is closest to (above or below) the given date.
-//     */
-//    func nearestTo(_ inDate: Date) -> RCVST_DataProvider.RowSignupPlottableData? {
-//        var ret: RCVST_DataProvider.RowSignupPlottableData?
-//        
-//        forEach {
-//            guard let retTemp = ret else {
-//                ret = $0
-//                return
-//            }
-//            
-//            if abs($0.date.timeIntervalSince(inDate)) < abs(retTemp.date.timeIntervalSince(inDate)) {
-//                ret = $0
-//            }
-//        }
-//        return ret
-//    }
-//}
+extension RCVST_DataProvider.Row {
+    /* ################################################################## */
+    /**
+     */
+    var formattedDate: String {
+        guard let sampleDate = sampleDate else { return "" }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .none
+        return dateFormatter.string(from: sampleDate)
+    }
+}
 
 /* ###################################################################################################################################### */
 // MARK: - Main Content View -
@@ -98,18 +86,18 @@ struct PieChart: View, RCVST_UsesData, RCVST_HapticHopper {
      True, if the user is dragging across the chart.
      */
     @State private var _isDragging = false
+    
+    /* ################################################################## */
+    /**
+     This displays the currently selected date.
+     */
+    @State private var _currentDateString = " "
 
     /* ################################################################## */
     /**
-     The value being selected by the user, while dragging.
+     This holds the slider value, internally.
      */
-    @State private var _selectedValue: RCVST_DataProvider.RowSignupPlottableData?
-
-    /* ################################################################## */
-    /**
-     The string that displays the data for the selected bar.
-     */
-    @State private var _selectedValuesString: String = " "
+    @State private var _sliderValue: Double = 0
 
     /* ################################################################## */
     /**
@@ -121,7 +109,16 @@ struct PieChart: View, RCVST_UsesData, RCVST_HapticHopper {
     /**
      The segregated user type data.
      */
-    private var _dataFiltered: [RCVST_DataProvider.RowSignupPlottableData] { data?.signupTypePlottable ?? [] }
+    private var _dataFiltered: [RCVST_DataProvider.Row] {
+        guard let allRows = data?.allRows else { return [] }
+        var ret = [RCVST_DataProvider.Row]()
+        
+        for row in stride(from: 0, to: allRows.count - 1, by: 2) {
+            ret.append(allRows[row])
+        }
+        
+        return ret
+    }
 
     /* ################################################################## */
     /**
@@ -139,22 +136,31 @@ struct PieChart: View, RCVST_UsesData, RCVST_HapticHopper {
 
     /* ################################################################## */
     /**
-     This returns whether or not the selected data bar is being dragged.
-     
-     - parameter inRowData: The selected bar.
-     - returns: True, if the bar is being selected.
-     */
-    private func _isLineDragged(_ inRowData: RCVST_DataProvider.RowSignupPlottableData) -> Bool {
-        _isDragging && inRowData.date == _selectedValue?.date
-    }
-
-    /* ################################################################## */
-    /**
      The main chart body.
      */
     var body: some View {
+        let sliderValue = Binding<Double>(
+            get: { _sliderValue },
+            set: {
+                _currentDateString = _dataFiltered[Int($0)].formattedDate
+                _sliderValue = $0
+                triggerHaptic()
+            }
+        )
+
         // It is surrounded by a standard group box.
         GroupBox("SLUG-CHART-3-TITLE".localizedVariant) {
+            Slider(value: sliderValue,
+                   in: 0...Double(_dataFiltered.count - 1),
+                   step: 1,
+                   onEditingChanged: { inWasChanged in _isDragging = inWasChanged }
+            )
+            Text(_currentDateString)
+        }
+        .onAppear {
+            prepareHaptics()
+            _sliderValue = Double(_dataFiltered.count - 1)
+            _currentDateString = _dataFiltered[Int(_sliderValue)].formattedDate
         }
     }
 }
