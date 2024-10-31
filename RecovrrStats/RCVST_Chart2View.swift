@@ -59,7 +59,7 @@ struct RCVST_Chart2View: View, RCVST_UsesData {
         GeometryReader { inGeometry in
             ScrollView {
                 VStack {
-                    SignupTypesChart(data: data)
+                    SignupActivityChart(data: data)
                 }
                 .padding()
                 .frame(
@@ -75,12 +75,12 @@ struct RCVST_Chart2View: View, RCVST_UsesData {
 }
 
 /* ###################################################################################################################################### */
-// MARK: - User Type Bar Chart -
+// MARK: - Signup Activity Bar Chart -
 /* ###################################################################################################################################### */
 /**
- This displays a simple bar chart of the users, segeregated by the type of user.
+ This displays a simple bar chart of the signups, segeregated by whether the signup was approved or rejected.
  */
-struct SignupTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
+struct SignupActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
     /* ################################################################## */
     /**
      Tracks scene activity.

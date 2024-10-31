@@ -102,23 +102,6 @@ struct RCVST_InitialContentView: View {
  
  */
 struct RootStackView: View, RCVST_UsesData {
-    /* ################################################################################################################################## */
-    // MARK: These are the types of charts we can have.
-    /* ################################################################################################################################## */
-    /**
-     */
-    enum ChartTypes: String, CaseIterable {
-        /* ############################################################## */
-        /**
-         */
-        case userTotals = "User Totals"
-        
-        /* ############################################################## */
-        /**
-         */
-        case signupTotals = "Signup Totals"
-    }
-
     /* ################################################################## */
     /**
      This is the actual dataframe wrapper for the stats.
@@ -133,6 +116,7 @@ struct RootStackView: View, RCVST_UsesData {
             List {
                 NavigationLink("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart1View(data: data) }
                 NavigationLink("SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart2View(data: data) }
+                NavigationLink("SLUG-CHART-3-TITLE".localizedVariant) { RCVST_Chart3View(data: data) }
             }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
             .navigationBarTitleDisplayMode(.large)
