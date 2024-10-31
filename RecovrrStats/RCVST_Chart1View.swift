@@ -28,6 +28,7 @@ extension Array where Element == RCVST_DataProvider.RowUserPlottableData {
                 ret = $0
                 return
             }
+            
             if abs($0.date.timeIntervalSince(inDate)) < abs(retTemp.date.timeIntervalSince(inDate)) {
                 ret = $0
             }
@@ -43,12 +44,12 @@ extension Array where Element == RCVST_DataProvider.RowUserPlottableData {
  This displays a chart, with the different user types, over time.
  It is selectable, and dragging your finger across the chart, shows exact numbers.
  */
-struct RCVST_Chart1View: View {
+struct RCVST_Chart1View: View, RCVST_UsesData {
     /* ################################################################## */
     /**
      This is the actual dataframe wrapper for the stats.
      */
-    @State var data: RCVST_DataProvider
+    @State var data: RCVST_DataProvider?
 
     /* ################################################################## */
     /**
@@ -58,7 +59,7 @@ struct RCVST_Chart1View: View {
         GeometryReader { inGeometry in
             ScrollView {
                 VStack {
-                    UserTypesChart(data: data.userTypePlottable)
+                    UserTypesChart(data: data)
                 }
                 .padding()
                 .frame(
@@ -79,7 +80,7 @@ struct RCVST_Chart1View: View {
 /**
  This displays a simple bar chart of the users, segeregated by the type of user.
  */
-struct UserTypesChart: View {
+struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
     /* ################################################################## */
     /**
      Tracks scene activity.
@@ -88,9 +89,9 @@ struct UserTypesChart: View {
 
     /* ################################################################## */
     /**
-     The segregated user type data.
+     The general user type data.
      */
-    @State var data: [RCVST_DataProvider.RowUserPlottableData]
+    @State var data: RCVST_DataProvider?
 
     /* ################################################################## */
     /**
@@ -109,48 +110,24 @@ struct UserTypesChart: View {
      The string that displays the data for the selected bar.
      */
     @State private var _selectedValuesString: String = " "
-
-    /* ################################################################## */
-    /**
-     This returns whether or not the selected data bar is being dragged.
-     
-     - parameter inRowData: The selected bar.
-     - returns: True, if the bar is being selected.
-     */
-    private func _isLineDragged(_ inRowData: RCVST_DataProvider.RowUserPlottableData) -> Bool {
-        _isDragging && inRowData.date == _selectedValue?.date
-    }
     
     /* ################################################################## */
     /**
      This is used to give us haptic feedback for dragging.
      */
     @State var hapticEngine: CHHapticEngine?
-
+    
     /* ################################################################## */
     /**
-     This triggers the haptic. We don't lose sleep, if it fails.
+     The segregated user type data.
      */
-    private func _triggerHaptic() {
-        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-        var events = [CHHapticEvent]()
-
-        let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.25)
-        let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity], relativeTime: 0)
-        events.append(event)
-
-        guard let pattern = try? CHHapticPattern(events: events, parameters: []),
-              let player = try? hapticEngine?.makePlayer(with: pattern)
-        else { return }
-        
-        try? player.start(atTime: 0)
-    }
+    private var _dataFiltered: [RCVST_DataProvider.RowUserPlottableData] { data?.userTypePlottable ?? [] }
 
     /* ################################################################## */
     /**
      This prepares our haptic engine.
      */
-    func _prepareHaptics() {
+    func prepareHaptics() {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics,
               let hapticEngineTemp = try? CHHapticEngine()
         else { return }
@@ -162,13 +139,24 @@ struct UserTypesChart: View {
 
     /* ################################################################## */
     /**
+     This returns whether or not the selected data bar is being dragged.
+     
+     - parameter inRowData: The selected bar.
+     - returns: True, if the bar is being selected.
+     */
+    private func _isLineDragged(_ inRowData: RCVST_DataProvider.RowUserPlottableData) -> Bool {
+        _isDragging && inRowData.date == _selectedValue?.date
+    }
+
+    /* ################################################################## */
+    /**
      The main chart body.
      */
     var body: some View {
         let numberOfXValues = TimeInterval(4)
         // This gives us "breathing room" around the X-axis.
-        let minimumDate = data.first?.date.addingTimeInterval(-43200) ?? .now
-        let maximumDate = data.last?.date.addingTimeInterval(43200) ?? .now
+        let minimumDate = _dataFiltered.first?.date.addingTimeInterval(-43200) ?? .now
+        let maximumDate = _dataFiltered.last?.date.addingTimeInterval(43200) ?? .now
         // We use this to set a fixed number of X-axis dates.
         let step = (maximumDate - minimumDate) / numberOfXValues
         // Set up an array of dates to use as values for the X-axis.
@@ -185,7 +173,7 @@ struct UserTypesChart: View {
                 .font(.subheadline)
                 .foregroundStyle(.red)
             // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
-            Chart(data) { inRowData in
+            Chart(_dataFiltered) { inRowData in
                 ForEach(inRowData.data, id: \.userType) { inUserTypeData in
                     BarMark(
                         x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date),
@@ -235,7 +223,7 @@ struct UserTypesChart: View {
                                     if let frame = chart.plotFrame {
                                         let currentX = max(0, min(chart.plotSize.width, value.location.x - geometry[frame].origin.x))
                                         guard let date = chart.value(atX: currentX, as: Date.self) else { return }
-                                        if let newValue = data.nearestTo(date) {
+                                        if let newValue = _dataFiltered.nearestTo(date) {
                                             _selectedValuesString = String(format: "SLUG-USER-TYPES-DESC-STRING-FORMAT".localizedVariant,
                                                                            dateFormatter.string(from: newValue.date),
                                                                            newValue.data[0].value,
@@ -243,7 +231,7 @@ struct UserTypesChart: View {
                                                                            newValue.data[0].value + newValue.data[1].value
                                             )
                                             if newValue.date != _selectedValue?.date {
-                                                _triggerHaptic()
+                                                triggerHaptic()
                                             }
                                             _selectedValue = newValue
                                         }
@@ -252,7 +240,7 @@ struct UserTypesChart: View {
                                     }
                                 }
                                 .onEnded { _ in
-                                    _triggerHaptic()
+                                    triggerHaptic()
                                     _isDragging = false
                                     _selectedValue = nil
                                     _selectedValuesString = " "
@@ -268,7 +256,7 @@ struct UserTypesChart: View {
         // This makes sure the haptics are set up, every time we are activated.
         .onChange(of: _scenePhase, initial: true) {
             if .active == _scenePhase {
-                _prepareHaptics()
+                prepareHaptics()
             }
         }
     }
