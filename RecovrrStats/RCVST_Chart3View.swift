@@ -7,23 +7,6 @@ import TabularData
 import Charts
 import RVS_Generic_Swift_Toolbox
 import CoreHaptics
-import Combine
-
-/* ###################################################################################################################################### */
-// MARK: - Add A Formatted Date Output -
-/* ###################################################################################################################################### */
-extension RCVST_DataProvider.Row {
-    /* ################################################################## */
-    /**
-     */
-    var formattedDate: String {
-        guard let sampleDate = sampleDate else { return "" }
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-        dateFormatter.timeStyle = .none
-        return dateFormatter.string(from: sampleDate)
-    }
-}
 
 /* ###################################################################################################################################### */
 // MARK: - Main Content View -
@@ -47,7 +30,7 @@ struct RCVST_Chart3View: View, RCVST_UsesData {
         GeometryReader { inGeometry in
             ScrollView {
                 VStack {
-                    PieChart(data: data)
+                    UserActivityChart(data: data)
                 }
                 .padding()
                 .frame(
@@ -63,12 +46,12 @@ struct RCVST_Chart3View: View, RCVST_UsesData {
 }
 
 /* ###################################################################################################################################### */
-// MARK: - User Type Bar Chart -
+// MARK: - Signup Activity Bar Chart -
 /* ###################################################################################################################################### */
 /**
- This displays a simple bar chart of the users, segeregated by the type of user.
+ This displays a simple bar chart of the signups, segeregated by whether the signup was approved or rejected.
  */
-struct PieChart: View, RCVST_UsesData, RCVST_HapticHopper {
+struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
     /* ################################################################## */
     /**
      Tracks scene activity.
@@ -86,18 +69,18 @@ struct PieChart: View, RCVST_UsesData, RCVST_HapticHopper {
      True, if the user is dragging across the chart.
      */
     @State private var _isDragging = false
-    
-    /* ################################################################## */
-    /**
-     This displays the currently selected date.
-     */
-    @State private var _currentDateString = " "
 
     /* ################################################################## */
     /**
-     This holds the slider value, internally.
+     The value being selected by the user, while dragging.
      */
-    @State private var _sliderValue: Double = 0
+    @State private var _selectedValue: RCVST_DataProvider.RowSignupPlottableData?
+
+    /* ################################################################## */
+    /**
+     The string that displays the data for the selected bar.
+     */
+    @State private var _selectedValuesString: String = " "
 
     /* ################################################################## */
     /**
@@ -109,16 +92,7 @@ struct PieChart: View, RCVST_UsesData, RCVST_HapticHopper {
     /**
      The segregated user type data.
      */
-    private var _dataFiltered: [RCVST_DataProvider.Row] {
-        guard let allRows = data?.allRows else { return [] }
-        var ret = [RCVST_DataProvider.Row]()
-        
-        for row in stride(from: 0, to: allRows.count - 1, by: 2) {
-            ret.append(allRows[row])
-        }
-        
-        return ret
-    }
+    private var _dataFiltered: [RCVST_DataProvider.Row] { data?.allRows ?? [] }
 
     /* ################################################################## */
     /**
@@ -136,31 +110,41 @@ struct PieChart: View, RCVST_UsesData, RCVST_HapticHopper {
 
     /* ################################################################## */
     /**
+     This returns whether or not the selected data bar is being dragged.
+     
+     - parameter inRowData: The selected bar.
+     - returns: True, if the bar is being selected.
+     */
+    private func _isLineDragged(_ inRowData: RCVST_DataProvider.RowSignupPlottableData) -> Bool {
+        _isDragging && inRowData.date == _selectedValue?.date
+    }
+
+    /* ################################################################## */
+    /**
      The main chart body.
      */
     var body: some View {
-        let sliderValue = Binding<Double>(
-            get: { _sliderValue },
-            set: {
-                _currentDateString = _dataFiltered[Int($0)].formattedDate
-                _sliderValue = $0
-                triggerHaptic()
-            }
-        )
-
+        let numberOfXValues = TimeInterval(4)
+        // This gives us "breathing room" around the X-axis.
+        let minimumDate = _dataFiltered.first?.sampleDate?.addingTimeInterval(-43200) ?? .now
+        let maximumDate = _dataFiltered.last?.sampleDate?.addingTimeInterval(43200) ?? .now
+        // We use this to set a fixed number of X-axis dates.
+        let step = (maximumDate - minimumDate) / numberOfXValues
+        // Set up an array of dates to use as values for the X-axis.
+        let dates = Array<Date>(stride(from: minimumDate, through: maximumDate, by: step))
+        // Set up an array of strings to use as labels for the X-axis.
+        let dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
         // It is surrounded by a standard group box.
-        GroupBox("SLUG-CHART-3-TITLE".localizedVariant) {
-            Slider(value: sliderValue,
-                   in: 0...Double(_dataFiltered.count - 1),
-                   step: 1,
-                   onEditingChanged: { inWasChanged in _isDragging = inWasChanged }
-            )
-            Text(_currentDateString)
+        GroupBox("SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant) {
+            Text(dateString.description)
         }
-        .onAppear {
-            prepareHaptics()
-            _sliderValue = Double(_dataFiltered.count - 1)
-            _currentDateString = _dataFiltered[Int(_sliderValue)].formattedDate
+        // This is so the user has room to scroll, if the chart is off the screen.
+        .padding([.leading, .trailing], 20)
+        // This makes sure the haptics are set up, every time we are activated.
+        .onChange(of: _scenePhase, initial: true) {
+            if .active == _scenePhase {
+                prepareHaptics()
+            }
         }
     }
 }

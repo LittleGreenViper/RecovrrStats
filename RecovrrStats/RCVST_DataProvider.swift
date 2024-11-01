@@ -7,6 +7,38 @@ import TabularData
 import RVS_Generic_Swift_Toolbox
 
 /* ###################################################################################################################################### */
+// MARK: - Array Extension For Arrays of Rows -
+/* ###################################################################################################################################### */
+extension Array where Element == RCVST_DataProvider.Row {
+    /* ################################################################## */
+    /**
+     This returns the sample closest to the given date.
+     
+     - parameter inDate: The date we want to compare against.
+     
+     - returns: The sample that is closest to (above or below) the given date.
+     */
+    func nearestTo(_ inDate: Date) -> RCVST_DataProvider.Row? {
+        var ret: RCVST_DataProvider.Row?
+        
+        forEach {
+            guard let retTemp = ret,
+                  let currentDate = $0.sampleDate,
+                  let compDate = retTemp.sampleDate
+            else {
+                ret = $0
+                return
+            }
+            
+            if abs(currentDate.timeIntervalSince(inDate)) < abs(compDate.timeIntervalSince(inDate)) {
+                ret = $0
+            }
+        }
+        return ret
+    }
+}
+
+/* ###################################################################################################################################### */
 // MARK: - Stats Data Provider -
 /* ###################################################################################################################################### */
 /**

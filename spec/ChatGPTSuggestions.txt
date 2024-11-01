@@ -1,0 +1,185 @@
+Step 1: Loading the CSV Data
+
+import Foundation
+import TabularData
+
+// Load CSV data into a DataFrame
+guard let fileUrl = Bundle.main.url(forResource: "your_file", withExtension: "csv") else {
+    fatalError("File not found")
+}
+
+var options = CSVReadingOptions()
+options.hasHeaderRow = true
+let dataFrame = try DataFrame(contentsOfCSVFile: fileUrl, options: options)
+
+// Convert "sample_date" to Date type
+dataFrame["sample_date"] = dataFrame["sample_date"].map { cell in
+    guard let timestamp = cell as? Int else { return cell }
+    return Date(timeIntervalSince1970: Double(timestamp))
+}
+
+print(dataFrame)
+
+Step 2: User Growth and Engagement Analysis
+
+For plotting, let’s use SwiftUI with the Charts library. Start by creating a view that displays the user growth.
+
+import SwiftUI
+import Charts
+
+struct UserGrowthView: View {
+    var dataFrame: DataFrame
+
+    var body: some View {
+        Chart {
+            ForEach(dataFrame.rows.indices, id: \.self) { index in
+                let date = dataFrame[index, "sample_date"] as? Date ?? Date()
+                let totalUsers = dataFrame[index, "total_users"] as? Int ?? 0
+                let newUsers = dataFrame[index, "new_users"] as? Int ?? 0
+                
+                LineMark(x: .value("Date", date), y: .value("Total Users", totalUsers))
+                    .foregroundStyle(.blue)
+                    .interpolationMethod(.linear)
+                
+                LineMark(x: .value("Date", date), y: .value("New Users", newUsers))
+                    .foregroundStyle(.green)
+                    .interpolationMethod(.linear)
+            }
+        }
+        .chartYScale(domain: 0...)
+        .frame(height: 300)
+        .padding()
+        .navigationTitle("User Growth Over Time")
+    }
+}
+
+Step 3: Active User Engagement
+
+You can create a similar SwiftUI view to plot active_1, active_7, active_30, and active_90.
+
+struct ActiveUserEngagementView: View {
+    var dataFrame: DataFrame
+
+    var body: some View {
+        Chart {
+            ForEach(dataFrame.rows.indices, id: \.self) { index in
+                let date = dataFrame[index, "sample_date"] as? Date ?? Date()
+                let active1 = dataFrame[index, "active_1"] as? Int ?? 0
+                let active7 = dataFrame[index, "active_7"] as? Int ?? 0
+                let active30 = dataFrame[index, "active_30"] as? Int ?? 0
+                let active90 = dataFrame[index, "active_90"] as? Int ?? 0
+
+                LineMark(x: .value("Date", date), y: .value("Active in 1 Day", active1))
+                    .foregroundStyle(.red)
+                
+                LineMark(x: .value("Date", date), y: .value("Active in 7 Days", active7))
+                    .foregroundStyle(.orange)
+                
+                LineMark(x: .value("Date", date), y: .value("Active in 30 Days", active30))
+                    .foregroundStyle(.yellow)
+                
+                LineMark(x: .value("Date", date), y: .value("Active in 90 Days", active90))
+                    .foregroundStyle(.green)
+            }
+        }
+        .chartYScale(domain: 0...)
+        .frame(height: 300)
+        .padding()
+        .navigationTitle("User Engagement Over Different Activity Periods")
+    }
+}
+
+Step 4: Signup Request Flow Analysis
+
+This view would track the total, accepted, and rejected requests.
+
+struct SignupRequestFlowView: View {
+    var dataFrame: DataFrame
+
+    var body: some View {
+        Chart {
+            ForEach(dataFrame.rows.indices, id: \.self) { index in
+                let date = dataFrame[index, "sample_date"] as? Date ?? Date()
+                let totalRequests = dataFrame[index, "total_requests"] as? Int ?? 0
+                let acceptedRequests = dataFrame[index, "accepted_requests"] as? Int ?? 0
+                let rejectedRequests = dataFrame[index, "rejected_requests"] as? Int ?? 0
+                
+                LineMark(x: .value("Date", date), y: .value("Total Requests", totalRequests))
+                    .foregroundStyle(.blue)
+                
+                LineMark(x: .value("Date", date), y: .value("Accepted Requests", acceptedRequests))
+                    .foregroundStyle(.green)
+                
+                LineMark(x: .value("Date", date), y: .value("Rejected Requests", rejectedRequests))
+                    .foregroundStyle(.red)
+            }
+        }
+        .chartYScale(domain: 0...)
+        .frame(height: 300)
+        .padding()
+        .navigationTitle("Signup Requests Over Time")
+    }
+}
+
+Step 5: User Retention and Churn Analysis
+
+For deleted active and inactive users:
+
+struct UserRetentionChurnView: View {
+    var dataFrame: DataFrame
+
+    var body: some View {
+        Chart {
+            ForEach(dataFrame.rows.indices, id: \.self) { index in
+                let date = dataFrame[index, "sample_date"] as? Date ?? Date()
+                let deletedActive = dataFrame[index, "deleted_active"] as? Int ?? 0
+                let deletedInactive = dataFrame[index, "deleted_inactive"] as? Int ?? 0
+
+                LineMark(x: .value("Date", date), y: .value("Deleted Active Users", deletedActive))
+                    .foregroundStyle(.purple)
+                
+                LineMark(x: .value("Date", date), y: .value("Deleted Inactive Users", deletedInactive))
+                    .foregroundStyle(.pink)
+            }
+        }
+        .chartYScale(domain: 0...)
+        .frame(height: 300)
+        .padding()
+        .navigationTitle("Deleted Users (Active and Inactive)")
+    }
+}
+
+Step 6: Conversion Rate Analysis
+
+To calculate conversion rate, we can add it directly to the DataFrame and visualize it.
+
+import TabularData
+
+// Add conversion rate to the DataFrame
+dataFrame["conversion_rate"] = dataFrame.rows.map { row in
+    guard let newUsers = row["new_users"] as? Int, let acceptedRequests = row["accepted_requests"] as? Int else {
+        return 0.0
+    }
+    return Double(newUsers) / Double(acceptedRequests)
+}
+
+struct ConversionRateView: View {
+    var dataFrame: DataFrame
+
+    var body: some View {
+        Chart {
+            ForEach(dataFrame.rows.indices, id: \.self) { index in
+                let date = dataFrame[index, "sample_date"] as? Date ?? Date()
+                let conversionRate = dataFrame[index, "conversion_rate"] as? Double ?? 0.0
+                
+                LineMark(x: .value("Date", date), y: .value("Conversion Rate", conversionRate))
+                    .foregroundStyle(.cyan)
+            }
+        }
+        .chartYScale(domain: 0...)
+        .frame(height: 300)
+        .padding()
+        .navigationTitle("Signup Conversion Rate Over Time")
+    }
+}
+
