@@ -74,7 +74,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
     /**
      The value being selected by the user, while dragging.
      */
-    @State private var _selectedValue: RCVST_DataProvider.RowSignupPlottableData?
+    @State private var _selectedValue: RCVST_DataProvider.Row?
 
     /* ################################################################## */
     /**
@@ -90,9 +90,26 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
     
     /* ################################################################## */
     /**
-     The segregated user type data.
      */
-    private var _dataFiltered: [RCVST_DataProvider.Row] { data?.allRows ?? [] }
+    @State private var _selectedActivityRange: Int = 1
+    
+    /* ################################################################## */
+    /**
+     */
+    private var _dataFiltered: [RCVST_DataProvider.Row] {
+        var ret = [RCVST_DataProvider.Row]()
+        
+        guard let rows = data?.allRows,
+              !rows.isEmpty
+        else { return ret }
+
+        for index in stride(from: 1, to: rows.count, by: 2) {
+            let dailySample = rows[index]
+            ret.append(dailySample)
+        }
+        
+        return ret
+    }
 
     /* ################################################################## */
     /**
@@ -115,10 +132,58 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
      - parameter inRowData: The selected bar.
      - returns: True, if the bar is being selected.
      */
-    private func _isLineDragged(_ inRowData: RCVST_DataProvider.RowSignupPlottableData) -> Bool {
-        _isDragging && inRowData.date == _selectedValue?.date
+    private func _isLineDragged(_ inRowData: RCVST_DataProvider.Row) -> Bool {
+        _isDragging && nil != inRowData.sampleDate && inRowData.sampleDate == _selectedValue?.sampleDate
     }
 
+    /* ################################################################## */
+    /**
+     This returns a set of strings and integers, to be displayed to the user, depending on the given row.
+     
+     - parameter inRowData: The selected bar.
+     - returns: The number of active users, depending on the segmented selection.
+     */
+    private func getActiveDataValue(for inRowData: RCVST_DataProvider.Row) -> Int {
+        switch _selectedActivityRange {
+        case 1:
+            return inRowData.activeInLast24Hours
+        case 7:
+            return inRowData.activeInLastWeek
+        case 30:
+            return inRowData.activeInLast30Days
+        case 90:
+            return inRowData.activeInLast90Days
+        default:
+            return inRowData.averageLastActiveInDays
+        }
+    }
+
+    /* ################################################################## */
+    /**
+     This returns a set of strings and integers, to be displayed to the user, depending on the given row.
+     
+     - parameter inRowData: The selected bar.
+     - returns: A tuple, with the relevant data to use for the string.
+     */
+    private func getActiveDataItem(for inRowData: RCVST_DataProvider.Row) -> (activePeriodString: String, activeUsersNew: Int) {
+        let activePeriodString = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-\(_selectedActivityRange)".localizedVariant
+        var activeUsersNew = 0
+        switch _selectedActivityRange {
+        case 1:
+            activeUsersNew = inRowData.activeInLast24Hours
+        case 7:
+            activeUsersNew = inRowData.activeInLastWeek
+        case 30:
+            activeUsersNew = inRowData.activeInLast30Days
+        case 90:
+            activeUsersNew = inRowData.activeInLast90Days
+        default:
+            activeUsersNew = inRowData.averageLastActiveInDays
+        }
+        
+        return (activePeriodString: activePeriodString, activeUsersNew: activeUsersNew)
+    }
+    
     /* ################################################################## */
     /**
      The main chart body.
@@ -135,8 +200,111 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
         // Set up an array of strings to use as labels for the X-axis.
         let dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
         // It is surrounded by a standard group box.
-        GroupBox("SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant) {
-            Text(dateString.description)
+        GroupBox("SLUG-CHART-3-TITLE".localizedVariant) {
+            Picker("Activity", selection: $_selectedActivityRange) {
+                Text("1").tag(1)
+                Text("7").tag(7)
+                Text("30").tag(30)
+                Text("90").tag(90)
+                Text("SLUG-BAR-CHART-ACTIVE-TYPES-AVERAGE".localizedVariant).tag(0)
+            }
+            .pickerStyle(.segmented)
+            
+            // This displays the value of the selected bar.
+            Text(_selectedValuesString)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+                .font(.subheadline)
+                .foregroundStyle(.red)
+            // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
+            Chart(_dataFiltered) { inRowData in
+                let date = inRowData.sampleDate ?? .now
+                let active = getActiveDataValue(for: inRowData)
+                BarMark(
+                    x: .value("SLUG-BAR-CHART-TYPES-X".localizedVariant, date),
+                    y: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y".localizedVariant, active)
+                )
+                .foregroundStyle(by: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant,
+                                            _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : "SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant)
+                )
+            }
+            .chartForegroundStyleScale(["SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant: .green,
+                                        "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
+                                       ])
+            // We leave the Y-axis almost default, except that we want it on the left.
+            .chartYAxisLabel("SLUG-BAR-CHART-Y-AXIS-CHART-3-LABEL".localizedVariant, spacing: 12)
+            .chartYAxis {
+                AxisMarks(preset: .aligned, position: .leading) { _ in
+                    AxisTick()
+                    AxisGridLine()
+                    AxisValueLabel(anchor: .trailing)
+                }
+            }
+            // We customize the X-axis, to only have a few sections.
+            .chartXScale(domain: [minimumDate, maximumDate])
+            .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-CHART-3-LABEL".localizedVariant, alignment: .top)
+            .chartXAxis {
+                AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in
+                    AxisTick(length: 8)
+                    AxisGridLine()
+                    AxisValueLabel(dateString[inValue.index])
+                }
+            }
+            // This mess is the finger tracker.
+            .chartOverlay { chart in
+                GeometryReader { geometry in
+                    Rectangle()
+                        .fill(Color.clear)
+                        .contentShape(Rectangle())
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let dateFormatter = DateFormatter()
+                                    dateFormatter.dateStyle = .short
+                                    dateFormatter.timeStyle = .none
+                                    if let frame = chart.plotFrame {
+                                        let currentX = max(0, min(chart.plotSize.width, value.location.x - geometry[frame].origin.x))
+                                        guard let date = chart.value(atX: currentX, as: Date.self) else { return }
+                                        if let newValue = _dataFiltered.nearestTo(date),
+                                           let newDate = newValue.sampleDate {
+                                            let dateString = dateFormatter.string(from: newDate)
+                                            let allUsers = newValue.activeUsers
+                                            let activeUsersNew = getActiveDataItem(for: newValue).activeUsersNew
+                                            let activePeriodString = getActiveDataItem(for: newValue).activePeriodString
+                                            let percentage =  Int((100 * activeUsersNew) / allUsers)
+                                            if 0 == _selectedActivityRange {
+                                                _selectedValuesString = String(format: "SLUG-CHART-3-AVERAGE-DESC-STRING-FORMAT".localizedVariant,
+                                                                               dateString,
+                                                                               activeUsersNew
+                                                )
+                                            } else {
+                                                _selectedValuesString = String(format: "SLUG-CHART-3-TYPES-DESC-STRING-FORMAT".localizedVariant,
+                                                                               dateString,
+                                                                               activePeriodString,
+                                                                               activeUsersNew,
+                                                                               percentage
+                                                )
+                                            }
+                                            if newDate != (_selectedValue?.sampleDate ?? newDate) {
+                                                triggerHaptic()
+                                            }
+                                            _selectedValue = newValue
+                                        }
+                                        
+                                        _isDragging = true
+                                    }
+                                }
+                                .onEnded { _ in
+                                    triggerHaptic()
+                                    _isDragging = false
+                                    _selectedValue = nil
+                                    _selectedValuesString = " "
+                                }
+                        )
+                }
+            }
+            .padding([.trailing], 20)
+            .padding([.leading, .top, .bottom], 8)
         }
         // This is so the user has room to scroll, if the chart is off the screen.
         .padding([.leading, .trailing], 20)

@@ -212,7 +212,13 @@ extension RCVST_DataProvider {
 /* ###################################################################################################################################### */
 public extension RCVST_DataProvider {
     /// This provides a simple interface to the data for each row.
-    struct Row {
+    struct Row: Identifiable {
+        /* ############################################################## */
+        /**
+         Make us identifiable.
+         */
+        public let id = UUID()
+        
         // MARK: Previous Sample Access (Private)
         
         /* ############################################################## */

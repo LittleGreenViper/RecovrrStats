@@ -53,3 +53,17 @@
 "SLUG-BAR-CHART-X-AXIS-SIGNUP-LABEL"        =   "Date";
 
 "SLUG-CHART-3-TITLE"                        =   "User Activity";
+"SLUG-CHART-3-TYPES-DESC-STRING-FORMAT"     =   "%@: Active (%@): %d (%d%%)";
+"SLUG-CHART-3-AVERAGE-DESC-STRING-FORMAT"   =   "%@: Avg. Days Last Login: %d";
+"SLUG-BAR-CHART-X-AXIS-CHART-3-LABEL"       =   "Date";
+"SLUG-BAR-CHART-Y-AXIS-CHART-3-LABEL"       =   "Users";
+"SLUG-BAR-CHART-TYPES-X"                    =   "Date";
+"SLUG-BAR-CHART-ACTIVE-TYPES-Y"             =   "ACTIVE-1";
+"SLUG-BAR-CHART-INACTIVE-TYPES-Y"           =   "INACTIVE-1";
+"SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND"      =   "Active";
+"SLUG-BAR-CHART-ACTIVE-TYPES-AVERAGE"       =   "Avg";
+"SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-1"      =   "one day";
+"SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-7"      =   "one week";
+"SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-30"     =   "30 days";
+"SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-90"     =   "90 days";
+"SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-0"      =   "average";
