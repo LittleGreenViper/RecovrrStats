@@ -13,22 +13,22 @@
 /* Begin PBXFileReference section */
 		D4484A452CBEA80B0019BC0E /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Warnings.xcconfig; sourceTree = "<group>"; };
 		D4A62DD52CC9372D001DD8A9 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
-		D4F14D862CBEA585000C482E /* RecovrrStats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RecovrrStats.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4F14D862CBEA585000C482E /* Recovrr Stats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Recovrr Stats.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		D4F14DB62CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "RecovrrStats" target */ = {
+		D4F14DB62CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "Recovrr Stats" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 				Localizable.strings,
 			);
-			target = D4F14D852CBEA585000C482E /* RecovrrStats */;
+			target = D4F14D852CBEA585000C482E /* Recovrr Stats */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		D4F14DB72CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "Compile Sources" phase from "RecovrrStats" target */ = {
+		D4F14DB72CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "Compile Sources" phase from "Recovrr Stats" target */ = {
 			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
 			buildPhase = D4F14D822CBEA585000C482E /* Sources */;
 			membershipExceptions = (
@@ -41,8 +41,8 @@
 		D4F14D882CBEA585000C482E /* RecovrrStats */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				D4F14DB62CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "RecovrrStats" target */,
-				D4F14DB72CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "Compile Sources" phase from "RecovrrStats" target */,
+				D4F14DB62CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "Recovrr Stats" target */,
+				D4F14DB72CBEA616000C482E /* Exceptions for "RecovrrStats" folder in "Compile Sources" phase from "Recovrr Stats" target */,
 			);
 			path = RecovrrStats;
 			sourceTree = "<group>";
@@ -90,7 +90,7 @@
 		D4F14D872CBEA585000C482E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D4F14D862CBEA585000C482E /* RecovrrStats.app */,
+				D4F14D862CBEA585000C482E /* Recovrr Stats.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -98,9 +98,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		D4F14D852CBEA585000C482E /* RecovrrStats */ = {
+		D4F14D852CBEA585000C482E /* Recovrr Stats */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D4F14DAA2CBEA586000C482E /* Build configuration list for PBXNativeTarget "RecovrrStats" */;
+			buildConfigurationList = D4F14DAA2CBEA586000C482E /* Build configuration list for PBXNativeTarget "Recovrr Stats" */;
 			buildPhases = (
 				D4A62DD42CC935F2001DD8A9 /* SwiftLint */,
 				D4F14D822CBEA585000C482E /* Sources */,
@@ -114,12 +114,12 @@
 			fileSystemSynchronizedGroups = (
 				D4F14D882CBEA585000C482E /* RecovrrStats */,
 			);
-			name = RecovrrStats;
+			name = "Recovrr Stats";
 			packageProductDependencies = (
 				D433ED252CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox */,
 			);
 			productName = RecovrrStats;
-			productReference = D4F14D862CBEA585000C482E /* RecovrrStats.app */;
+			productReference = D4F14D862CBEA585000C482E /* Recovrr Stats.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -154,7 +154,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				D4F14D852CBEA585000C482E /* RecovrrStats */,
+				D4F14D852CBEA585000C482E /* Recovrr Stats */,
 			);
 		};
 /* End PBXProject section */
@@ -347,9 +347,15 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.littlegreenviper.RecovrrStats;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -380,9 +386,15 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.littlegreenviper.RecovrrStats;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -401,7 +413,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D4F14DAA2CBEA586000C482E /* Build configuration list for PBXNativeTarget "RecovrrStats" */ = {
+		D4F14DAA2CBEA586000C482E /* Build configuration list for PBXNativeTarget "Recovrr Stats" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D4F14DAB2CBEA586000C482E /* Debug */,

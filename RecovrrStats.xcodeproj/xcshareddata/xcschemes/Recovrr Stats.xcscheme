@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D4F14D852CBEA585000C482E"
-               BuildableName = "RecovrrStats.app"
-               BlueprintName = "RecovrrStats"
+               BuildableName = "Recovrr Stats.app"
+               BlueprintName = "Recovrr Stats"
                ReferencedContainer = "container:RecovrrStats.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,8 +45,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D4F14D852CBEA585000C482E"
-            BuildableName = "RecovrrStats.app"
-            BlueprintName = "RecovrrStats"
+            BuildableName = "Recovrr Stats.app"
+            BlueprintName = "Recovrr Stats"
             ReferencedContainer = "container:RecovrrStats.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,8 +62,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D4F14D852CBEA585000C482E"
-            BuildableName = "RecovrrStats.app"
-            BlueprintName = "RecovrrStats"
+            BuildableName = "Recovrr Stats.app"
+            BlueprintName = "Recovrr Stats"
             ReferencedContainer = "container:RecovrrStats.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

@@ -172,6 +172,7 @@ struct SignupActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                 .lineLimit(1)
                 .font(.subheadline)
                 .foregroundStyle(.red)
+            
             // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
             Chart(_dataFiltered) { inRowData in
                 ForEach(inRowData.data, id: \.signupType) { inSignupTypeData in

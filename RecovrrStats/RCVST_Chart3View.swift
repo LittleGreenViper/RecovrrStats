@@ -201,6 +201,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
         let dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
         // It is surrounded by a standard group box.
         GroupBox("SLUG-CHART-3-TITLE".localizedVariant) {
+            // This picker allows us to view the various activity ranges.
             Picker("Activity", selection: $_selectedActivityRange) {
                 Text("1").tag(1)
                 Text("7").tag(7)
@@ -209,6 +210,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                 Text("SLUG-BAR-CHART-ACTIVE-TYPES-AVERAGE".localizedVariant).tag(0)
             }
             .pickerStyle(.segmented)
+            .onChange(of: _selectedActivityRange) { triggerHaptic(intensity: 0.5, sharpness: 0.25) }
             
             // This displays the value of the selected bar.
             Text(_selectedValuesString)
@@ -216,6 +218,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                 .lineLimit(1)
                 .font(.subheadline)
                 .foregroundStyle(.red)
+            
             // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
             Chart(_dataFiltered) { inRowData in
                 let date = inRowData.sampleDate ?? .now

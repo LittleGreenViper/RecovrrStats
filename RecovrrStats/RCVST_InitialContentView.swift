@@ -119,7 +119,6 @@ struct RootStackView: View, RCVST_UsesData {
                 NavigationLink("SLUG-CHART-3-TITLE".localizedVariant) { RCVST_Chart3View(data: data) }
             }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
-            .navigationBarTitleDisplayMode(.large)
         }
     }
 }
