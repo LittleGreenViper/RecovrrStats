@@ -185,13 +185,13 @@ extension RCVST_DataProvider {
      - parameter completion: A simple completion proc, with a single argument of dataframe, containing the stats. This is always called in the main thread.
      */
     private func _fetchStats(completion inCompletion: ((DataFrame?) -> Void)?) {
-        guard let url = URL(string: Self._g_statsURLString)
-        else {
-            inCompletion?(nil)
-            return
-        }
         // We don't need to do this in the main thread.
         DispatchQueue.global().async {
+            guard let url = URL(string: Self._g_statsURLString)
+            else {
+                DispatchQueue.main.async { inCompletion?(nil) }
+                return
+            }
             do {
                 var dataFrame = try DataFrame(contentsOfCSVFile: url)
                 // We convert the integer timestamp to a more usable Date instance.
