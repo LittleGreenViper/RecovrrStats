@@ -22,18 +22,16 @@ extension Array where Element == RCVST_DataProvider.Row {
         var ret: RCVST_DataProvider.Row?
         
         forEach {
-            guard let retTemp = ret,
-                  let currentDate = $0.sampleDate,
-                  let compDate = retTemp.sampleDate
+            guard let currentDate = $0.sampleDate,
+                  let compDate = ret?.sampleDate
             else {
                 ret = $0
                 return
             }
             
-            if abs(currentDate.timeIntervalSince(inDate)) < abs(compDate.timeIntervalSince(inDate)) {
-                ret = $0
-            }
+            ret = abs(currentDate.timeIntervalSince(inDate)) < abs(compDate.timeIntervalSince(inDate)) ? $0 : ret
         }
+        
         return ret
     }
 }
@@ -62,11 +60,7 @@ public class RCVST_DataProvider: ObservableObject {
      Upon initialization, we go out, and fetch the stats file.
      */
     required init() {
-        _fetchStats {
-            guard let stats = $0 else { return }
-            // We need to publish the change in the main thread.
-            self.statusDataFrame = stats
-        }
+        _fetchStats { inResults in DispatchQueue.main.async { self.statusDataFrame = inResults } }
     }
 }
 
@@ -182,26 +176,29 @@ extension RCVST_DataProvider {
     /**
      This fetches the current stats file, and delivers it as a dataframe.
      
-     - parameter completion: A simple completion proc, with a single argument of dataframe, containing the stats. This is always called in the main thread.
+     - parameter completion: A simple completion proc, with a single argument of dataframe, containing the stats.
      */
     private func _fetchStats(completion inCompletion: ((DataFrame?) -> Void)?) {
         // We don't need to do this in the main thread.
         DispatchQueue.global().async {
             guard let url = URL(string: Self._g_statsURLString)
             else {
-                DispatchQueue.main.async { inCompletion?(nil) }
+                inCompletion?(nil)
                 return
             }
             do {
                 var dataFrame = try DataFrame(contentsOfCSVFile: url)
                 // We convert the integer timestamp to a more usable Date instance.
                 dataFrame.transformColumn(_Columns.sample_date.rawValue) { (inUnixTime: Int) -> Date in Date(timeIntervalSince1970: TimeInterval(inUnixTime)) }
-                DispatchQueue.main.async { inCompletion?(dataFrame) }
+                #if DEBUG
+                    print("Data Frame Successful Initialization")
+                #endif
+                inCompletion?(dataFrame)
             } catch {
                 #if DEBUG
                     print("Data Frame Initialization Error: \(error.localizedDescription)")
                 #endif
-                DispatchQueue.main.async { inCompletion?(nil) }
+                inCompletion?(nil)
             }
         }
     }

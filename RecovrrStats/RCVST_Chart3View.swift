@@ -9,13 +9,19 @@ import RVS_Generic_Swift_Toolbox
 import CoreHaptics
 
 /* ###################################################################################################################################### */
-// MARK: - Main Content View -
+// MARK: - Main Content View for Last Active Chart -
 /* ###################################################################################################################################### */
 /**
- This displays a chart, with the different signup states, over time.
+ This displays a chart, with the activity of active users (based on when they last signed in, at the time of the sample), over time.
  It is selectable, and dragging your finger across the chart, shows exact numbers.
  */
 struct RCVST_Chart3View: View, RCVST_UsesData {
+    /* ################################################################## */
+    /**
+     Padding for the sides.
+     */
+    private static let _sidePadding = CGFloat(20)
+    
     /* ################################################################## */
     /**
      This is the actual dataframe wrapper for the stats.
@@ -29,29 +35,37 @@ struct RCVST_Chart3View: View, RCVST_UsesData {
     var body: some View {
         GeometryReader { inGeometry in
             ScrollView {
-                VStack {
-                    UserActivityChart(data: data)
-                }
-                .padding()
+                UserActivityChart(data: data)
+                // This is so the user has room to scroll, if the chart is off the screen.
+                .padding([.leading, .trailing], Self._sidePadding)
                 .frame(
                     minWidth: inGeometry.size.width,
                     maxWidth: inGeometry.size.width,
-                    minHeight: inGeometry.size.width,
+                    minHeight: inGeometry.size.width - (Self._sidePadding * 2), // Make it square.
                     maxHeight: .infinity,
                     alignment: .topLeading
                 )
             }
+            // Prevents the scroller from "bouncing," unless we are beyond the bounds of the screen.
+            .scrollBounceBehavior(.basedOnSize)
         }
     }
 }
 
 /* ###################################################################################################################################### */
-// MARK: - Signup Activity Bar Chart -
+// MARK: - Active User Activity Bar Chart -
 /* ###################################################################################################################################### */
 /**
- This displays a simple bar chart of the signups, segeregated by whether the signup was approved or rejected.
+ This displays a simple bar chart of the activity, selectable for one day (24 hours) 1 week (7 days), 30 days, or 90 days.
+ You also have an "Average," which is the average of all users' last sign in from the time of the sample (in days).
  */
 struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
+    /* ################################################################## */
+    /**
+     Padding for the right side.
+     */
+    private static let _sidePadding = CGFloat(20)
+    
     /* ################################################################## */
     /**
      Tracks scene activity.
@@ -95,6 +109,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
     
     /* ################################################################## */
     /**
+     We provide the whole row, as data, broken into 1-day intervals.
      */
     private var _dataFiltered: [RCVST_DataProvider.Row] {
         var ret = [RCVST_DataProvider.Row]()
@@ -231,6 +246,8 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                             _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : "SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant)
                 )
             }
+            // Gives the last X string room.
+            .padding([.trailing], Self._sidePadding)
             .chartForegroundStyleScale(["SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant: .green,
                                         "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
                                        ])
@@ -306,11 +323,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                         )
                 }
             }
-            .padding([.trailing], 20)
-            .padding([.leading, .top, .bottom], 8)
         }
-        // This is so the user has room to scroll, if the chart is off the screen.
-        .padding([.leading, .trailing], 20)
         // This makes sure the haptics are set up, every time we are activated.
         .onChange(of: _scenePhase, initial: true) {
             if .active == _scenePhase {

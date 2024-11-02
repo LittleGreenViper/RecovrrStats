@@ -29,8 +29,8 @@ protocol RCVST_HapticHopper {
     /**
      This triggers the haptic. OPTIONAL
      
-     - parameter intensity: The 0 -> 1 intensity, with 0, being off, and 1 being max. Optional. Default is 0.25 (gentle selection).
-     - parameter intensity: The 0 -> 1 sharpness, with 0, being soft, and 1 being hard. Optional. Default is 0 (very soft).
+     - parameter intensity: The 0 -> 1 intensity, with 0, being off, and 1 being max. Optional for protocol default. Default is 0.25 (gentle selection).
+     - parameter sharpness: The 0 -> 1 sharpness, with 0, being soft, and 1 being hard. Optional for protocol default. Default is 0 (soft).
      */
     func triggerHaptic(intensity: Float, sharpness: Float)
 }
@@ -41,7 +41,7 @@ protocol RCVST_HapticHopper {
 extension RCVST_HapticHopper {
     /* ################################################################## */
     /**
-     We add defaults, here.
+     This provides a basic haptic trigger function. Probably all we need.
      */
     func triggerHaptic(intensity inIntensity: Float = 0.25, sharpness inSharpness: Float = 0) {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
@@ -91,7 +91,7 @@ struct RCVST_InitialContentView: View {
 // MARK: - The List of Charts -
 /* ###################################################################################################################################### */
 /**
- 
+ This presents a simple navigation list, with callouts to the various charts.
  */
 struct RootStackView: View {
     /* ################################################################## */
@@ -99,6 +99,12 @@ struct RootStackView: View {
      This is the actual dataframe wrapper for the stats.
      */
     @State var data: RCVST_DataProvider = RCVST_DataProvider()
+    
+    /* ################################################################## */
+    /**
+     We use this semaphore, to avoid redunant loads.
+     */
+    @State var skipLoad: Bool = true
 
     /* ################################################################## */
     /**
@@ -108,6 +114,7 @@ struct RootStackView: View {
 
     /* ################################################################## */
     /**
+     The main navigation stack screen.
      */
     var body: some View {
         NavigationStack {
@@ -117,11 +124,20 @@ struct RootStackView: View {
                 NavigationLink("SLUG-CHART-3-TITLE".localizedVariant) { RCVST_Chart3View(data: data) }
             }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
+            // Reacts to "pull to refresh," to reload the file.
+            .refreshable {
+                skipLoad = true
+                data = RCVST_DataProvider()
+            }
         }
         // Forces updates, whenever we become active.
         .onChange(of: _scenePhase, initial: true) {
-            if .active == _scenePhase {
+            if !skipLoad,
+               .active == _scenePhase {
+                skipLoad = true
                 data = RCVST_DataProvider()
+            } else if .background == _scenePhase {
+                skipLoad = false
             }
         }
     }

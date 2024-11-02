@@ -29,22 +29,27 @@ extension Array where Element == RCVST_DataProvider.RowSignupPlottableData {
                 return
             }
             
-            if abs($0.date.timeIntervalSince(inDate)) < abs(retTemp.date.timeIntervalSince(inDate)) {
-                ret = $0
-            }
+            ret = abs($0.date.timeIntervalSince(inDate)) < abs(retTemp.date.timeIntervalSince(inDate)) ? $0 : ret
         }
+        
         return ret
     }
 }
 
 /* ###################################################################################################################################### */
-// MARK: - Main Content View -
+// MARK: - Main Content View For Signup Administration Activity Chart -
 /* ###################################################################################################################################### */
 /**
  This displays a chart, with the different signup states, over time.
  It is selectable, and dragging your finger across the chart, shows exact numbers.
  */
 struct RCVST_Chart2View: View, RCVST_UsesData {
+    /* ################################################################## */
+    /**
+     Padding for the sides.
+     */
+    private static let _sidePadding = CGFloat(20)
+    
     /* ################################################################## */
     /**
      This is the actual dataframe wrapper for the stats.
@@ -58,18 +63,19 @@ struct RCVST_Chart2View: View, RCVST_UsesData {
     var body: some View {
         GeometryReader { inGeometry in
             ScrollView {
-                VStack {
-                    SignupActivityChart(data: data)
-                }
-                .padding()
+                SignupActivityChart(data: data)
+                // This is so the user has room to scroll, if the chart is off the screen.
+                .padding([.leading, .trailing], Self._sidePadding)
                 .frame(
                     minWidth: inGeometry.size.width,
                     maxWidth: inGeometry.size.width,
-                    minHeight: inGeometry.size.width,
+                    minHeight: inGeometry.size.width - (Self._sidePadding * 2), // Make it square.
                     maxHeight: .infinity,
                     alignment: .topLeading
                 )
             }
+            // Prevents the scroller from "bouncing," unless we are beyond the bounds of the screen.
+            .scrollBounceBehavior(.basedOnSize)
         }
     }
 }
@@ -81,6 +87,12 @@ struct RCVST_Chart2View: View, RCVST_UsesData {
  This displays a simple bar chart of the signups, segeregated by whether the signup was approved or rejected.
  */
 struct SignupActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
+    /* ################################################################## */
+    /**
+     Padding for the right side.
+     */
+    private static let _sidePadding = CGFloat(20)
+    
     /* ################################################################## */
     /**
      Tracks scene activity.
@@ -119,7 +131,7 @@ struct SignupActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
     
     /* ################################################################## */
     /**
-     The segregated user type data.
+     The segregated signup activity data.
      */
     private var _dataFiltered: [RCVST_DataProvider.RowSignupPlottableData] { data?.signupTypePlottable ?? [] }
 
@@ -185,6 +197,8 @@ struct SignupActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                     )
                 }
             }
+            // Gives the last X string room.
+            .padding([.trailing], Self._sidePadding)
             .chartForegroundStyleScale(["SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL".localizedVariant: .green,
                                         "SLUG-REJECTED-SIGNUP-LEGEND-LABEL".localizedVariant: .orange,
                                         "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
@@ -248,11 +262,7 @@ struct SignupActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                         )
                 }
             }
-            .padding([.trailing], 20)
-            .padding([.leading, .top, .bottom], 8)
         }
-        // This is so the user has room to scroll, if the chart is off the screen.
-        .padding([.leading, .trailing], 20)
         // This makes sure the haptics are set up, every time we are activated.
         .onChange(of: _scenePhase, initial: true) {
             if .active == _scenePhase {
