@@ -82,17 +82,9 @@ protocol RCVST_UsesData {
 struct RCVST_InitialContentView: View {
     /* ################################################################## */
     /**
-     This is the actual dataframe wrapper for the stats.
-     */
-    @ObservedObject var data = RCVST_DataProvider()
-
-    /* ################################################################## */
-    /**
      This is the layout for this screen.
      */
-    var body: some View {
-        RootStackView(data: data)
-    }
+    var body: some View { RootStackView() }
 }
 
 /* ###################################################################################################################################### */
@@ -101,12 +93,18 @@ struct RCVST_InitialContentView: View {
 /**
  
  */
-struct RootStackView: View, RCVST_UsesData {
+struct RootStackView: View {
     /* ################################################################## */
     /**
      This is the actual dataframe wrapper for the stats.
      */
-    @State var data: RCVST_DataProvider?
+    @State var data: RCVST_DataProvider = RCVST_DataProvider()
+
+    /* ################################################################## */
+    /**
+     Tracks scene activity.
+     */
+    @Environment(\.scenePhase) private var _scenePhase
 
     /* ################################################################## */
     /**
@@ -119,6 +117,12 @@ struct RootStackView: View, RCVST_UsesData {
                 NavigationLink("SLUG-CHART-3-TITLE".localizedVariant) { RCVST_Chart3View(data: data) }
             }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
+        }
+        // Forces updates, whenever we become active.
+        .onChange(of: _scenePhase, initial: true) {
+            if .active == _scenePhase {
+                data = RCVST_DataProvider()
+            }
         }
     }
 }
