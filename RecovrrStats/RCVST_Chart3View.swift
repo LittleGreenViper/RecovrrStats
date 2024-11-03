@@ -18,12 +18,6 @@ import CoreHaptics
 struct RCVST_Chart3View: View, RCVST_UsesData {
     /* ################################################################## */
     /**
-     Padding for the sides.
-     */
-    private static let _sidePadding = CGFloat(20)
-    
-    /* ################################################################## */
-    /**
      This is the actual dataframe wrapper for the stats.
      */
     @State var data: RCVST_DataProvider?
@@ -36,12 +30,10 @@ struct RCVST_Chart3View: View, RCVST_UsesData {
         GeometryReader { inGeometry in
             ScrollView {
                 UserActivityChart(data: data)
-                // This is so the user has room to scroll, if the chart is off the screen.
-                .padding([.leading, .trailing], Self._sidePadding)
                 .frame(
                     minWidth: inGeometry.size.width,
                     maxWidth: inGeometry.size.width,
-                    minHeight: inGeometry.size.width - (Self._sidePadding * 2), // Make it square.
+                    minHeight: inGeometry.size.width - (UserActivityChart.sidePadding * 2), // Make it square.
                     maxHeight: .infinity,
                     alignment: .topLeading
                 )
@@ -64,7 +56,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
     /**
      Padding for the right side.
      */
-    private static let _sidePadding = CGFloat(20)
+    static let sidePadding = CGFloat(20)
     
     /* ################################################################## */
     /**
@@ -246,8 +238,6 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                             _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : "SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant)
                 )
             }
-            // Gives the last X string room.
-            .padding([.trailing], Self._sidePadding)
             .chartForegroundStyleScale(["SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant: .green,
                                         "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
                                        ])
@@ -323,6 +313,8 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                         )
                 }
             }
+            // This is so the user has room to scroll, if the chart is off the screen.
+            .padding([.leading, .trailing], Self.sidePadding)
         }
         // This makes sure the haptics are set up, every time we are activated.
         .onChange(of: _scenePhase, initial: true) {

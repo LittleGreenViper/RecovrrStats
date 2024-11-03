@@ -46,12 +46,6 @@ extension Array where Element == RCVST_DataProvider.RowUserPlottableData {
 struct RCVST_Chart1View: View, RCVST_UsesData {
     /* ################################################################## */
     /**
-     Padding for the sides.
-     */
-    private static let _sidePadding = CGFloat(20)
-    
-    /* ################################################################## */
-    /**
      This is the actual dataframe wrapper for the stats.
      */
     @State var data: RCVST_DataProvider?
@@ -64,12 +58,10 @@ struct RCVST_Chart1View: View, RCVST_UsesData {
         GeometryReader { inGeometry in
             ScrollView {
                 UserTypesChart(data: data)
-                // This is so the user has room to scroll, if the chart is off the screen.
-                .padding([.leading, .trailing], Self._sidePadding)
                 .frame(
                     minWidth: inGeometry.size.width,
                     maxWidth: inGeometry.size.width,
-                    minHeight: inGeometry.size.width - (Self._sidePadding * 2), // Make it square.
+                    minHeight: inGeometry.size.width - (UserTypesChart.sidePadding * 2), // Make it square.
                     maxHeight: .infinity,
                     alignment: .topLeading
                 )
@@ -91,7 +83,7 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
     /**
      Padding for the right side.
      */
-    private static let _sidePadding = CGFloat(20)
+    static let sidePadding = CGFloat(20)
     
     /* ################################################################## */
     /**
@@ -197,8 +189,6 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
                     )
                 }
             }
-            // Gives the last X string room.
-            .padding([.trailing], Self._sidePadding)
             // These define the three items in the legend, as well as the colors we'll use in the bars.
             .chartForegroundStyleScale(["SLUG-ACTIVE-LEGEND-LABEL".localizedVariant: .green,
                                         "SLUG-NEW-LEGEND-LABEL".localizedVariant: .blue,
@@ -263,7 +253,9 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
                         )
                 }
             }
-        }
+            // This is so the user has room to scroll, if the chart is off the screen.
+            .padding([.leading, .trailing], Self.sidePadding)
+       }
         // This makes sure the haptics are set up, every time we are activated.
         .onChange(of: _scenePhase, initial: true) {
             if .active == _scenePhase {

@@ -46,12 +46,6 @@ extension Array where Element == RCVST_DataProvider.RowSignupPlottableData {
 struct RCVST_Chart2View: View, RCVST_UsesData {
     /* ################################################################## */
     /**
-     Padding for the sides.
-     */
-    private static let _sidePadding = CGFloat(20)
-    
-    /* ################################################################## */
-    /**
      This is the actual dataframe wrapper for the stats.
      */
     @State var data: RCVST_DataProvider?
@@ -64,12 +58,10 @@ struct RCVST_Chart2View: View, RCVST_UsesData {
         GeometryReader { inGeometry in
             ScrollView {
                 SignupActivityChart(data: data)
-                // This is so the user has room to scroll, if the chart is off the screen.
-                .padding([.leading, .trailing], Self._sidePadding)
                 .frame(
                     minWidth: inGeometry.size.width,
                     maxWidth: inGeometry.size.width,
-                    minHeight: inGeometry.size.width - (Self._sidePadding * 2), // Make it square.
+                    minHeight: inGeometry.size.width - (SignupActivityChart.sidePadding * 2), // Make it square.
                     maxHeight: .infinity,
                     alignment: .topLeading
                 )
@@ -91,7 +83,7 @@ struct SignupActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
     /**
      Padding for the right side.
      */
-    private static let _sidePadding = CGFloat(20)
+    static let sidePadding = CGFloat(20)
     
     /* ################################################################## */
     /**
@@ -197,8 +189,6 @@ struct SignupActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                     )
                 }
             }
-            // Gives the last X string room.
-            .padding([.trailing], Self._sidePadding)
             .chartForegroundStyleScale(["SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL".localizedVariant: .green,
                                         "SLUG-REJECTED-SIGNUP-LEGEND-LABEL".localizedVariant: .orange,
                                         "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
@@ -262,6 +252,8 @@ struct SignupActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                         )
                 }
             }
+            // This is so the user has room to scroll, if the chart is off the screen.
+            .padding([.leading, .trailing], Self.sidePadding)
         }
         // This makes sure the haptics are set up, every time we are activated.
         .onChange(of: _scenePhase, initial: true) {
