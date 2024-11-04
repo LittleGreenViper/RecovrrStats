@@ -98,13 +98,7 @@ struct RootStackView: View {
     /**
      This is the actual dataframe wrapper for the stats.
      */
-    @State var data: RCVST_DataProvider = RCVST_DataProvider()
-    
-    /* ################################################################## */
-    /**
-     We use this semaphore, to avoid redunant loads.
-     */
-    @State var skipLoad: Bool = true
+    @State private var _data: RCVST_DataProvider? = RCVST_DataProvider()
 
     /* ################################################################## */
     /**
@@ -119,25 +113,23 @@ struct RootStackView: View {
     var body: some View {
         NavigationStack {
             List {
-                NavigationLink("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart1View(data: data) }
-                NavigationLink("SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart2View(data: data) }
-                NavigationLink("SLUG-CHART-3-TITLE".localizedVariant) { RCVST_Chart3View(data: data) }
+                NavigationLink("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart1View(data: _data) }
+                NavigationLink("SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart2View(data: _data) }
+                NavigationLink("SLUG-CHART-3-TITLE".localizedVariant) { RCVST_Chart3View(data: _data) }
             }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
             // Reacts to "pull to refresh," to reload the file.
             .refreshable {
-                skipLoad = true
-                data = RCVST_DataProvider()
+                _data = RCVST_DataProvider()
             }
         }
         // Forces updates, whenever we become active.
         .onChange(of: _scenePhase, initial: true) {
-            if !skipLoad,
-               .active == _scenePhase {
-                skipLoad = true
-                data = RCVST_DataProvider()
+            if .active == _scenePhase,
+               nil == _data {
+                _data = RCVST_DataProvider()
             } else if .background == _scenePhase {
-                skipLoad = false
+                _data = nil
             }
         }
     }
