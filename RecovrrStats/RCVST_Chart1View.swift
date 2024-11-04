@@ -255,7 +255,8 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
             }
             // This is so the user has room to scroll, if the chart is off the screen.
             .padding([.leading, .trailing], Self.sidePadding)
-       }
+        }
+        .padding()
         // This makes sure the haptics are set up, every time we are activated.
         .onChange(of: _scenePhase, initial: true) {
             if .active == _scenePhase {
