@@ -414,19 +414,19 @@ public extension RCVST_DataProvider {
         /**
          The change in the total number of users. Positive is users added, negative is users removed.
          */
-        public var changeInTotalUsers: Int { totalUsers - _previousTotalUsers }
+        public var changeInTotalUsers: Int { 0 == _previousTotalUsers ? 0 : totalUsers - _previousTotalUsers }
 
         /* ############################################################## */
         /**
          The change in the total number of inactive users. Positive is users added, negative is users removed.
          */
-        public var changeInNewUsers: Int { newUsers - _previousNewUsers }
+        public var changeInNewUsers: Int { 0 == _previousNewUsers ? 0 : newUsers - _previousNewUsers }
 
         /* ############################################################## */
         /**
          The change in the total number of inactive users. Positive is users added, negative is users removed.
          */
-        public var changeInActiveUsers: Int { activeUsers - _previousActiveUsers }
+        public var changeInActiveUsers: Int { 0 == _previousActiveUsers ? 0 : activeUsers - _previousActiveUsers }
 
         /* ############################################################## */
         /**
@@ -463,12 +463,6 @@ public extension RCVST_DataProvider {
          The number of inactive users deleted by the administrators since the last sample.
          */
         public var newDeletedInactive: Int { deletedInactive - _previousDeletedInactive }
-
-        /* ############################################################## */
-        /**
-         The number of users that have deleted themselves (as opposed to being deleted by admins), since the last sample.
-         */
-        public var newSelfDeletedActive: Int { Swift.max(0, changeInActiveUsers - newDeletedActive) }
     }
 }
 
@@ -877,6 +871,143 @@ public extension RCVST_DataProvider {
             let rejectedSignups = RowSignupTypesPlottableData(signupType: .rejectedSignups, value: sample1.newRejectedRequests + sample2.newRejectedRequests)
             let acceptedSignups = RowSignupTypesPlottableData(signupType: .acceptedSignups, value: sample1.newAcceptedRequests + sample2.newAcceptedRequests)
             ret.append(RowSignupPlottableData(date: date, data: [acceptedSignups, rejectedSignups]))
+        }
+        
+        return ret
+    }
+}
+
+/* ###################################################################################################################################### */
+// MARK: - Adds Chart Plottable Stuff For Account Deletion Types -
+/* ###################################################################################################################################### */
+public extension RCVST_DataProvider {
+    /* ################################################################################################################################## */
+    // MARK: This is used to define the types of deletions.
+    /* ################################################################################################################################## */
+    /**
+     This enum defines the delete types we provide separately.
+     */
+    enum DeletionTypes: String {
+        /* ############################################################## */
+        /**
+         Deleted active accounts (usually for inactivity for a long time).
+         */
+        case deletedActive
+        
+        /* ############################################################## */
+        /**
+         Deleted inactive accounts (usually for inactivity for a long time).
+         */
+        case deletedInactive
+        
+        /* ############################################################## */
+        /**
+         Accounts that deleted themselves.
+         */
+        case selfDeleted
+
+        /* ############################################################## */
+        /**
+         The column name, localized.
+         */
+        var localizedString: String { "SLUG-DELETED-COLUMN-NAME-\(rawValue)".localizedVariant }
+    }
+    
+    /* ################################################################################################################################## */
+    // MARK: A Single Signup Data Point
+    /* ################################################################################################################################## */
+    /**
+     This struct is one data point (count of signup types).
+     */
+    struct RowDeleteTypesPlottableData: Identifiable {
+        /* ############################################################## */
+        /**
+         Make me identifiable.
+         */
+        public var id = UUID()
+
+        /* ############################################################## */
+        /**
+         The type of signup being tracked.
+         */
+        let deletionType: DeletionTypes
+
+        /* ############################################################## */
+        /**
+         The number of signups that fit this type.
+         */
+        let value: Int
+        
+        /* ############################################################## */
+        /**
+         A string that can be used as a legend key
+         */
+        var descriptionString: String {
+            switch deletionType {
+            case .deletedActive: return "SLUG-DELETED-ACTIVE-LEGEND-LABEL".localizedVariant
+            case .deletedInactive: return "SLUG-DELETED-INACTIVE-LEGEND-LABEL".localizedVariant
+            case .selfDeleted: return "SLUG-DELETED-SELF-LEGEND-LABEL".localizedVariant
+            }
+        }
+    }
+    
+    /* ################################################################################################################################## */
+    // MARK: A Collection of Data Points For One Signup Types Sample.
+    /* ################################################################################################################################## */
+    /**
+     This provides signup type totals for one date.
+     */
+    struct RowDeletePlottableData: Identifiable {
+        /* ############################################################## */
+        /**
+         Make me identifiable.
+         */
+        public var id = UUID()
+
+        /* ############################################################## */
+        /**
+         The date the sample was taken.
+         */
+        let date: Date
+
+        /* ############################################################## */
+        /**
+         The totals of the types of deletions, for this sample.
+         */
+        var data: [RowDeleteTypesPlottableData]
+        
+        /* ############################################################## */
+        /**
+         Initializer
+         
+         - parameter date: The sample date. Optional. Default is .distantPast.
+         - parameter data: The totals of the types of deletions. Optional. Default is an empty array.
+         */
+        init(date inDate: Date = .distantPast, data inData: [RowDeleteTypesPlottableData] = []) {
+            date = inDate
+            data = inData
+        }
+    }
+    
+    /* ############################################################## */
+    /**
+     This returns all the samples in a simplified manner for countable deletion types, suitable for plotting in a chart.
+     This combines two samples into one (we sample every twelve hours, so this makes it daily).
+     */
+    var deleteTypePlottable: [RowDeletePlottableData] {
+        var ret = [RowDeletePlottableData]()
+        
+        let rows = allRows
+        
+        guard !rows.isEmpty else { return ret }
+
+        for index in stride(from: 1, to: rows.count, by: 2) {
+            let sample1 = rows[index - 1]
+            let sample2 = rows[index]
+            guard let date = sample1.sampleDate else { break }
+            let deletedActive = RowDeleteTypesPlottableData(deletionType: .deletedActive, value: sample1.newDeletedActive + sample2.newDeletedActive)
+            let deletedInactive = RowDeleteTypesPlottableData(deletionType: .deletedInactive, value: sample1.newDeletedInactive + sample2.newDeletedInactive)
+            ret.append(RowDeletePlottableData(date: date, data: [deletedActive, deletedInactive]))
         }
         
         return ret

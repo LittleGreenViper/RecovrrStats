@@ -116,6 +116,7 @@ struct RootStackView: View {
                 NavigationLink("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart1View(data: _data) }
                 NavigationLink("SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart2View(data: _data) }
                 NavigationLink("SLUG-CHART-3-TITLE".localizedVariant) { RCVST_Chart3View(data: _data) }
+                NavigationLink("SLUG-CHART-4-TITLE".localizedVariant) { RCVST_Chart4View(data: _data) }
             }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
             // Reacts to "pull to refresh," to reload the file.
