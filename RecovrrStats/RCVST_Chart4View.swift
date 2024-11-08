@@ -229,7 +229,7 @@ struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                         let currentX = max(0, min(chart.plotSize.width, value.location.x - geometry[frame].origin.x))
                                         guard let date = chart.value(atX: currentX, as: Date.self) else { return }
                                         if let newValue = _dataFiltered.nearestTo(date) {
-                                            _selectedValuesString = String(format: "SLUG-SIGNUP-TYPES-DESC-STRING-FORMAT".localizedVariant,
+                                            _selectedValuesString = String(format: "SLUG-DELETED-TYPES-DESC-STRING-FORMAT".localizedVariant,
                                                                            dateFormatter.string(from: newValue.date),
                                                                            newValue.data[0].value,
                                                                            newValue.data[1].value,

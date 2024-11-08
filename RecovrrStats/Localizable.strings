@@ -69,7 +69,7 @@
 "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-0"      =   "average";
 
 "SLUG-CHART-4-TITLE"                        =   "Account Deletions";
-"SLUG-SIGNUP-TYPES-DESC-STRING-FORMAT"      =   "%@: Active: %d, Inactive: %d, Total: %d";
+"SLUG-DELETED-TYPES-DESC-STRING-FORMAT"     =   "%@: Active: %d, Inactive: %d, Total: %d";
 "SLUG-DELETED-ACTIVE-LEGEND-LABEL"          =   "Active";
 "SLUG-DELETED-INACTIVE-LEGEND-LABEL"        =   "Inactive";
 "SLUG-DELETION-COLUMN-NAME-deletedActive"   =   "Deleted Active";
