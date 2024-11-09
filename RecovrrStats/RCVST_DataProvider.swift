@@ -867,9 +867,13 @@ public extension RCVST_DataProvider {
         for index in stride(from: 1, to: rows.count, by: 2) {
             let sample1 = rows[index - 1]
             let sample2 = rows[index]
-            guard let date = sample1.sampleDate else { break }
-            let rejectedSignups = RowSignupTypesPlottableData(signupType: .rejectedSignups, value: sample1.newRejectedRequests + sample2.newRejectedRequests)
-            let acceptedSignups = RowSignupTypesPlottableData(signupType: .acceptedSignups, value: sample1.newAcceptedRequests + sample2.newAcceptedRequests)
+            guard let date = sample2.sampleDate else { break }
+            let sample1RejectedValue = sample1.newRejectedRequests
+            let sample2RejectedValue = sample2.newRejectedRequests
+            let sample1AcceptedValue = sample1.newAcceptedRequests
+            let sample2AcceptedValue = sample2.newAcceptedRequests
+            let rejectedSignups = RowSignupTypesPlottableData(signupType: .rejectedSignups, value: sample1RejectedValue + sample2RejectedValue)
+            let acceptedSignups = RowSignupTypesPlottableData(signupType: .acceptedSignups, value: sample1AcceptedValue + sample2AcceptedValue)
             ret.append(RowSignupPlottableData(date: date, data: [acceptedSignups, rejectedSignups]))
         }
         
@@ -1000,13 +1004,17 @@ public extension RCVST_DataProvider {
         let rows = allRows
         
         guard !rows.isEmpty else { return ret }
-
+        
         for index in stride(from: 1, to: rows.count, by: 2) {
             let sample1 = rows[index - 1]
             let sample2 = rows[index]
-            guard let date = sample1.sampleDate else { break }
-            let deletedActive = RowDeleteTypesPlottableData(deletionType: .deletedActive, value: sample1.newDeletedActive + sample2.newDeletedActive)
-            let deletedInactive = RowDeleteTypesPlottableData(deletionType: .deletedInactive, value: sample1.newDeletedInactive + sample2.newDeletedInactive)
+            guard let date = sample2.sampleDate else { break }
+            let sample1ActiveValue = sample1.newDeletedActive
+            let sample2ActiveValue = sample2.newDeletedActive
+            let sample1InactiveValue = sample1.newDeletedInactive
+            let sample2InactiveValue = sample2.newDeletedInactive
+            let deletedActive = RowDeleteTypesPlottableData(deletionType: .deletedActive, value: sample1ActiveValue + sample2ActiveValue)
+            let deletedInactive = RowDeleteTypesPlottableData(deletionType: .deletedInactive, value: sample1InactiveValue + sample2InactiveValue)
             ret.append(RowDeletePlottableData(date: date, data: [deletedActive, deletedInactive]))
         }
         
