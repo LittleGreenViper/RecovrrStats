@@ -129,6 +129,18 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
     
     /* ################################################################## */
     /**
+     Used to track pinching the chart.
+     */
+    @GestureState private var _magnifyBy = 1.0
+    
+    /* ################################################################## */
+    /**
+     Used to track pinching the chart.
+     */
+    @GestureState private var _zoomCenter: CGPoint?
+
+    /* ################################################################## */
+    /**
      The segregated user type data.
      */
     private var _dataFiltered: [RCVST_DataProvider.RowUserPlottableData] { data?.userTypePlottable ?? [] }
@@ -156,6 +168,22 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
      */
     private func _isLineDragged(_ inRowData: RCVST_DataProvider.RowUserPlottableData) -> Bool {
         _isDragging && inRowData.date == _selectedValue?.date
+    }
+
+    /* ################################################################## */
+    /**
+     A gesture to capture magnification pinches.
+     */
+    var magnification: some Gesture {
+        MagnifyGesture()
+            .updating($_magnifyBy) { value, gestureState, _ in
+                gestureState = value.magnification
+                print("Zoom Level: \(gestureState)")
+            }
+            .updating($_zoomCenter) { value, gestureState, _ in
+                gestureState = value.startLocation
+                print("Zoom Center: \(String(describing: gestureState))")
+            }
     }
 
     /* ################################################################## */
@@ -228,6 +256,7 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
                     Rectangle()
                         .fill(Color.clear)
                         .contentShape(Rectangle())
+                        .gesture(magnification)
                         .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
