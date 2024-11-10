@@ -126,18 +126,6 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
      This is used to give us haptic feedback for dragging.
      */
     @State var hapticEngine: CHHapticEngine?
-    
-    /* ################################################################## */
-    /**
-     Used to track pinching the chart.
-     */
-    @GestureState private var _magnifyBy = 1.0
-    
-    /* ################################################################## */
-    /**
-     Used to track pinching the chart.
-     */
-    @GestureState private var _zoomCenter: CGPoint?
 
     /* ################################################################## */
     /**
@@ -172,22 +160,6 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
 
     /* ################################################################## */
     /**
-     A gesture to capture magnification pinches.
-     */
-    var magnification: some Gesture {
-        MagnifyGesture()
-            .updating($_magnifyBy) { value, gestureState, _ in
-                gestureState = value.magnification
-                print("Zoom Level: \(gestureState)")
-            }
-            .updating($_zoomCenter) { value, gestureState, _ in
-                gestureState = value.startLocation
-                print("Zoom Center: \(String(describing: gestureState))")
-            }
-    }
-
-    /* ################################################################## */
-    /**
      The main chart body.
      */
     var body: some View {
@@ -214,13 +186,15 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
             // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
             Chart(_dataFiltered) { inRowData in
                 ForEach(inRowData.data, id: \.userType) { inUserTypeData in
-                    BarMark(
-                        x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date),
-                        y: .value("SLUG-BAR-CHART-USER-TYPES-Y".localizedVariant, inUserTypeData.value)
-                    )
-                    .foregroundStyle(by: .value("SLUG-BAR-CHART-USER-TYPES-LEGEND".localizedVariant,
-                                                _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inUserTypeData.descriptionString)
-                    )
+                    if _chartDomain?.contains(inRowData.date) ?? false {
+                        BarMark(
+                            x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date),
+                            y: .value("SLUG-BAR-CHART-USER-TYPES-Y".localizedVariant, inUserTypeData.value)
+                        )
+                        .foregroundStyle(by: .value("SLUG-BAR-CHART-USER-TYPES-LEGEND".localizedVariant,
+                                                    _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inUserTypeData.descriptionString)
+                        )
+                    }
                 }
             }
             .onAppear {
@@ -252,11 +226,42 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
             }
             // This mess is the finger tracker.
             .chartOverlay { chart in
-                GeometryReader { geometry in
+                GeometryReader { inGeom in
                     Rectangle()
                         .fill(Color.clear)
                         .contentShape(Rectangle())
-                        .gesture(magnification)
+                        // This allows pinch-to-zoom (horizonatl axis).
+                        .gesture(MagnifyGesture()
+                            .onChanged { inValue in
+                                let maxSeconds = maximumDate.timeIntervalSince1970
+                                let minSeconds = minimumDate.timeIntervalSince1970
+                                let maximumSeconds = maxSeconds - minSeconds
+                                let center = inValue.startAnchor.x
+                                let magnification = inValue.magnification
+
+                                guard let localMinSeconds = _chartDomain?.lowerBound.timeIntervalSince1970,
+                                      let localMaxSeconds = _chartDomain?.upperBound.timeIntervalSince1970
+                                else { return }
+                                
+                                let maximumLocalSeconds = min(maximumSeconds, localMaxSeconds - localMinSeconds)
+                                let magnifiedRange = max(86400 * 2, min(maximumSeconds, (maximumLocalSeconds * magnification) / 2))
+                                
+                                let centerSeconds = min(maxSeconds, max(minSeconds, (maximumLocalSeconds * center) + localMinSeconds))
+                                let newMinSeconds = max(minSeconds, centerSeconds - magnifiedRange)
+                                let newMaxSeconds = min(maxSeconds, centerSeconds + magnifiedRange)
+                                
+                                let newMaxDate = Date(timeIntervalSince1970: newMaxSeconds)
+                                let centerDate = Date(timeIntervalSince1970: centerSeconds)
+                                let newMinDate = Date(timeIntervalSince1970: newMinSeconds)
+                                
+                                print("Magnification: \(magnification)")
+                                print("Min Date: \(newMinDate)")
+                                print("Center Date: \(centerDate)")
+                                print("Max Date: \(newMaxDate)")
+                                
+                                self._chartDomain = newMinDate...newMaxDate
+                            }
+                        )
                         .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
@@ -264,7 +269,7 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                     dateFormatter.dateStyle = .short
                                     dateFormatter.timeStyle = .none
                                     if let frame = chart.plotFrame {
-                                        let currentX = max(0, min(chart.plotSize.width, value.location.x - geometry[frame].origin.x))
+                                        let currentX = max(0, min(chart.plotSize.width, value.location.x - inGeom[frame].origin.x))
                                         guard let date = chart.value(atX: currentX, as: Date.self) else { return }
                                         if let newValue = _dataFiltered.nearestTo(date) {
                                             _selectedValuesString = String(format: "SLUG-USER-TYPES-DESC-STRING-FORMAT".localizedVariant,
