@@ -102,6 +102,12 @@ struct SignupActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
      True, if the user is dragging across the chart.
      */
     @State private var _isDragging = false
+    
+    /* ################################################################## */
+    /**
+     This is the range displayed by the chart.
+     */
+    @State private var _chartDomain: ClosedRange<Date>?
 
     /* ################################################################## */
     /**
@@ -189,6 +195,9 @@ struct SignupActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                     )
                 }
             }
+            .onAppear {
+                _chartDomain = _chartDomain ?? minimumDate...maximumDate
+            }
             .chartForegroundStyleScale(["SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL".localizedVariant: .green,
                                         "SLUG-REJECTED-SIGNUP-LEGEND-LABEL".localizedVariant: .orange,
                                         "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
@@ -203,7 +212,7 @@ struct SignupActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                 }
             }
             // We customize the X-axis, to only have a few sections.
-            .chartXScale(domain: [minimumDate, maximumDate])
+            .chartXScale(domain: _chartDomain ?? minimumDate...maximumDate)
             .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-SIGNUP-LABEL".localizedVariant, alignment: .top)
             .chartXAxis {
                 AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in

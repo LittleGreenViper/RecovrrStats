@@ -75,6 +75,12 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
      True, if the user is dragging across the chart.
      */
     @State private var _isDragging = false
+    
+    /* ################################################################## */
+    /**
+     This is the range displayed by the chart.
+     */
+    @State private var _chartDomain: ClosedRange<Date>?
 
     /* ################################################################## */
     /**
@@ -238,6 +244,9 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                             _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : "SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant)
                 )
             }
+            .onAppear {
+                _chartDomain = _chartDomain ?? minimumDate...maximumDate
+            }
             .chartForegroundStyleScale(["SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant: .green,
                                         "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
                                        ])
@@ -251,7 +260,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                 }
             }
             // We customize the X-axis, to only have a few sections.
-            .chartXScale(domain: [minimumDate, maximumDate])
+            .chartXScale(domain: _chartDomain ?? minimumDate...maximumDate)
             .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-CHART-3-LABEL".localizedVariant, alignment: .top)
             .chartXAxis {
                 AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in

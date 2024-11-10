@@ -102,6 +102,12 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
      True, if the user is dragging across the chart.
      */
     @State private var _isDragging = false
+    
+    /* ################################################################## */
+    /**
+     This is the range displayed by the chart.
+     */
+    @State private var _chartDomain: ClosedRange<Date>?
 
     /* ################################################################## */
     /**
@@ -167,7 +173,7 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
         let dates = Array<Date>(stride(from: minimumDate, through: maximumDate, by: step))
         // Set up an array of strings to use as labels for the X-axis.
         let dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
-        
+                
         // It is surrounded by a standard group box.
         GroupBox("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) {
             // This displays the value of the selected bar.
@@ -189,6 +195,9 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
                     )
                 }
             }
+            .onAppear {
+                _chartDomain = _chartDomain ?? minimumDate...maximumDate
+            }
             // These define the three items in the legend, as well as the colors we'll use in the bars.
             .chartForegroundStyleScale(["SLUG-ACTIVE-LEGEND-LABEL".localizedVariant: .green,
                                         "SLUG-NEW-LEGEND-LABEL".localizedVariant: .blue,
@@ -204,7 +213,7 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
                 }
             }
             // We customize the X-axis, to only have a few sections.
-            .chartXScale(domain: [minimumDate, maximumDate])
+            .chartXScale(domain: _chartDomain ?? minimumDate...maximumDate)
             .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-LABEL".localizedVariant, alignment: .top)
             .chartXAxis {
                 AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in
