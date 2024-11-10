@@ -226,7 +226,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                 .font(.subheadline)
                 .foregroundStyle(.red)
             
-            // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
+            // The main chart view. It is a simple bar chart.
             Chart(_dataFiltered) { inRowData in
                 let date = inRowData.sampleDate ?? .now
                 let active = getActiveDataValue(for: inRowData)
