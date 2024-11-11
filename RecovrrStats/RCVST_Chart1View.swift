@@ -239,21 +239,24 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
                         // This allows pinch-to-zoom (horizonatl axis).
                         .gesture(MagnifyGesture()
                             .onChanged { inValue in
+                                triggerHaptic(intensity: 0.25, sharpness: 0.5)
                                 let maxSeconds = maximumDate.timeIntervalSince1970
                                 let minSeconds = minimumDate.timeIntervalSince1970
                                 let maximumSeconds = maxSeconds - minSeconds
                                 let center = inValue.startAnchor.x
-                                let magnification = inValue.magnification
+                                let magnification = inValue.magnification / 1.0
 
                                 guard let localMinSeconds = _chartDomain?.lowerBound.timeIntervalSince1970,
                                       let localMaxSeconds = _chartDomain?.upperBound.timeIntervalSince1970
                                 else { return }
                                 
-                                _startingPoint = _startingPoint ?? (minimumSeconds: localMinSeconds, maximumSeconds: localMaxSeconds)
+                                self._startingPoint = self._startingPoint ?? (minimumSeconds: localMinSeconds, maximumSeconds: localMaxSeconds)
                                 
                                 if let startingPoint = self._startingPoint {
-                                    let maximumLocalSeconds = min(maximumSeconds, startingPoint.maximumSeconds - startingPoint.minimumSeconds)
-                                    let magnifiedRange = max(86400 * 2, min(maximumSeconds, (maximumLocalSeconds * magnification) / 2))
+                                    let localStartingPointSeconds = startingPoint.maximumSeconds - startingPoint.minimumSeconds
+                                    let maximumLocalSeconds = min(maximumSeconds, localStartingPointSeconds)
+                                    let magnifiedLocalSeconds = (maximumLocalSeconds / magnification)
+                                    let magnifiedRange = max(86400 * 2, min(maximumSeconds, magnifiedLocalSeconds / 2))
                                     
                                     let centerSeconds = min(maxSeconds, max(minSeconds, (maximumLocalSeconds * center) + localMinSeconds))
                                     let newMinSeconds = max(minSeconds, centerSeconds - magnifiedRange)
@@ -276,7 +279,7 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                 self._startingPoint = nil
                             }
                         )
-                        .gesture(
+                        .simultaneousGesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
                                     let dateFormatter = DateFormatter()
