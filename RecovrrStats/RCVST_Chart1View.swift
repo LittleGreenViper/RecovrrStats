@@ -176,9 +176,9 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
         // We use this to set a fixed number of X-axis dates.
         let step = (maximumDate - minimumDate) / numberOfXValues
         // Set up an array of dates to use as values for the X-axis.
-        var dates = Array<Date>(stride(from: minimumDate, through: maximumDate, by: step))
+        let dates = Array<Date>(stride(from: minimumDate, through: maximumDate, by: step))
         // Set up an array of strings to use as labels for the X-axis.
-        var dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
+        let dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
                 
         // It is surrounded by a standard group box.
         GroupBox("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) {
@@ -237,49 +237,7 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
                         .fill(Color.clear)
                         .contentShape(Rectangle())
                         // This allows pinch-to-zoom (horizonatl axis).
-                        .gesture(MagnifyGesture()
-                            .onChanged { inValue in
-                                triggerHaptic(intensity: 0.25, sharpness: 0.5)
-                                let maxSeconds = maximumDate.timeIntervalSince1970
-                                let minSeconds = minimumDate.timeIntervalSince1970
-                                let maximumSeconds = maxSeconds - minSeconds
-                                let center = inValue.startAnchor.x
-                                let magnification = inValue.magnification / 1.0
-
-                                guard let localMinSeconds = _chartDomain?.lowerBound.timeIntervalSince1970,
-                                      let localMaxSeconds = _chartDomain?.upperBound.timeIntervalSince1970
-                                else { return }
-                                
-                                self._startingPoint = self._startingPoint ?? (minimumSeconds: localMinSeconds, maximumSeconds: localMaxSeconds)
-                                
-                                if let startingPoint = self._startingPoint {
-                                    let localStartingPointSeconds = startingPoint.maximumSeconds - startingPoint.minimumSeconds
-                                    let maximumLocalSeconds = min(maximumSeconds, localStartingPointSeconds)
-                                    let magnifiedLocalSeconds = (maximumLocalSeconds / magnification)
-                                    let magnifiedRange = max(86400 * 2, min(maximumSeconds, magnifiedLocalSeconds / 2))
-                                    
-                                    let centerSeconds = min(maxSeconds, max(minSeconds, (maximumLocalSeconds * center) + localMinSeconds))
-                                    let newMinSeconds = max(minSeconds, centerSeconds - magnifiedRange)
-                                    let newMaxSeconds = min(maxSeconds, centerSeconds + magnifiedRange)
-                                    
-                                    let newMaxDate = Date(timeIntervalSince1970: newMaxSeconds)
-                                    let newMinDate = Date(timeIntervalSince1970: newMinSeconds)
-
-                                    self._chartDomain = newMinDate...newMaxDate
-
-                                    // We use this to set a fixed number of X-axis dates.
-                                    let step = (newMaxDate - newMinDate) / numberOfXValues
-                                    // Set up an array of dates to use as values for the X-axis.
-                                    dates = Array<Date>(stride(from: newMinDate, through: newMaxDate, by: step))
-                                    // Set up an array of strings to use as labels for the X-axis.
-                                    dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
-                                }
-                            }
-                            .onEnded { _ in
-                                self._startingPoint = nil
-                            }
-                        )
-                        .simultaneousGesture(
+                        .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
                                     let dateFormatter = DateFormatter()
