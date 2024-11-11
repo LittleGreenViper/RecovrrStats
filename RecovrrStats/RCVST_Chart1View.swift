@@ -102,7 +102,12 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
      True, if the user is dragging across the chart.
      */
     @State private var _isDragging = false
-    
+
+    /* ################################################################## */
+    /**
+     */
+    @State private var _startingPoint: (minimumSeconds: Double, maximumSeconds: Double)?
+
     /* ################################################################## */
     /**
      This is the range displayed by the chart.
@@ -167,12 +172,13 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
         // This gives us "breathing room" around the X-axis.
         let minimumDate = _dataFiltered.first?.date.addingTimeInterval(-43200) ?? .now
         let maximumDate = _dataFiltered.last?.date.addingTimeInterval(43200) ?? .now
+
         // We use this to set a fixed number of X-axis dates.
         let step = (maximumDate - minimumDate) / numberOfXValues
         // Set up an array of dates to use as values for the X-axis.
-        let dates = Array<Date>(stride(from: minimumDate, through: maximumDate, by: step))
+        var dates = Array<Date>(stride(from: minimumDate, through: maximumDate, by: step))
         // Set up an array of strings to use as labels for the X-axis.
-        let dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
+        var dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
                 
         // It is surrounded by a standard group box.
         GroupBox("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) {
@@ -243,23 +249,31 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                       let localMaxSeconds = _chartDomain?.upperBound.timeIntervalSince1970
                                 else { return }
                                 
-                                let maximumLocalSeconds = min(maximumSeconds, localMaxSeconds - localMinSeconds)
-                                let magnifiedRange = max(86400 * 2, min(maximumSeconds, (maximumLocalSeconds * magnification) / 2))
+                                _startingPoint = _startingPoint ?? (minimumSeconds: localMinSeconds, maximumSeconds: localMaxSeconds)
                                 
-                                let centerSeconds = min(maxSeconds, max(minSeconds, (maximumLocalSeconds * center) + localMinSeconds))
-                                let newMinSeconds = max(minSeconds, centerSeconds - magnifiedRange)
-                                let newMaxSeconds = min(maxSeconds, centerSeconds + magnifiedRange)
-                                
-                                let newMaxDate = Date(timeIntervalSince1970: newMaxSeconds)
-                                let centerDate = Date(timeIntervalSince1970: centerSeconds)
-                                let newMinDate = Date(timeIntervalSince1970: newMinSeconds)
-                                
-                                print("Magnification: \(magnification)")
-                                print("Min Date: \(newMinDate)")
-                                print("Center Date: \(centerDate)")
-                                print("Max Date: \(newMaxDate)")
-                                
-                                self._chartDomain = newMinDate...newMaxDate
+                                if let startingPoint = self._startingPoint {
+                                    let maximumLocalSeconds = min(maximumSeconds, startingPoint.maximumSeconds - startingPoint.minimumSeconds)
+                                    let magnifiedRange = max(86400 * 2, min(maximumSeconds, (maximumLocalSeconds * magnification) / 2))
+                                    
+                                    let centerSeconds = min(maxSeconds, max(minSeconds, (maximumLocalSeconds * center) + localMinSeconds))
+                                    let newMinSeconds = max(minSeconds, centerSeconds - magnifiedRange)
+                                    let newMaxSeconds = min(maxSeconds, centerSeconds + magnifiedRange)
+                                    
+                                    let newMaxDate = Date(timeIntervalSince1970: newMaxSeconds)
+                                    let newMinDate = Date(timeIntervalSince1970: newMinSeconds)
+
+                                    self._chartDomain = newMinDate...newMaxDate
+
+                                    // We use this to set a fixed number of X-axis dates.
+                                    let step = (newMaxDate - newMinDate) / numberOfXValues
+                                    // Set up an array of dates to use as values for the X-axis.
+                                    dates = Array<Date>(stride(from: newMinDate, through: newMaxDate, by: step))
+                                    // Set up an array of strings to use as labels for the X-axis.
+                                    dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
+                                }
+                            }
+                            .onEnded { _ in
+                                self._startingPoint = nil
                             }
                         )
                         .gesture(
