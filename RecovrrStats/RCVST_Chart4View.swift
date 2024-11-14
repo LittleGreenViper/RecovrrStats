@@ -73,7 +73,7 @@ struct RCVST_Chart4View: View, RCVST_UsesData {
                     
                     DeleteChart(data: data, selectedValuesString: $selectedValuesString)
                         .frame(
-                            minHeight: inGeometry.size.width - (UserTypesChart.sidePadding * 2), // Make it square.
+                            minHeight: inGeometry.size.width,
                             maxHeight: .infinity,
                             alignment: .topLeading
                         )
@@ -82,7 +82,7 @@ struct RCVST_Chart4View: View, RCVST_UsesData {
             .frame(
                 minWidth: inGeometry.size.width,
                 maxWidth: inGeometry.size.width,
-                minHeight: inGeometry.size.width, // Make it square.
+                minHeight: inGeometry.size.width,
                 maxHeight: inGeometry.size.width,
                 alignment: .topLeading
             )

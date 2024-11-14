@@ -18,6 +18,12 @@ import CoreHaptics
 struct RCVST_Chart3View: View, RCVST_UsesData, RCVST_HapticHopper {
     /* ################################################################## */
     /**
+     Tracks scene activity.
+     */
+    @Environment(\.scenePhase) private var _scenePhase
+
+    /* ################################################################## */
+    /**
      This is used to give us haptic feedback for dragging.
      */
     @State var hapticEngine: CHHapticEngine?
@@ -81,7 +87,7 @@ struct RCVST_Chart3View: View, RCVST_UsesData, RCVST_HapticHopper {
                     
                     UserActivityChart(data: data, selectedValuesString: $selectedValuesString, selectedActivityRange: $selectedActivityRange)
                         .frame(
-                            minHeight: inGeometry.size.width - (UserTypesChart.sidePadding * 2), // Make it square.
+                            minHeight: inGeometry.size.width,
                             maxHeight: .infinity,
                             alignment: .topLeading
                         )
@@ -90,10 +96,16 @@ struct RCVST_Chart3View: View, RCVST_UsesData, RCVST_HapticHopper {
             .frame(
                 minWidth: inGeometry.size.width,
                 maxWidth: inGeometry.size.width,
-                minHeight: inGeometry.size.width, // Make it square.
+                minHeight: inGeometry.size.width,
                 maxHeight: inGeometry.size.width,
                 alignment: .topLeading
             )
+            // This makes sure the haptics are set up, every time we are activated.
+            .onChange(of: _scenePhase, initial: true) {
+                if .active == _scenePhase {
+                    prepareHaptics()
+                }
+            }
         }
     }
 }
@@ -266,103 +278,103 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
         let dates = Array<Date>(stride(from: minimumDate, through: maximumDate, by: step))
         // Set up an array of strings to use as labels for the X-axis.
         let dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
-            // The main chart view. It is a simple bar chart.
-            Chart(_dataFiltered) { inRowData in
-                let date = inRowData.sampleDate ?? .now
-                let active = getActiveDataValue(for: inRowData)
-                BarMark(
-                    x: .value("SLUG-BAR-CHART-TYPES-X".localizedVariant, date),
-                    y: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y".localizedVariant, active)
-                )
-                .foregroundStyle(by: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant,
-                                            _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : "SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant)
-                )
+        // The main chart view. It is a simple bar chart.
+        Chart(_dataFiltered) { inRowData in
+            let date = inRowData.sampleDate ?? .now
+            let active = getActiveDataValue(for: inRowData)
+            BarMark(
+                x: .value("SLUG-BAR-CHART-TYPES-X".localizedVariant, date),
+                y: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y".localizedVariant, active)
+            )
+            .foregroundStyle(by: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant,
+                                        _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : "SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant)
+            )
+        }
+        .onAppear {
+            _chartDomain = _chartDomain ?? minimumDate...maximumDate
+        }
+        .chartForegroundStyleScale(["SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant: .green,
+                                    "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
+                                   ])
+        // We leave the Y-axis almost default, except that we want it on the left.
+        .chartYAxisLabel("SLUG-BAR-CHART-Y-AXIS-CHART-3-LABEL".localizedVariant, spacing: 12)
+        .chartYAxis {
+            AxisMarks(preset: .aligned, position: .leading) { _ in
+                AxisTick()
+                AxisGridLine()
+                AxisValueLabel(anchor: .trailing)
             }
-            .onAppear {
-                _chartDomain = _chartDomain ?? minimumDate...maximumDate
+        }
+        // We customize the X-axis, to only have a few sections.
+        .chartXScale(domain: _chartDomain ?? minimumDate...maximumDate)
+        .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-CHART-3-LABEL".localizedVariant, alignment: .top)
+        .chartXAxis {
+            AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in
+                AxisTick(length: 8)
+                AxisGridLine()
+                AxisValueLabel(dateString[inValue.index])
             }
-            .chartForegroundStyleScale(["SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant: .green,
-                                        "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
-                                       ])
-            // We leave the Y-axis almost default, except that we want it on the left.
-            .chartYAxisLabel("SLUG-BAR-CHART-Y-AXIS-CHART-3-LABEL".localizedVariant, spacing: 12)
-            .chartYAxis {
-                AxisMarks(preset: .aligned, position: .leading) { _ in
-                    AxisTick()
-                    AxisGridLine()
-                    AxisValueLabel(anchor: .trailing)
-                }
-            }
-            // We customize the X-axis, to only have a few sections.
-            .chartXScale(domain: _chartDomain ?? minimumDate...maximumDate)
-            .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-CHART-3-LABEL".localizedVariant, alignment: .top)
-            .chartXAxis {
-                AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in
-                    AxisTick(length: 8)
-                    AxisGridLine()
-                    AxisValueLabel(dateString[inValue.index])
-                }
-            }
-            // This mess is the finger tracker.
-            .chartOverlay { chart in
-                GeometryReader { geometry in
-                    Rectangle()
-                        .fill(Color.clear)
-                        .contentShape(Rectangle())
-                        .gesture(
-                            DragGesture(minimumDistance: 0)
-                                .onChanged { value in
-                                    let dateFormatter = DateFormatter()
-                                    dateFormatter.dateStyle = .short
-                                    dateFormatter.timeStyle = .none
-                                    if let frame = chart.plotFrame {
-                                        let currentX = max(0, min(chart.plotSize.width, value.location.x - geometry[frame].origin.x))
-                                        guard let date = chart.value(atX: currentX, as: Date.self) else { return }
-                                        if let newValue = _dataFiltered.nearestTo(date),
-                                           let newDate = newValue.sampleDate {
-                                            let dateString = dateFormatter.string(from: newDate)
-                                            let allUsers = newValue.activeUsers
-                                            let activeUsersNew = getActiveDataItem(for: newValue).activeUsersNew
-                                            let activePeriodString = getActiveDataItem(for: newValue).activePeriodString
-                                            let percentage =  Int((100 * activeUsersNew) / allUsers)
-                                            if 0 == selectedActivityRange {
-                                                selectedValuesString = String(format: "SLUG-CHART-3-AVERAGE-DESC-STRING-FORMAT".localizedVariant,
-                                                                               dateString,
-                                                                               activeUsersNew
-                                                )
-                                            } else {
-                                                selectedValuesString = String(format: "SLUG-CHART-3-TYPES-DESC-STRING-FORMAT".localizedVariant,
-                                                                               dateString,
-                                                                               activePeriodString,
-                                                                               activeUsersNew,
-                                                                               percentage
-                                                )
-                                            }
-                                            if newDate != (_selectedValue?.sampleDate ?? newDate) {
-                                                triggerHaptic()
-                                            }
-                                            _selectedValue = newValue
+        }
+        // This mess is the finger tracker.
+        .chartOverlay { chart in
+            GeometryReader { geometry in
+                Rectangle()
+                    .fill(Color.clear)
+                    .contentShape(Rectangle())
+                    .gesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                let dateFormatter = DateFormatter()
+                                dateFormatter.dateStyle = .short
+                                dateFormatter.timeStyle = .none
+                                if let frame = chart.plotFrame {
+                                    let currentX = max(0, min(chart.plotSize.width, value.location.x - geometry[frame].origin.x))
+                                    guard let date = chart.value(atX: currentX, as: Date.self) else { return }
+                                    if let newValue = _dataFiltered.nearestTo(date),
+                                       let newDate = newValue.sampleDate {
+                                        let dateString = dateFormatter.string(from: newDate)
+                                        let allUsers = newValue.activeUsers
+                                        let activeUsersNew = getActiveDataItem(for: newValue).activeUsersNew
+                                        let activePeriodString = getActiveDataItem(for: newValue).activePeriodString
+                                        let percentage =  Int((100 * activeUsersNew) / allUsers)
+                                        if 0 == selectedActivityRange {
+                                            selectedValuesString = String(format: "SLUG-CHART-3-AVERAGE-DESC-STRING-FORMAT".localizedVariant,
+                                                                           dateString,
+                                                                           activeUsersNew
+                                            )
+                                        } else {
+                                            selectedValuesString = String(format: "SLUG-CHART-3-TYPES-DESC-STRING-FORMAT".localizedVariant,
+                                                                           dateString,
+                                                                           activePeriodString,
+                                                                           activeUsersNew,
+                                                                           percentage
+                                            )
                                         }
-                                        
-                                        _isDragging = true
+                                        if newDate != (_selectedValue?.sampleDate ?? newDate) {
+                                            triggerHaptic()
+                                        }
+                                        _selectedValue = newValue
                                     }
+                                    
+                                    _isDragging = true
                                 }
-                                .onEnded { _ in
-                                    triggerHaptic()
-                                    _isDragging = false
-                                    _selectedValue = nil
-                                    selectedValuesString = " "
-                                }
-                        )
-                }
+                            }
+                            .onEnded { _ in
+                                triggerHaptic()
+                                _isDragging = false
+                                _selectedValue = nil
+                                selectedValuesString = " "
+                            }
+                    )
             }
-            // This is so the user has room to scroll, if the chart is off the screen.
-            .padding([.leading, .trailing], Self.sidePadding)
-            // This makes sure the haptics are set up, every time we are activated.
-            .onChange(of: _scenePhase, initial: true) {
-                if .active == _scenePhase {
-                    prepareHaptics()
-                }
+        }
+        // This is so the user has room to scroll, if the chart is off the screen.
+        .padding([.leading, .trailing], Self.sidePadding)
+        // This makes sure the haptics are set up, every time we are activated.
+        .onChange(of: _scenePhase, initial: true) {
+            if .active == _scenePhase {
+                prepareHaptics()
             }
+        }
     }
 }
