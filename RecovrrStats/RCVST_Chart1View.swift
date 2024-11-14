@@ -52,22 +52,40 @@ struct RCVST_Chart1View: View, RCVST_UsesData {
 
     /* ################################################################## */
     /**
+     The string that displays the data for the selected bar.
+     */
+    @State var selectedValuesString: String = " "
+    
+    /* ################################################################## */
+    /**
      This is the layout for this screen.
      */
     var body: some View {
         GeometryReader { inGeometry in
-            ScrollView {
-                UserTypesChart(data: data)
-                .frame(
-                    minWidth: inGeometry.size.width,
-                    maxWidth: inGeometry.size.width,
-                    minHeight: inGeometry.size.width - (UserTypesChart.sidePadding * 2), // Make it square.
-                    maxHeight: .infinity,
-                    alignment: .topLeading
-                )
+            GroupBox("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) {
+                VStack {
+                    // This displays the value of the selected bar.
+                    Text(selectedValuesString)
+                        .minimumScaleFactor(0.5)
+                        .lineLimit(1)
+                        .font(.subheadline)
+                        .foregroundStyle(.red)
+                    
+                    UserTypesChart(data: data, selectedValuesString: $selectedValuesString)
+                        .frame(
+                            minHeight: inGeometry.size.width - (UserTypesChart.sidePadding * 2), // Make it square.
+                            maxHeight: .infinity,
+                            alignment: .topLeading
+                        )
+                }
             }
-            // Prevents the scroller from "bouncing," unless we are beyond the bounds of the screen.
-            .scrollBounceBehavior(.basedOnSize)
+            .frame(
+                minWidth: inGeometry.size.width,
+                maxWidth: inGeometry.size.width,
+                minHeight: inGeometry.size.width, // Make it square.
+                maxHeight: inGeometry.size.width,
+                alignment: .topLeading
+            )
         }
     }
 }
@@ -124,7 +142,7 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
     /**
      The string that displays the data for the selected bar.
      */
-    @State private var _selectedValuesString: String = " "
+    @Binding var selectedValuesString: String
     
     /* ################################################################## */
     /**
@@ -180,101 +198,90 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
         // Set up an array of strings to use as labels for the X-axis.
         let dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
                 
-        // It is surrounded by a standard group box.
-        GroupBox("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) {
-            // This displays the value of the selected bar.
-            Text(_selectedValuesString)
-                .minimumScaleFactor(0.5)
-                .lineLimit(1)
-                .font(.subheadline)
-                .foregroundStyle(.red)
-            
-            // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
-            Chart(_dataFiltered) { inRowData in
-                ForEach(inRowData.data, id: \.userType) { inUserTypeData in
-                    if _chartDomain?.contains(inRowData.date) ?? false {
-                        BarMark(
-                            x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date),
-                            y: .value("SLUG-BAR-CHART-USER-TYPES-Y".localizedVariant, inUserTypeData.value)
-                        )
-                        .foregroundStyle(by: .value("SLUG-BAR-CHART-USER-TYPES-LEGEND".localizedVariant,
-                                                    _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inUserTypeData.descriptionString)
-                        )
-                    }
+        // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
+        Chart(_dataFiltered) { inRowData in
+            ForEach(inRowData.data, id: \.userType) { inUserTypeData in
+                if _chartDomain?.contains(inRowData.date) ?? false {
+                    BarMark(
+                        x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date),
+                        y: .value("SLUG-BAR-CHART-USER-TYPES-Y".localizedVariant, inUserTypeData.value)
+                    )
+                    .foregroundStyle(by: .value("SLUG-BAR-CHART-USER-TYPES-LEGEND".localizedVariant,
+                                                _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inUserTypeData.descriptionString)
+                    )
                 }
             }
-            .onAppear {
-                _chartDomain = _chartDomain ?? minimumDate...maximumDate
-            }
-            // These define the three items in the legend, as well as the colors we'll use in the bars.
-            .chartForegroundStyleScale(["SLUG-ACTIVE-LEGEND-LABEL".localizedVariant: .green,
-                                        "SLUG-NEW-LEGEND-LABEL".localizedVariant: .blue,
-                                        "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
-                                       ])
-            // We leave the Y-axis almost default, except that we want it on the left.
-            .chartYAxisLabel("SLUG-BAR-CHART-Y-AXIS-LABEL".localizedVariant, spacing: 12)
-            .chartYAxis {
-                AxisMarks(preset: .aligned, position: .leading) { _ in
-                    AxisTick()
-                    AxisGridLine()
-                    AxisValueLabel(anchor: .trailing)
-                }
-            }
-            // We customize the X-axis, to only have a few sections.
-            .chartXScale(domain: _chartDomain ?? minimumDate...maximumDate)
-            .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-LABEL".localizedVariant, alignment: .top)
-            .chartXAxis {
-                AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in
-                    AxisTick(length: 8)
-                    AxisGridLine()
-                    AxisValueLabel(dateString[inValue.index])
-                }
-            }
-            // This mess is the finger tracker.
-            .chartOverlay { chart in
-                GeometryReader { inGeom in
-                    Rectangle()
-                        .fill(Color.clear)
-                        .contentShape(Rectangle())
-                        // This allows pinch-to-zoom (horizonatl axis).
-                        .gesture(
-                            DragGesture(minimumDistance: 0)
-                                .onChanged { value in
-                                    let dateFormatter = DateFormatter()
-                                    dateFormatter.dateStyle = .short
-                                    dateFormatter.timeStyle = .none
-                                    if let frame = chart.plotFrame {
-                                        let currentX = max(0, min(chart.plotSize.width, value.location.x - inGeom[frame].origin.x))
-                                        guard let date = chart.value(atX: currentX, as: Date.self) else { return }
-                                        if let newValue = _dataFiltered.nearestTo(date) {
-                                            _selectedValuesString = String(format: "SLUG-USER-TYPES-DESC-STRING-FORMAT".localizedVariant,
-                                                                           dateFormatter.string(from: newValue.date),
-                                                                           newValue.data[0].value,
-                                                                           newValue.data[1].value,
-                                                                           newValue.data[0].value + newValue.data[1].value
-                                            )
-                                            if newValue.date != _selectedValue?.date {
-                                                triggerHaptic()
-                                            }
-                                            _selectedValue = newValue
-                                        }
-                                        
-                                        _isDragging = true
-                                    }
-                                }
-                                .onEnded { _ in
-                                    triggerHaptic()
-                                    _isDragging = false
-                                    _selectedValue = nil
-                                    _selectedValuesString = " "
-                                }
-                        )
-                }
-            }
-            // This is so the user has room to scroll, if the chart is off the screen.
-            .padding([.leading, .trailing], Self.sidePadding)
         }
-        .padding()
+        .onAppear {
+            _chartDomain = _chartDomain ?? minimumDate...maximumDate
+        }
+        // These define the three items in the legend, as well as the colors we'll use in the bars.
+        .chartForegroundStyleScale(["SLUG-ACTIVE-LEGEND-LABEL".localizedVariant: .green,
+                                    "SLUG-NEW-LEGEND-LABEL".localizedVariant: .blue,
+                                    "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
+                                   ])
+        // We leave the Y-axis almost default, except that we want it on the left.
+        .chartYAxisLabel("SLUG-BAR-CHART-Y-AXIS-LABEL".localizedVariant, spacing: 12)
+        .chartYAxis {
+            AxisMarks(preset: .aligned, position: .leading) { _ in
+                AxisTick()
+                AxisGridLine()
+                AxisValueLabel(anchor: .trailing)
+            }
+        }
+        // We customize the X-axis, to only have a few sections.
+        .chartXScale(domain: _chartDomain ?? minimumDate...maximumDate)
+        .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-LABEL".localizedVariant, alignment: .top)
+        .chartXAxis {
+            AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in
+                AxisTick(length: 8)
+                AxisGridLine()
+                AxisValueLabel(dateString[inValue.index])
+            }
+        }
+        // This mess is the finger tracker.
+        .chartOverlay { chart in
+            GeometryReader { inGeom in
+                Rectangle()
+                    .fill(Color.clear)
+                    .contentShape(Rectangle())
+                    // This allows pinch-to-zoom (horizonatl axis).
+                    .gesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                let dateFormatter = DateFormatter()
+                                dateFormatter.dateStyle = .short
+                                dateFormatter.timeStyle = .none
+                                if let frame = chart.plotFrame {
+                                    let currentX = max(0, min(chart.plotSize.width, value.location.x - inGeom[frame].origin.x))
+                                    guard let date = chart.value(atX: currentX, as: Date.self) else { return }
+                                    if let newValue = _dataFiltered.nearestTo(date) {
+                                        selectedValuesString = String(format: "SLUG-USER-TYPES-DESC-STRING-FORMAT".localizedVariant,
+                                                                       dateFormatter.string(from: newValue.date),
+                                                                       newValue.data[0].value,
+                                                                       newValue.data[1].value,
+                                                                       newValue.data[0].value + newValue.data[1].value
+                                        )
+                                        if newValue.date != _selectedValue?.date {
+                                            triggerHaptic()
+                                        }
+                                        _selectedValue = newValue
+                                    }
+                                    
+                                    _isDragging = true
+                                }
+                            }
+                            .onEnded { _ in
+                                triggerHaptic()
+                                _isDragging = false
+                                _selectedValue = nil
+                                selectedValuesString = " "
+                            }
+                    )
+            }
+        }
+        // This is so the user has room to scroll, if the chart is off the screen.
+        .padding([.leading, .trailing], Self.sidePadding)
         // This makes sure the haptics are set up, every time we are activated.
         .onChange(of: _scenePhase, initial: true) {
             if .active == _scenePhase {

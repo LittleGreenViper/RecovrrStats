@@ -15,7 +15,13 @@ import CoreHaptics
  This displays a chart, with the activity of active users (based on when they last signed in, at the time of the sample), over time.
  It is selectable, and dragging your finger across the chart, shows exact numbers.
  */
-struct RCVST_Chart3View: View, RCVST_UsesData {
+struct RCVST_Chart3View: View, RCVST_UsesData, RCVST_HapticHopper {
+    /* ################################################################## */
+    /**
+     This is used to give us haptic feedback for dragging.
+     */
+    @State var hapticEngine: CHHapticEngine?
+
     /* ################################################################## */
     /**
      This is the actual dataframe wrapper for the stats.
@@ -24,22 +30,70 @@ struct RCVST_Chart3View: View, RCVST_UsesData {
 
     /* ################################################################## */
     /**
+     The string that displays the data for the selected bar.
+     */
+    @State var selectedValuesString: String = " "
+    
+    /* ################################################################## */
+    /**
+     */
+    @State var selectedActivityRange: Int = 1
+
+    /* ################################################################## */
+    /**
+     This prepares our haptic engine.
+     */
+    func prepareHaptics() {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics,
+              let hapticEngineTemp = try? CHHapticEngine()
+        else { return }
+        
+        hapticEngine = hapticEngineTemp
+        
+        try? hapticEngine?.start()
+    }
+
+    /* ################################################################## */
+    /**
      This is the layout for this screen.
      */
     var body: some View {
         GeometryReader { inGeometry in
-            ScrollView {
-                UserActivityChart(data: data)
-                .frame(
-                    minWidth: inGeometry.size.width,
-                    maxWidth: inGeometry.size.width,
-                    minHeight: inGeometry.size.width - (UserActivityChart.sidePadding * 2), // Make it square.
-                    maxHeight: .infinity,
-                    alignment: .topLeading
-                )
+            GroupBox("SLUG-CHART-3-TITLE".localizedVariant) {
+                VStack {
+                    // This picker allows us to view the various activity ranges.
+                    Picker("Activity", selection: $selectedActivityRange) {
+                        Text("1").tag(1)
+                        Text("7").tag(7)
+                        Text("30").tag(30)
+                        Text("90").tag(90)
+                        Text("SLUG-BAR-CHART-ACTIVE-TYPES-AVERAGE".localizedVariant).tag(0)
+                    }
+                    .pickerStyle(.segmented)
+                    .onChange(of: selectedActivityRange) { triggerHaptic(intensity: 0.5, sharpness: 0.25) }
+                    
+                    // This displays the value of the selected bar.
+                    Text(selectedValuesString)
+                        .minimumScaleFactor(0.5)
+                        .lineLimit(1)
+                        .font(.subheadline)
+                        .foregroundStyle(.red)
+                    
+                    UserActivityChart(data: data, selectedValuesString: $selectedValuesString, selectedActivityRange: $selectedActivityRange)
+                        .frame(
+                            minHeight: inGeometry.size.width - (UserTypesChart.sidePadding * 2), // Make it square.
+                            maxHeight: .infinity,
+                            alignment: .topLeading
+                        )
+                }
             }
-            // Prevents the scroller from "bouncing," unless we are beyond the bounds of the screen.
-            .scrollBounceBehavior(.basedOnSize)
+            .frame(
+                minWidth: inGeometry.size.width,
+                maxWidth: inGeometry.size.width,
+                minHeight: inGeometry.size.width, // Make it square.
+                maxHeight: inGeometry.size.width,
+                alignment: .topLeading
+            )
         }
     }
 }
@@ -92,18 +146,18 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
     /**
      The string that displays the data for the selected bar.
      */
-    @State private var _selectedValuesString: String = " "
+    @Binding var selectedValuesString: String
+    
+    /* ################################################################## */
+    /**
+     */
+    @Binding var selectedActivityRange: Int
 
     /* ################################################################## */
     /**
      This is used to give us haptic feedback for dragging.
      */
     @State var hapticEngine: CHHapticEngine?
-    
-    /* ################################################################## */
-    /**
-     */
-    @State private var _selectedActivityRange: Int = 1
     
     /* ################################################################## */
     /**
@@ -157,7 +211,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
      - returns: The number of active users, depending on the segmented selection.
      */
     private func getActiveDataValue(for inRowData: RCVST_DataProvider.Row) -> Int {
-        switch _selectedActivityRange {
+        switch selectedActivityRange {
         case 1:
             return inRowData.activeInLast24Hours
         case 7:
@@ -179,9 +233,9 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
      - returns: A tuple, with the relevant data to use for the string.
      */
     private func getActiveDataItem(for inRowData: RCVST_DataProvider.Row) -> (activePeriodString: String, activeUsersNew: Int) {
-        let activePeriodString = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-\(_selectedActivityRange)".localizedVariant
+        let activePeriodString = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-\(selectedActivityRange)".localizedVariant
         var activeUsersNew = 0
-        switch _selectedActivityRange {
+        switch selectedActivityRange {
         case 1:
             activeUsersNew = inRowData.activeInLast24Hours
         case 7:
@@ -212,26 +266,6 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
         let dates = Array<Date>(stride(from: minimumDate, through: maximumDate, by: step))
         // Set up an array of strings to use as labels for the X-axis.
         let dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
-        // It is surrounded by a standard group box.
-        GroupBox("SLUG-CHART-3-TITLE".localizedVariant) {
-            // This picker allows us to view the various activity ranges.
-            Picker("Activity", selection: $_selectedActivityRange) {
-                Text("1").tag(1)
-                Text("7").tag(7)
-                Text("30").tag(30)
-                Text("90").tag(90)
-                Text("SLUG-BAR-CHART-ACTIVE-TYPES-AVERAGE".localizedVariant).tag(0)
-            }
-            .pickerStyle(.segmented)
-            .onChange(of: _selectedActivityRange) { triggerHaptic(intensity: 0.5, sharpness: 0.25) }
-            
-            // This displays the value of the selected bar.
-            Text(_selectedValuesString)
-                .minimumScaleFactor(0.5)
-                .lineLimit(1)
-                .font(.subheadline)
-                .foregroundStyle(.red)
-            
             // The main chart view. It is a simple bar chart.
             Chart(_dataFiltered) { inRowData in
                 let date = inRowData.sampleDate ?? .now
@@ -291,13 +325,13 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                             let activeUsersNew = getActiveDataItem(for: newValue).activeUsersNew
                                             let activePeriodString = getActiveDataItem(for: newValue).activePeriodString
                                             let percentage =  Int((100 * activeUsersNew) / allUsers)
-                                            if 0 == _selectedActivityRange {
-                                                _selectedValuesString = String(format: "SLUG-CHART-3-AVERAGE-DESC-STRING-FORMAT".localizedVariant,
+                                            if 0 == selectedActivityRange {
+                                                selectedValuesString = String(format: "SLUG-CHART-3-AVERAGE-DESC-STRING-FORMAT".localizedVariant,
                                                                                dateString,
                                                                                activeUsersNew
                                                 )
                                             } else {
-                                                _selectedValuesString = String(format: "SLUG-CHART-3-TYPES-DESC-STRING-FORMAT".localizedVariant,
+                                                selectedValuesString = String(format: "SLUG-CHART-3-TYPES-DESC-STRING-FORMAT".localizedVariant,
                                                                                dateString,
                                                                                activePeriodString,
                                                                                activeUsersNew,
@@ -317,20 +351,18 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                     triggerHaptic()
                                     _isDragging = false
                                     _selectedValue = nil
-                                    _selectedValuesString = " "
+                                    selectedValuesString = " "
                                 }
                         )
                 }
             }
             // This is so the user has room to scroll, if the chart is off the screen.
             .padding([.leading, .trailing], Self.sidePadding)
-        }
-        .padding()
-        // This makes sure the haptics are set up, every time we are activated.
-        .onChange(of: _scenePhase, initial: true) {
-            if .active == _scenePhase {
-                prepareHaptics()
+            // This makes sure the haptics are set up, every time we are activated.
+            .onChange(of: _scenePhase, initial: true) {
+                if .active == _scenePhase {
+                    prepareHaptics()
+                }
             }
-        }
     }
 }
