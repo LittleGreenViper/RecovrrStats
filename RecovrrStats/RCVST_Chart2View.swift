@@ -196,7 +196,7 @@ struct SignupActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
         Chart(_dataFiltered) { inRowData in
             ForEach(inRowData.data, id: \.signupType) { inSignupTypeData in
                 BarMark(
-                    x: .value("SLUG-BAR-CHART-SIGNUP-TYPES-X".localizedVariant, inRowData.date),
+                    x: .value("SLUG-BAR-CHART-SIGNUP-TYPES-X".localizedVariant, inRowData.date, unit: .day),
                     y: .value("SLUG-BAR-CHART-SIGNUP-TYPES-Y".localizedVariant, inSignupTypeData.value)
                 )
                 .foregroundStyle(by: .value("SLUG-BAR-CHART-SIGNUP-TYPES-LEGEND".localizedVariant,

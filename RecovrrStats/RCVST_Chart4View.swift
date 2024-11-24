@@ -196,7 +196,7 @@ struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
         Chart(_dataFiltered) { inRowData in
             ForEach(inRowData.data, id: \.deletionType) { inDeletionType in
                 BarMark(
-                    x: .value("SLUG-BAR-CHART-DELETION-TYPES-X".localizedVariant, inRowData.date),
+                    x: .value("SLUG-BAR-CHART-DELETION-TYPES-X".localizedVariant, inRowData.date, unit: .day),
                     y: .value("SLUG-BAR-CHART-DELETION-TYPES-Y".localizedVariant, inDeletionType.value)
                 )
                 .foregroundStyle(by: .value("SLUG-BAR-CHART-DELETION-TYPES-LEGEND".localizedVariant,

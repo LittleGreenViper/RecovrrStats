@@ -203,7 +203,7 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
             ForEach(inRowData.data, id: \.userType) { inUserTypeData in
                 if _chartDomain?.contains(inRowData.date) ?? false {
                     BarMark(
-                        x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date),
+                        x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date, unit: .day),
                         y: .value("SLUG-BAR-CHART-USER-TYPES-Y".localizedVariant, inUserTypeData.value)
                     )
                     .foregroundStyle(by: .value("SLUG-BAR-CHART-USER-TYPES-LEGEND".localizedVariant,

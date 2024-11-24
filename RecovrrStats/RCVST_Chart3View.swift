@@ -283,7 +283,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
             let date = inRowData.sampleDate ?? .now
             let active = getActiveDataValue(for: inRowData)
             BarMark(
-                x: .value("SLUG-BAR-CHART-TYPES-X".localizedVariant, date),
+                x: .value("SLUG-BAR-CHART-TYPES-X".localizedVariant, date, unit: .day),
                 y: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y".localizedVariant, active)
             )
             .foregroundStyle(by: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant,
