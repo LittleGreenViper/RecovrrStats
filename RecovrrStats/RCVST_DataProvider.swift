@@ -7,9 +7,20 @@ import TabularData
 import RVS_Generic_Swift_Toolbox
 
 /* ###################################################################################################################################### */
+// MARK: - Protocol That Allows Generic Handling -
+/* ###################################################################################################################################### */
+protocol RCVST_DataProvider_ElementHasDate {
+    /* ############################################################## */
+    /**
+     The date the sample was taken. If error, it will be .distantFuture
+     */
+    var date: Date { get }
+}
+
+/* ###################################################################################################################################### */
 // MARK: - Array Extension For Arrays of Rows -
 /* ###################################################################################################################################### */
-extension Array where Element == RCVST_DataProvider.Row {
+extension Array where Element: RCVST_DataProvider_ElementHasDate {
     /* ################################################################## */
     /**
      This returns the sample closest to the given date.
@@ -18,12 +29,13 @@ extension Array where Element == RCVST_DataProvider.Row {
      
      - returns: The sample that is closest to (above or below) the given date.
      */
-    func nearestTo(_ inDate: Date) -> RCVST_DataProvider.Row? {
-        var ret: RCVST_DataProvider.Row?
+    func nearestTo(_ inDate: Date) -> Element? {
+        var ret: Element?
         
         forEach {
-            guard let currentDate = $0.sampleDate,
-                  let compDate = ret?.sampleDate
+            let currentDate = $0.date
+            
+            guard let compDate = ret?.date
             else {
                 ret = $0
                 return
@@ -209,7 +221,7 @@ extension RCVST_DataProvider {
 /* ###################################################################################################################################### */
 public extension RCVST_DataProvider {
     /// This provides a simple interface to the data for each row.
-    struct Row: Identifiable {
+    struct Row: Identifiable, RCVST_DataProvider_ElementHasDate {
         /* ############################################################## */
         /**
          Make us identifiable.
@@ -463,6 +475,14 @@ public extension RCVST_DataProvider {
          The number of inactive users deleted by the administrators since the last sample.
          */
         public var newDeletedInactive: Int { deletedInactive - _previousDeletedInactive }
+        
+        // MARK: RCVST_DataProvider_ElementHasDate Conformance
+        
+        /* ############################################################## */
+        /**
+         The date the sample was taken. If error, it will be .distantFuture
+         */
+        public var date: Date { sampleDate ?? .distantFuture }
     }
 }
 
@@ -692,7 +712,7 @@ public extension RCVST_DataProvider {
     /**
      This provides user type totals for one date.
      */
-    struct RowUserPlottableData: Identifiable {
+    struct RowUserPlottableData: Identifiable, RCVST_DataProvider_ElementHasDate {
         /* ############################################################## */
         /**
          Make me identifiable.
@@ -820,7 +840,7 @@ public extension RCVST_DataProvider {
     /**
      This provides signup type totals for one date.
      */
-    struct RowSignupPlottableData: Identifiable {
+    struct RowSignupPlottableData: Identifiable, RCVST_DataProvider_ElementHasDate {
         /* ############################################################## */
         /**
          Make me identifiable.
@@ -961,7 +981,7 @@ public extension RCVST_DataProvider {
     /**
      This provides signup type totals for one date.
      */
-    struct RowDeletePlottableData: Identifiable {
+    struct RowDeletePlottableData: Identifiable, RCVST_DataProvider_ElementHasDate {
         /* ############################################################## */
         /**
          Make me identifiable.

@@ -9,34 +9,6 @@ import RVS_Generic_Swift_Toolbox
 import CoreHaptics
 
 /* ###################################################################################################################################### */
-// MARK: - Array Extension For Our Data Type -
-/* ###################################################################################################################################### */
-extension Array where Element == RCVST_DataProvider.RowDeletePlottableData {
-    /* ################################################################## */
-    /**
-     This returns the sample closest to the given date.
-     
-     - parameter inDate: The date we want to compare against.
-     
-     - returns: The sample that is closest to (above or below) the given date.
-     */
-    func nearestTo(_ inDate: Date) -> RCVST_DataProvider.RowDeletePlottableData? {
-        var ret: RCVST_DataProvider.RowDeletePlottableData?
-        
-        forEach {
-            guard let retTemp = ret else {
-                ret = $0
-                return
-            }
-            
-            ret = abs($0.date.timeIntervalSince(inDate)) < abs(retTemp.date.timeIntervalSince(inDate)) ? $0 : ret
-        }
-        
-        return ret
-    }
-}
-
-/* ###################################################################################################################################### */
 // MARK: - Main Content View for Deletion Types Chart -
 /* ###################################################################################################################################### */
 /**

@@ -9,34 +9,6 @@ import RVS_Generic_Swift_Toolbox
 import CoreHaptics
 
 /* ###################################################################################################################################### */
-// MARK: - Array Extension For Our Data Type -
-/* ###################################################################################################################################### */
-extension Array where Element == RCVST_DataProvider.RowSignupPlottableData {
-    /* ################################################################## */
-    /**
-     This returns the sample closest to the given date.
-     
-     - parameter inDate: The date we want to compare against.
-     
-     - returns: The sample that is closest to (above or below) the given date.
-     */
-    func nearestTo(_ inDate: Date) -> RCVST_DataProvider.RowSignupPlottableData? {
-        var ret: RCVST_DataProvider.RowSignupPlottableData?
-        
-        forEach {
-            guard let retTemp = ret else {
-                ret = $0
-                return
-            }
-            
-            ret = abs($0.date.timeIntervalSince(inDate)) < abs(retTemp.date.timeIntervalSince(inDate)) ? $0 : ret
-        }
-        
-        return ret
-    }
-}
-
-/* ###################################################################################################################################### */
 // MARK: - Main Content View For Signup Administration Activity Chart -
 /* ###################################################################################################################################### */
 /**
