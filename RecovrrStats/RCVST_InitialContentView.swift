@@ -7,6 +7,26 @@ import TabularData
 import CoreHaptics
 
 /* ###################################################################################################################################### */
+// MARK: - Generic Data Display Module View -
+/* ###################################################################################################################################### */
+/**
+ This allows us to "genericize" the view structs.
+ */
+protocol RCVST_DataDisplay: View {
+    /* ################################################################## */
+    /**
+     This is the actual dataframe wrapper for the stats.
+     */
+    var data: RCVST_DataProvider? { get set }
+    
+    /* ################################################################## */
+    /**
+     The string that displays the data for the selected bar.
+     */
+    var selectedValuesString: String { get set }
+}
+
+/* ###################################################################################################################################### */
 // MARK: - Helps With Haptics -
 /* ###################################################################################################################################### */
 /**
@@ -113,10 +133,10 @@ struct RootStackView: View {
     var body: some View {
         NavigationStack {
             List {
-                NavigationLink("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart1View(data: _data) }
-                NavigationLink("SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart2View(data: _data) }
-                NavigationLink("SLUG-CHART-3-TITLE".localizedVariant) { RCVST_Chart3View(data: _data) }
-                NavigationLink("SLUG-CHART-4-TITLE".localizedVariant) { RCVST_Chart4View(data: _data) }
+                NavigationLink("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart1View(title: "SLUG-USER-TOTALS-CHART-TITLE".localizedVariant, data: _data) }
+                NavigationLink("SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant) { RCVST_Chart2View(title: "SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant, data: _data) }
+                NavigationLink("SLUG-CHART-3-TITLE".localizedVariant) { RCVST_Chart3View(title: "SLUG-CHART-3-TITLE".localizedVariant, data: _data) }
+                NavigationLink("SLUG-CHART-4-TITLE".localizedVariant) { RCVST_Chart4View(title: "SLUG-CHART-4-TITLE".localizedVariant, data: _data) }
             }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
             // Reacts to "pull to refresh," to reload the file.

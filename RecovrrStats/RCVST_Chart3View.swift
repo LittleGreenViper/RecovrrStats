@@ -3,7 +3,6 @@
 */
 
 import SwiftUI
-import TabularData
 import Charts
 import RVS_Generic_Swift_Toolbox
 import CoreHaptics
@@ -15,7 +14,13 @@ import CoreHaptics
  This displays a chart, with the activity of active users (based on when they last signed in, at the time of the sample), over time.
  It is selectable, and dragging your finger across the chart, shows exact numbers.
  */
-struct RCVST_Chart3View: View, RCVST_UsesData, RCVST_HapticHopper {
+struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
+    /* ################################################################## */
+    /**
+     This is the title to display over the chart.
+     */
+    @State var title: String
+
     /* ################################################################## */
     /**
      Tracks scene activity.
@@ -65,7 +70,7 @@ struct RCVST_Chart3View: View, RCVST_UsesData, RCVST_HapticHopper {
      */
     var body: some View {
         GeometryReader { inGeometry in
-            GroupBox("SLUG-CHART-3-TITLE".localizedVariant) {
+            GroupBox(title) {
                 VStack {
                     // This picker allows us to view the various activity ranges.
                     Picker("Activity", selection: $selectedActivityRange) {
@@ -118,12 +123,6 @@ struct RCVST_Chart3View: View, RCVST_UsesData, RCVST_HapticHopper {
  You also have an "Average," which is the average of all users' last sign in from the time of the sample (in days).
  */
 struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
-    /* ################################################################## */
-    /**
-     Padding for the right side.
-     */
-    static let sidePadding = CGFloat(20)
-    
     /* ################################################################## */
     /**
      Tracks scene activity.
@@ -368,8 +367,8 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                     )
             }
         }
-        // This is so the user has room to scroll, if the chart is off the screen.
-        .padding([.leading, .trailing], Self.sidePadding)
+        // This gives the last X axis label room to display.
+        .padding([.trailing], RCVST_App.sidePadding)
         // This makes sure the haptics are set up, every time we are activated.
         .onChange(of: _scenePhase, initial: true) {
             if .active == _scenePhase {

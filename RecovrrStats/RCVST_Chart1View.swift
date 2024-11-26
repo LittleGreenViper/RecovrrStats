@@ -3,7 +3,6 @@
 */
 
 import SwiftUI
-import TabularData
 import Charts
 import RVS_Generic_Swift_Toolbox
 import CoreHaptics
@@ -15,7 +14,13 @@ import CoreHaptics
  This displays a chart, with the different user types, over time.
  It is selectable, and dragging your finger across the chart, shows exact numbers.
  */
-struct RCVST_Chart1View: View, RCVST_UsesData {
+struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
+    /* ################################################################## */
+    /**
+     This is the title to display over the chart.
+     */
+    @State var title: String
+
     /* ################################################################## */
     /**
      This is the actual dataframe wrapper for the stats.
@@ -34,7 +39,7 @@ struct RCVST_Chart1View: View, RCVST_UsesData {
      */
     var body: some View {
         GeometryReader { inGeometry in
-            GroupBox("SLUG-USER-TOTALS-CHART-TITLE".localizedVariant) {
+            GroupBox(title) {
                 VStack {
                     // This displays the value of the selected bar.
                     Text(selectedValuesString)
@@ -42,7 +47,7 @@ struct RCVST_Chart1View: View, RCVST_UsesData {
                         .lineLimit(1)
                         .font(.subheadline)
                         .foregroundStyle(.red)
-                    
+
                     UserTypesChart(data: data, selectedValuesString: $selectedValuesString)
                         .frame(
                             minHeight: inGeometry.size.width,
@@ -68,13 +73,7 @@ struct RCVST_Chart1View: View, RCVST_UsesData {
 /**
  This displays a simple bar chart of the users, segeregated by the type of user.
  */
-struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
-    /* ################################################################## */
-    /**
-     Padding for the right side.
-     */
-    static let sidePadding = CGFloat(20)
-    
+struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
     /* ################################################################## */
     /**
      Tracks scene activity.
@@ -252,8 +251,8 @@ struct UserTypesChart: View, RCVST_UsesData, RCVST_HapticHopper {
                     )
             }
         }
-        // This is so the user has room to scroll, if the chart is off the screen.
-        .padding([.leading, .trailing], Self.sidePadding)
+        // This gives the last X axis label room to display.
+        .padding([.trailing], RCVST_App.sidePadding)
         // This makes sure the haptics are set up, every time we are activated.
         .onChange(of: _scenePhase, initial: true) {
             if .active == _scenePhase {

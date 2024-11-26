@@ -3,22 +3,6 @@
 */
 
 import SwiftUI
-import TabularData
-
-/* ###################################################################################################################################### */
-// MARK: - Special Date Extension For Subtracting Dates -
-/* ###################################################################################################################################### */
-extension Date {
-    /* ################################################################## */
-    /**
-     A simple minus operator for dates.
-     
-     - paremeter lhs: The left-hand side of the subtration
-     - parameter rhs: The right-hand side of the subtraction.
-     - returns: A TimeInterval, with the number of seconds between the dates. If rhs > lhs, it is negative.
-     */
-    static func - (lhs: Date, rhs: Date) -> TimeInterval { lhs.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate }
-}
 
 /* ###################################################################################################################################### */
 // MARK: - Main App -
@@ -28,6 +12,12 @@ extension Date {
  */
 @main
 struct RCVST_App: App {
+    /* ################################################################## */
+    /**
+     Padding for the right side. This allows the last X-axis value label to show.
+     */
+    static let sidePadding = CGFloat(20)
+    
     /* ################################################################## */
     /**
      The initial app screen.

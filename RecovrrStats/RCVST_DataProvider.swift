@@ -7,6 +7,21 @@ import TabularData
 import RVS_Generic_Swift_Toolbox
 
 /* ###################################################################################################################################### */
+// MARK: - Special Date Extension For Subtracting Dates -
+/* ###################################################################################################################################### */
+extension Date {
+    /* ################################################################## */
+    /**
+     A simple minus operator for dates.
+     
+     - paremeter lhs: The left-hand side of the subtration
+     - parameter rhs: The right-hand side of the subtraction.
+     - returns: A TimeInterval, with the number of seconds between the dates. If rhs > lhs, it is negative.
+     */
+    static func - (lhs: Date, rhs: Date) -> TimeInterval { lhs.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate }
+}
+
+/* ###################################################################################################################################### */
 // MARK: - Protocol That Allows Generic Handling -
 /* ###################################################################################################################################### */
 protocol RCVST_DataProvider_ElementHasDate {
