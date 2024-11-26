@@ -32,7 +32,7 @@ protocol RCVST_DataDisplay: View {
 /**
  We declare this, to provide a default haptic implementation.
  */
-protocol RCVST_HapticHopper {
+protocol RCVST_HapticHopper: View {
     /* ################################################################## */
     /**
      This is used to give us haptic feedback for dragging. REQUIRED
@@ -63,7 +63,7 @@ extension RCVST_HapticHopper {
     /**
      This provides a basic haptic trigger function. Probably all we need.
      */
-    func triggerHaptic(intensity inIntensity: Float = 0.25, sharpness inSharpness: Float = 0) {
+    func triggerHaptic(intensity inIntensity: Float = 0.3, sharpness inSharpness: Float = 0) {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
         var events = [CHHapticEvent]()
 
