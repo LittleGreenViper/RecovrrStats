@@ -221,7 +221,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
      - parameter inRowData: The selected bar.
      - returns: The number of active users, depending on the segmented selection.
      */
-    private func getActiveDataValue(for inRowData: RCVST_DataProvider.Row) -> Int {
+    private func getDataValue(for inRowData: RCVST_DataProvider.Row) -> Int {
         switch selectedActivityRange {
         case 1:
             return inRowData.activeInLast24Hours
@@ -243,7 +243,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
      - parameter inRowData: The selected bar.
      - returns: A tuple, with the relevant data to use for the string.
      */
-    private func getActiveDataItem(for inRowData: RCVST_DataProvider.Row) -> (activePeriodString: String, activeUsersNew: Int) {
+    private func getDataItem(for inRowData: RCVST_DataProvider.Row) -> (activePeriodString: String, activeUsersNew: Int) {
         let activePeriodString = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-\(selectedActivityRange)".localizedVariant
         var activeUsersNew = 0
         switch selectedActivityRange {
@@ -280,7 +280,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
         // The main chart view. It is a simple bar chart.
         Chart(_dataFiltered) { inRowData in
             let date = inRowData.sampleDate ?? .now
-            let active = getActiveDataValue(for: inRowData)
+            let active = getDataValue(for: inRowData)
             BarMark(
                 x: .value("SLUG-BAR-CHART-TYPES-X".localizedVariant, date, unit: .day),
                 y: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y".localizedVariant, active)
@@ -333,8 +333,8 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                        let newDate = newValue.sampleDate {
                                         let dateString = dateFormatter.string(from: newDate)
                                         let allUsers = newValue.activeUsers
-                                        let activeUsersNew = getActiveDataItem(for: newValue).activeUsersNew
-                                        let activePeriodString = getActiveDataItem(for: newValue).activePeriodString
+                                        let activeUsersNew = getDataItem(for: newValue).activeUsersNew
+                                        let activePeriodString = getDataItem(for: newValue).activePeriodString
                                         let percentage =  Int((100 * activeUsersNew) / allUsers)
                                         if 0 == selectedActivityRange {
                                             selectedValuesString = String(format: "SLUG-CHART-3-AVERAGE-DESC-STRING-FORMAT".localizedVariant,
