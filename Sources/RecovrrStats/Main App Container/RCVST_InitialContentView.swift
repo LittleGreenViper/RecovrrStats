@@ -133,13 +133,13 @@ struct RootStackView: View {
 
     /* ################################################################## */
     /**
-     This is the actual dataframe wrapper for the stats.
+     This is the actual dataframe wrapper for the stats. Everything from here, on, will be bound to this.
      */
     @State private var _data: RCVST_DataProvider?
 
     /* ################################################################## */
     /**
-     The string that displays the data for the selected bar.
+     The string that displays the data for the selected bar. Everything from here, on, will be bound to this.
      */
     @State private var _selectedValuesString: String = " "
 
@@ -163,16 +163,14 @@ struct RootStackView: View {
             }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
             // Reacts to "pull to refresh," to reload the file.
-            .refreshable { _data = RCVST_DataProvider() }
+            .refreshable { _data = RCVST_DataProvider(useMockData: false) }
         }
-        .onAppear {
-            _data = RCVST_DataProvider()
-        }
+        .onAppear { _data = RCVST_DataProvider(useMockData: false) }
         // Forces updates, whenever we become active.
         .onChange(of: _scenePhase, initial: true) {
             if .active == _scenePhase,
                nil == _data {
-                _data = RCVST_DataProvider()
+                _data = RCVST_DataProvider(useMockData: false)
             } else if .background == _scenePhase {
                 _data = nil
             }

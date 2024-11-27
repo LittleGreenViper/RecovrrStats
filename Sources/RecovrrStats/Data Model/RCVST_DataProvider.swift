@@ -74,7 +74,7 @@ public class RCVST_DataProvider {
     /**
      Mock CSV data. The first ten days.
      */
-    private static let _g_mockData: Data? = """
+    private static let _g_mockData = """
 sample_date,total_users,new_users,never_set_location,total_requests,accepted_requests,rejected_requests,open_requests,active_1,active_7,active_30,active_90,active_avg,deleted_active,deleted_inactive
 1728964808,662,50,133,10,8,2,0,18,65,163,337,94,0,1
 1729008013,660,47,132,12,9,3,0,19,65,164,337,95,0,4
@@ -100,7 +100,7 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
     
     /* ################################################################## */
     /**
-     The URL string to the stats file.
+     The URL string to the active stats file.
      */
     private static let _g_statsURLString = "https://recovrr.org/recovrr/log/stats.csv"
     
@@ -114,9 +114,9 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
     /**
      Upon initialization, we go out, and fetch the stats file.
      
-     - parameter useMockData: If true (OPTIONAL -default is false), then we load mock data, instead of the actual file.
+     - parameter useMockData: If true (OPTIONAL -default is true), then we load mock data, instead of the actual file.
      */
-    required init(useMockData inUseMockData: Bool = false) {
+    required init(useMockData inUseMockData: Bool = true) {
         _fetchStats(useMockData: inUseMockData) { inResults in DispatchQueue.main.async { self.statusDataFrame = inResults } }
     }
 }
