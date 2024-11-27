@@ -98,6 +98,7 @@ protocol RCVST_UsesData {
 // MARK: - Initial View -
 /* ###################################################################################################################################### */
 /**
+ The main container view for everything else.
  */
 struct RCVST_InitialContentView: View {
     /* ################################################################## */
