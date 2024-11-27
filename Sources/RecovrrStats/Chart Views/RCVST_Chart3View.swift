@@ -173,7 +173,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
      - returns: True, if the bar is being selected.
      */
     private func _isLineDragged(_ inRowData: RCVST_DataProvider.Row) -> Bool {
-        _isDragging && nil != inRowData.sampleDate && inRowData.sampleDate == _selectedValue?.sampleDate
+        _isDragging && nil != _selectedValue?.date && inRowData.date == _selectedValue?.date
     }
 
     /* ################################################################## */
@@ -274,8 +274,8 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
     var body: some View {
         let numberOfXValues = TimeInterval(4)
         // This gives us "breathing room" around the X-axis.
-        let minimumDate = _dataFiltered.first?.sampleDate?.addingTimeInterval(-43200) ?? .now
-        let maximumDate = _dataFiltered.last?.sampleDate?.addingTimeInterval(43200) ?? .now
+        let minimumDate = _dataFiltered.first?.date.addingTimeInterval(-43200) ?? .now
+        let maximumDate = _dataFiltered.last?.date.addingTimeInterval(43200) ?? .now
         // We use this to set a fixed number of X-axis dates.
         let step = (maximumDate - minimumDate) / numberOfXValues
         // Set up an array of dates to use as values for the X-axis.
@@ -284,7 +284,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
         let dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
         // The main chart view. It is a simple bar chart.
         Chart(_dataFiltered) { inRowData in
-            let date = inRowData.sampleDate ?? .now
+            let date = inRowData.date
             let active = _getDataValue(for: inRowData)
             BarMark(
                 x: .value("SLUG-BAR-CHART-TYPES-X".localizedVariant, date, unit: .day),
@@ -334,8 +334,8 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                 if let frame = chart.plotFrame {
                                     let currentX = max(0, min(chart.plotSize.width, value.location.x - geometry[frame].origin.x))
                                     guard let date = chart.value(atX: currentX, as: Date.self) else { return }
-                                    if let newValue = _dataFiltered.nearestTo(date),
-                                       let newDate = newValue.sampleDate {
+                                    if let newValue = _dataFiltered.nearestTo(date) {
+                                        let newDate = newValue.date
                                         let dateString = dateFormatter.string(from: newDate)
                                         let allUsers = newValue.activeUsers
                                         let activeUsersNew = _getDataItem(for: newValue).activeUsersNew
@@ -354,7 +354,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                                                            percentage
                                             )
                                         }
-                                        if newDate != (_selectedValue?.sampleDate ?? newDate) {
+                                        if newDate != (_selectedValue?.date ?? newDate) {
                                             triggerHaptic()
                                         }
                                         _selectedValue = newValue

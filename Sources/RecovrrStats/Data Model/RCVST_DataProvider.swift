@@ -72,6 +72,34 @@ extension Array where Element: RCVST_DataProvider_ElementHasDate {
 public class RCVST_DataProvider {
     /* ################################################################## */
     /**
+     Mock CSV data. The first ten days.
+     */
+    private static let _g_mockData: Data? = """
+sample_date,total_users,new_users,never_set_location,total_requests,accepted_requests,rejected_requests,open_requests,active_1,active_7,active_30,active_90,active_avg,deleted_active,deleted_inactive
+1728964808,662,50,133,10,8,2,0,18,65,163,337,94,0,1
+1729008013,660,47,132,12,9,3,0,19,65,164,337,95,0,4
+1729051207,662,49,132,18,11,3,4,21,63,164,336,95,0,4
+1729094406,667,53,133,19,16,3,0,19,64,163,337,95,0,4
+1729137610,671,54,135,26,21,4,1,23,68,162,340,95,0,5
+1729180807,672,55,136,26,22,4,0,24,69,162,340,95,0,5
+1729224015,677,56,136,33,27,6,0,24,75,161,341,95,0,5
+1729267207,677,56,136,33,27,6,0,23,77,160,341,96,0,5
+1729310410,678,53,136,38,32,6,1,22,81,164,345,95,0,8
+1729353606,681,55,137,40,35,6,0,25,83,166,346,95,0,8
+1729396809,681,54,136,44,38,7,0,28,84,166,346,95,0,11
+1729440009,683,55,136,47,40,8,0,23,85,166,346,95,0,11
+1729483207,684,56,136,50,42,9,0,20,84,165,342,96,0,11
+1729526409,685,57,136,52,43,10,0,21,84,165,340,96,0,11
+1729569607,684,55,135,57,48,10,0,17,80,163,339,96,0,17
+1729612810,684,55,135,57,48,10,0,18,80,163,337,97,0,17
+1729656010,680,51,135,59,49,10,1,20,80,164,336,97,0,22
+1729699210,684,54,136,62,53,10,0,21,81,165,337,97,0,22
+1729742408,686,54,137,64,55,10,0,26,86,162,340,97,0,22
+1729785608,688,55,138,66,57,10,0,22,85,162,341,97,0,22
+""".data(using: .utf8)
+    
+    /* ################################################################## */
+    /**
      The URL string to the stats file.
      */
     private static let _g_statsURLString = "https://recovrr.org/recovrr/log/stats.csv"
@@ -85,9 +113,11 @@ public class RCVST_DataProvider {
     /* ################################################################## */
     /**
      Upon initialization, we go out, and fetch the stats file.
+     
+     - parameter useMockData: If true (OPTIONAL -default is false), then we load mock data, instead of the actual file.
      */
-    required init() {
-        _fetchStats { inResults in DispatchQueue.main.async { self.statusDataFrame = inResults } }
+    required init(useMockData inUseMockData: Bool = false) {
+        _fetchStats(useMockData: inUseMockData) { inResults in DispatchQueue.main.async { self.statusDataFrame = inResults } }
     }
 }
 
@@ -203,27 +233,47 @@ extension RCVST_DataProvider {
     /**
      This fetches the current stats file, and delivers it as a dataframe.
      
+     - parameter useMockData: If true, then we load mock data, instead of the actual file.
      - parameter completion: A simple completion proc, with a single argument of dataframe, containing the stats.
      */
-    private func _fetchStats(completion inCompletion: ((DataFrame?) -> Void)?) {
+    private func _fetchStats(useMockData inUseMockData: Bool, completion inCompletion: ((DataFrame?) -> Void)?) {
         // We don't need to do this in the main thread.
         DispatchQueue.global().async {
-            guard let url = URL(string: Self._g_statsURLString)
-            else {
-                inCompletion?(nil)
-                return
-            }
-            do {
-                var dataFrame = try DataFrame(contentsOfCSVFile: url)
-                // We convert the integer timestamp to a more usable Date instance.
-                dataFrame.transformColumn(_Columns.sample_date.rawValue) { (inUnixTime: Int) -> Date in Date(timeIntervalSince1970: TimeInterval(inUnixTime)) }
+            if inUseMockData,
+               let mockData = Self._g_mockData,
+               !mockData.isEmpty {
+                do {
+                    var dataFrame = try DataFrame(csvData: mockData)
+                    // We convert the integer timestamp to a more usable Date instance.
+                    dataFrame.transformColumn(_Columns.sample_date.rawValue) { (inUnixTime: Int) -> Date in Date(timeIntervalSince1970: TimeInterval(inUnixTime)) }
+                    #if DEBUG
+                        print("Data Frame Mock Data Successful Initialization")
+                    #endif
+                    inCompletion?(dataFrame)
+                } catch {
+                    #if DEBUG
+                        print("Data Frame Mock Data Initialization Error: \(error.localizedDescription)")
+                    #endif
+                    inCompletion?(nil)
+                }
+            } else if let url = URL(string: Self._g_statsURLString) {
+                do {
+                    var dataFrame = try DataFrame(contentsOfCSVFile: url)
+                    // We convert the integer timestamp to a more usable Date instance.
+                    dataFrame.transformColumn(_Columns.sample_date.rawValue) { (inUnixTime: Int) -> Date in Date(timeIntervalSince1970: TimeInterval(inUnixTime)) }
+                    #if DEBUG
+                        print("Data Frame Successful Initialization")
+                    #endif
+                    inCompletion?(dataFrame)
+                } catch {
+                    #if DEBUG
+                        print("Data Frame Initialization Error: \(error.localizedDescription)")
+                    #endif
+                    inCompletion?(nil)
+                }
+            } else {
                 #if DEBUG
-                    print("Data Frame Successful Initialization")
-                #endif
-                inCompletion?(dataFrame)
-            } catch {
-                #if DEBUG
-                    print("Data Frame Initialization Error: \(error.localizedDescription)")
+                    print("Unknown State. No Mock Data, No URL")
                 #endif
                 inCompletion?(nil)
             }
@@ -341,12 +391,6 @@ public extension RCVST_DataProvider {
         
         /* ############################################################## */
         /**
-         The date the sample was taken. Nil, if error.
-         */
-        public var sampleDate: Date? { _rowData?[0] as? Date }
-        
-        /* ############################################################## */
-        /**
          The total number of users (both active and inactive), at the time the sample was taken.
          */
         public var totalUsers: Int { _rowData?[1] as? Int ?? 0 }
@@ -459,7 +503,7 @@ public extension RCVST_DataProvider {
         /**
          The change in the number of users (both active and new), that have a nil location.
          */
-        public var changeInNeverSetLocation: Int { neverSetLocation - _previousNeverSetLocation }
+        public var changeInNeverSetLocation: Int { 0 == _previousNeverSetLocation ? 0 : neverSetLocation - _previousNeverSetLocation }
 
         /* ############################################################## */
         /**
@@ -497,7 +541,7 @@ public extension RCVST_DataProvider {
         /**
          The date the sample was taken. If error, it will be .distantFuture
          */
-        public var date: Date { sampleDate ?? .distantFuture }
+        public var date: Date { _rowData?[0] as? Date ?? .distantFuture }
     }
 }
 
@@ -772,7 +816,7 @@ public extension RCVST_DataProvider {
 
         for index in stride(from: 1, to: rows.count, by: 2) {
             let dailySample = rows[index]
-            guard let date = dailySample.sampleDate else { break }
+            let date = dailySample.date
             let activeUsers = RowUserTypesPlottableData(userType: .active, value: dailySample.activeUsers)
             let newUsers = RowUserTypesPlottableData(userType: .new, value: dailySample.newUsers)
             ret.append(RowUserPlottableData(date: date, data: [activeUsers, newUsers]))
@@ -902,7 +946,7 @@ public extension RCVST_DataProvider {
         for index in stride(from: 1, to: rows.count, by: 2) {
             let sample1 = rows[index - 1]
             let sample2 = rows[index]
-            guard let date = sample2.sampleDate else { break }
+            let date = sample2.date
             let sample1RejectedValue = sample1.newRejectedRequests
             let sample2RejectedValue = sample2.newRejectedRequests
             let sample1AcceptedValue = sample1.newAcceptedRequests
@@ -1043,7 +1087,7 @@ public extension RCVST_DataProvider {
         for index in stride(from: 1, to: rows.count, by: 2) {
             let sample1 = rows[index - 1]
             let sample2 = rows[index]
-            guard let date = sample2.sampleDate else { break }
+            let date = sample2.date
             let sample1ActiveValue = sample1.newDeletedActive
             let sample2ActiveValue = sample2.newDeletedActive
             let sample1InactiveValue = sample1.newDeletedInactive
