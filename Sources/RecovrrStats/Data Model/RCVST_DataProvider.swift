@@ -69,7 +69,7 @@ extension Array where Element: RCVST_DataProvider_ElementHasDate {
 /**
  This class reads in and processes the stats data.
  */
-public class RCVST_DataProvider: ObservableObject {
+public class RCVST_DataProvider {
     /* ################################################################## */
     /**
      The URL string to the stats file.
@@ -80,7 +80,7 @@ public class RCVST_DataProvider: ObservableObject {
     /**
      This stores the dataframe info.
      */
-    @Published var statusDataFrame: DataFrame?
+    var statusDataFrame: DataFrame?
 
     /* ################################################################## */
     /**
