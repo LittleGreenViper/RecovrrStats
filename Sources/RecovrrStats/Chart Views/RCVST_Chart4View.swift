@@ -8,13 +8,13 @@ import RVS_Generic_Swift_Toolbox
 import CoreHaptics
 
 /* ###################################################################################################################################### */
-// MARK: - Main Content View for User Types Chart -
+// MARK: - Main Content View for Deletion Types Chart -
 /* ###################################################################################################################################### */
 /**
- This displays a chart, with the different user types, over time.
+ This displays a chart, with the different deletion types, over time.
  It is selectable, and dragging your finger across the chart, shows exact numbers.
  */
-struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
+struct RCVST_Chart4View: RCVST_DataDisplay, RCVST_UsesData {
     /* ################################################################## */
     /**
      This is the title to display over the chart.
@@ -25,14 +25,14 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
     /**
      This is the actual dataframe wrapper for the stats.
      */
-    @State var data: RCVST_DataProvider?
+    @Binding var data: RCVST_DataProvider?
 
     /* ################################################################## */
     /**
      The string that displays the data for the selected bar.
      */
-    @State var selectedValuesString: String = " "
-    
+    @Binding var selectedValuesString: String
+
     /* ################################################################## */
     /**
      This is the layout for this screen.
@@ -40,21 +40,12 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
     var body: some View {
         GeometryReader { inGeometry in
             GroupBox(title) {
-                VStack {
-                    // This displays the value of the selected bar.
-                    Text(selectedValuesString)
-                        .minimumScaleFactor(0.5)
-                        .lineLimit(1)
-                        .font(.subheadline)
-                        .foregroundStyle(.red)
-
-                    UserTypesChart(data: data, selectedValuesString: $selectedValuesString)
-                        .frame(
-                            minHeight: inGeometry.size.width,
-                            maxHeight: .infinity,
-                            alignment: .topLeading
-                        )
-                }
+                DeleteChart(data: $data, selectedValuesString: $selectedValuesString)
+                    .frame(
+                        minHeight: inGeometry.size.width,
+                        maxHeight: .infinity,
+                        alignment: .topLeading
+                    )
             }
             .frame(
                 minWidth: inGeometry.size.width,
@@ -71,20 +62,16 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
 // MARK: - User Type Bar Chart -
 /* ###################################################################################################################################### */
 /**
- This displays a simple bar chart of the users, segeregated by the type of user.
+ This displays a simple bar chart of the deletion activities.
  */
-struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
+struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
+    // MARK: Private Properties
+
     /* ################################################################## */
     /**
      Tracks scene activity.
      */
     @Environment(\.scenePhase) private var _scenePhase
-
-    /* ################################################################## */
-    /**
-     The general user type data.
-     */
-    @State var data: RCVST_DataProvider?
 
     /* ################################################################## */
     /**
@@ -94,8 +81,9 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
 
     /* ################################################################## */
     /**
+     The value being selected by the user, while dragging.
      */
-    @State private var _startingPoint: (minimumSeconds: Double, maximumSeconds: Double)?
+    @State private var _selectedValue: RCVST_DataProvider.RowDeletePlottableData?
 
     /* ################################################################## */
     /**
@@ -103,29 +91,40 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
      */
     @State private var _chartDomain: ClosedRange<Date>?
 
+    // MARK: External Bindings
+
     /* ################################################################## */
     /**
-     The value being selected by the user, while dragging.
+     The general user type data.
      */
-    @State private var _selectedValue: RCVST_DataProvider.RowUserPlottableData?
+    @Binding var data: RCVST_DataProvider?
 
     /* ################################################################## */
     /**
      The string that displays the data for the selected bar.
      */
     @Binding var selectedValuesString: String
+
+    // MARK: Private Functions
+
+    /* ################################################################## */
+    /**
+     This returns whether or not the selected data bar is being dragged.
+     
+     - parameter inRowData: The selected bar.
+     - returns: True, if the bar is being selected.
+     */
+    private func _isLineDragged(_ inRowData: RCVST_DataProvider.RowDeletePlottableData) -> Bool {
+        _isDragging && inRowData.date == _selectedValue?.date
+    }
+
+    // MARK: RCVST_HapticHopper Conformance
     
     /* ################################################################## */
     /**
      This is used to give us haptic feedback for dragging.
      */
     @State var hapticEngine: CHHapticEngine?
-
-    /* ################################################################## */
-    /**
-     The segregated user type data.
-     */
-    private var _dataFiltered: [RCVST_DataProvider.RowUserPlottableData] { data?.userTypePlottable ?? [] }
 
     /* ################################################################## */
     /**
@@ -140,17 +139,14 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
         
         try? hapticEngine?.start()
     }
-
+    
+    // MARK: Computed Properties
+    
     /* ################################################################## */
     /**
-     This returns whether or not the selected data bar is being dragged.
-     
-     - parameter inRowData: The selected bar.
-     - returns: True, if the bar is being selected.
+     The segregated user type data.
      */
-    private func _isLineDragged(_ inRowData: RCVST_DataProvider.RowUserPlottableData) -> Bool {
-        _isDragging && inRowData.date == _selectedValue?.date
-    }
+    private var _dataFiltered: [RCVST_DataProvider.RowDeletePlottableData] { data?.deleteTypePlottable ?? [] }
 
     /* ################################################################## */
     /**
@@ -161,38 +157,35 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
         // This gives us "breathing room" around the X-axis.
         let minimumDate = _dataFiltered.first?.date.addingTimeInterval(-43200) ?? .now
         let maximumDate = _dataFiltered.last?.date.addingTimeInterval(43200) ?? .now
-
         // We use this to set a fixed number of X-axis dates.
         let step = (maximumDate - minimumDate) / numberOfXValues
         // Set up an array of dates to use as values for the X-axis.
         let dates = Array<Date>(stride(from: minimumDate, through: maximumDate, by: step))
         // Set up an array of strings to use as labels for the X-axis.
         let dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
-                
+        
         // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
         Chart(_dataFiltered) { inRowData in
-            ForEach(inRowData.data, id: \.userType) { inUserTypeData in
-                if _chartDomain?.contains(inRowData.date) ?? false {
-                    BarMark(
-                        x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date, unit: .day),
-                        y: .value("SLUG-BAR-CHART-USER-TYPES-Y".localizedVariant, inUserTypeData.value)
-                    )
-                    .foregroundStyle(by: .value("SLUG-BAR-CHART-USER-TYPES-LEGEND".localizedVariant,
-                                                _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inUserTypeData.descriptionString)
-                    )
-                }
+            ForEach(inRowData.data, id: \.deletionType) { inDeletionType in
+                BarMark(
+                    x: .value("SLUG-BAR-CHART-DELETION-TYPES-X".localizedVariant, inRowData.date, unit: .day),
+                    y: .value("SLUG-BAR-CHART-DELETION-TYPES-Y".localizedVariant, inDeletionType.value)
+                )
+                .foregroundStyle(by: .value("SLUG-BAR-CHART-DELETION-TYPES-LEGEND".localizedVariant,
+                                            _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inDeletionType.descriptionString)
+                )
             }
         }
         .onAppear {
             _chartDomain = _chartDomain ?? minimumDate...maximumDate
         }
         // These define the three items in the legend, as well as the colors we'll use in the bars.
-        .chartForegroundStyleScale(["SLUG-ACTIVE-LEGEND-LABEL".localizedVariant: .green,
-                                    "SLUG-NEW-LEGEND-LABEL".localizedVariant: .blue,
+        .chartForegroundStyleScale(["SLUG-DELETED-ACTIVE-LEGEND-LABEL".localizedVariant: .green,
+                                    "SLUG-DELETED-INACTIVE-LEGEND-LABEL".localizedVariant: .blue,
                                     "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
                                    ])
         // We leave the Y-axis almost default, except that we want it on the left.
-        .chartYAxisLabel("SLUG-BAR-CHART-Y-AXIS-LABEL".localizedVariant, spacing: 12)
+        .chartYAxisLabel("SLUG-BAR-CHART-X-AXIS-DELETION-LABEL".localizedVariant, spacing: 12)
         .chartYAxis {
             AxisMarks(preset: .aligned, position: .leading) { _ in
                 AxisTick()
@@ -202,7 +195,7 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
         }
         // We customize the X-axis, to only have a few sections.
         .chartXScale(domain: _chartDomain ?? minimumDate...maximumDate)
-        .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-LABEL".localizedVariant, alignment: .top)
+        .chartXAxisLabel("SLUG-BAR-CHART-Y-AXIS-DELETION-LABEL".localizedVariant, alignment: .top)
         .chartXAxis {
             AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in
                 AxisTick(length: 8)
@@ -212,11 +205,10 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
         }
         // This mess is the finger tracker.
         .chartOverlay { chart in
-            GeometryReader { inGeom in
+            GeometryReader { geometry in
                 Rectangle()
                     .fill(Color.clear)
                     .contentShape(Rectangle())
-                    // This allows pinch-to-zoom (horizonatl axis).
                     .gesture(
                         DragGesture(minimumDistance: 0)
                             .onChanged { value in
@@ -224,10 +216,10 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
                                 dateFormatter.dateStyle = .short
                                 dateFormatter.timeStyle = .none
                                 if let frame = chart.plotFrame {
-                                    let currentX = max(0, min(chart.plotSize.width, value.location.x - inGeom[frame].origin.x))
+                                    let currentX = max(0, min(chart.plotSize.width, value.location.x - geometry[frame].origin.x))
                                     guard let date = chart.value(atX: currentX, as: Date.self) else { return }
                                     if let newValue = _dataFiltered.nearestTo(date) {
-                                        selectedValuesString = String(format: "SLUG-USER-TYPES-DESC-STRING-FORMAT".localizedVariant,
+                                        selectedValuesString = String(format: "SLUG-DELETED-TYPES-DESC-STRING-FORMAT".localizedVariant,
                                                                        dateFormatter.string(from: newValue.date),
                                                                        newValue.data[0].value,
                                                                        newValue.data[1].value,

@@ -123,12 +123,6 @@ struct RootStackView: View {
                                                      "SLUG-CHART-3-TITLE".localizedVariant,
                                                      "SLUG-CHART-4-TITLE".localizedVariant
                                                     ]
-    
-    /* ################################################################## */
-    /**
-     This is the actual dataframe wrapper for the stats.
-     */
-    @State private var _data: RCVST_DataProvider? = RCVST_DataProvider()
 
     /* ################################################################## */
     /**
@@ -138,19 +132,40 @@ struct RootStackView: View {
 
     /* ################################################################## */
     /**
+     This is the actual dataframe wrapper for the stats.
+     */
+    @State private var _data: RCVST_DataProvider?
+
+    /* ################################################################## */
+    /**
+     The string that displays the data for the selected bar.
+     */
+    @State private var _selectedValuesString: String = " "
+
+    /* ################################################################## */
+    /**
      The main navigation stack screen.
      */
     var body: some View {
+        // This displays the value of the selected bar.
+        Text(_selectedValuesString)
+            .minimumScaleFactor(0.5)
+            .lineLimit(1)
+            .font(.subheadline)
+            .foregroundStyle(.red)
         NavigationStack {
             List {
-                NavigationLink(Self._navigationNames[0]) { RCVST_Chart1View(title: Self._navigationNames[0], data: _data) }
-                NavigationLink(Self._navigationNames[1]) { RCVST_Chart2View(title: Self._navigationNames[1], data: _data) }
-                NavigationLink(Self._navigationNames[2]) { RCVST_Chart3View(title: Self._navigationNames[2], data: _data) }
-                NavigationLink(Self._navigationNames[3]) { RCVST_Chart4View(title: Self._navigationNames[3], data: _data) }
+                NavigationLink(Self._navigationNames[0]) { RCVST_Chart1View(title: Self._navigationNames[0], data: $_data, selectedValuesString: $_selectedValuesString) }
+                NavigationLink(Self._navigationNames[1]) { RCVST_Chart2View(title: Self._navigationNames[1], data: $_data, selectedValuesString: $_selectedValuesString) }
+                NavigationLink(Self._navigationNames[2]) { RCVST_Chart3View(title: Self._navigationNames[2], data: $_data, selectedValuesString: $_selectedValuesString) }
+                NavigationLink(Self._navigationNames[3]) { RCVST_Chart4View(title: Self._navigationNames[3], data: $_data, selectedValuesString: $_selectedValuesString) }
             }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
             // Reacts to "pull to refresh," to reload the file.
             .refreshable { _data = RCVST_DataProvider() }
+        }
+        .onAppear {
+            _data = RCVST_DataProvider()
         }
         // Forces updates, whenever we become active.
         .onChange(of: _scenePhase, initial: true) {

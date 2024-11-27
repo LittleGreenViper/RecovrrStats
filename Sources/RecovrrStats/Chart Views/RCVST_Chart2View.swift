@@ -8,13 +8,13 @@ import RVS_Generic_Swift_Toolbox
 import CoreHaptics
 
 /* ###################################################################################################################################### */
-// MARK: - Main Content View for Deletion Types Chart -
+// MARK: - Main Content View For Signup Administration Activity Chart -
 /* ###################################################################################################################################### */
 /**
- This displays a chart, with the different deletion types, over time.
+ This displays a chart, with the different signup states, over time.
  It is selectable, and dragging your finger across the chart, shows exact numbers.
  */
-struct RCVST_Chart4View: RCVST_DataDisplay, RCVST_UsesData {
+struct RCVST_Chart2View: View, RCVST_UsesData {
     /* ################################################################## */
     /**
      This is the title to display over the chart.
@@ -25,13 +25,13 @@ struct RCVST_Chart4View: RCVST_DataDisplay, RCVST_UsesData {
     /**
      This is the actual dataframe wrapper for the stats.
      */
-    @State var data: RCVST_DataProvider?
+    @Binding var data: RCVST_DataProvider?
 
     /* ################################################################## */
     /**
      The string that displays the data for the selected bar.
      */
-    @State var selectedValuesString: String = " "
+    @Binding var selectedValuesString: String
 
     /* ################################################################## */
     /**
@@ -40,21 +40,12 @@ struct RCVST_Chart4View: RCVST_DataDisplay, RCVST_UsesData {
     var body: some View {
         GeometryReader { inGeometry in
             GroupBox(title) {
-                VStack {
-                    // This displays the value of the selected bar.
-                    Text(selectedValuesString)
-                        .minimumScaleFactor(0.5)
-                        .lineLimit(1)
-                        .font(.subheadline)
-                        .foregroundStyle(.red)
-                    
-                    DeleteChart(data: data, selectedValuesString: $selectedValuesString)
-                        .frame(
-                            minHeight: inGeometry.size.width,
-                            maxHeight: .infinity,
-                            alignment: .topLeading
-                        )
-                }
+                SignupActivityChart(data: $data, selectedValuesString: $selectedValuesString)
+                    .frame(
+                        minHeight: inGeometry.size.width,
+                        maxHeight: .infinity,
+                        alignment: .topLeading
+                    )
             }
             .frame(
                 minWidth: inGeometry.size.width,
@@ -68,23 +59,19 @@ struct RCVST_Chart4View: RCVST_DataDisplay, RCVST_UsesData {
 }
 
 /* ###################################################################################################################################### */
-// MARK: - User Type Bar Chart -
+// MARK: - Signup Activity Bar Chart -
 /* ###################################################################################################################################### */
 /**
- This displays a simple bar chart of the deletion activities.
+ This displays a simple bar chart of the signups, segeregated by whether the signup was approved or rejected.
  */
-struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
+struct SignupActivityChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
+    // MARK: Private Properties
+
     /* ################################################################## */
     /**
      Tracks scene activity.
      */
     @Environment(\.scenePhase) private var _scenePhase
-
-    /* ################################################################## */
-    /**
-     The general user type data.
-     */
-    @State var data: RCVST_DataProvider?
 
     /* ################################################################## */
     /**
@@ -102,7 +89,15 @@ struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
     /**
      The value being selected by the user, while dragging.
      */
-    @State private var _selectedValue: RCVST_DataProvider.RowDeletePlottableData?
+    @State private var _selectedValue: RCVST_DataProvider.RowSignupPlottableData?
+
+    // MARK: External Bindings
+
+    /* ################################################################## */
+    /**
+     The general user type data.
+     */
+    @Binding var data: RCVST_DataProvider?
 
     /* ################################################################## */
     /**
@@ -110,17 +105,26 @@ struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
      */
     @Binding var selectedValuesString: String
 
+    // MARK: Private Functions
+
+    /* ################################################################## */
+    /**
+     This returns whether or not the selected data bar is being dragged.
+     
+     - parameter inRowData: The selected bar.
+     - returns: True, if the bar is being selected.
+     */
+    private func _isLineDragged(_ inRowData: RCVST_DataProvider.RowSignupPlottableData) -> Bool {
+        _isDragging && inRowData.date == _selectedValue?.date
+    }
+
+    // MARK: RCVST_HapticHopper Conformance
+    
     /* ################################################################## */
     /**
      This is used to give us haptic feedback for dragging.
      */
     @State var hapticEngine: CHHapticEngine?
-    
-    /* ################################################################## */
-    /**
-     The segregated user type data.
-     */
-    private var _dataFiltered: [RCVST_DataProvider.RowDeletePlottableData] { data?.deleteTypePlottable ?? [] }
 
     /* ################################################################## */
     /**
@@ -135,17 +139,14 @@ struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
         
         try? hapticEngine?.start()
     }
-
+    
+    // MARK: Computed Properties
+    
     /* ################################################################## */
     /**
-     This returns whether or not the selected data bar is being dragged.
-     
-     - parameter inRowData: The selected bar.
-     - returns: True, if the bar is being selected.
+     The segregated signup activity data.
      */
-    private func _isLineDragged(_ inRowData: RCVST_DataProvider.RowDeletePlottableData) -> Bool {
-        _isDragging && inRowData.date == _selectedValue?.date
-    }
+    private var _dataFiltered: [RCVST_DataProvider.RowSignupPlottableData] { data?.signupTypePlottable ?? [] }
 
     /* ################################################################## */
     /**
@@ -165,26 +166,25 @@ struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
         
         // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
         Chart(_dataFiltered) { inRowData in
-            ForEach(inRowData.data, id: \.deletionType) { inDeletionType in
+            ForEach(inRowData.data, id: \.signupType) { inSignupTypeData in
                 BarMark(
-                    x: .value("SLUG-BAR-CHART-DELETION-TYPES-X".localizedVariant, inRowData.date, unit: .day),
-                    y: .value("SLUG-BAR-CHART-DELETION-TYPES-Y".localizedVariant, inDeletionType.value)
+                    x: .value("SLUG-BAR-CHART-SIGNUP-TYPES-X".localizedVariant, inRowData.date, unit: .day),
+                    y: .value("SLUG-BAR-CHART-SIGNUP-TYPES-Y".localizedVariant, inSignupTypeData.value)
                 )
-                .foregroundStyle(by: .value("SLUG-BAR-CHART-DELETION-TYPES-LEGEND".localizedVariant,
-                                            _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inDeletionType.descriptionString)
+                .foregroundStyle(by: .value("SLUG-BAR-CHART-SIGNUP-TYPES-LEGEND".localizedVariant,
+                                            _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inSignupTypeData.descriptionString)
                 )
             }
         }
         .onAppear {
             _chartDomain = _chartDomain ?? minimumDate...maximumDate
         }
-        // These define the three items in the legend, as well as the colors we'll use in the bars.
-        .chartForegroundStyleScale(["SLUG-DELETED-ACTIVE-LEGEND-LABEL".localizedVariant: .green,
-                                    "SLUG-DELETED-INACTIVE-LEGEND-LABEL".localizedVariant: .blue,
+        .chartForegroundStyleScale(["SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL".localizedVariant: .green,
+                                    "SLUG-REJECTED-SIGNUP-LEGEND-LABEL".localizedVariant: .orange,
                                     "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
                                    ])
         // We leave the Y-axis almost default, except that we want it on the left.
-        .chartYAxisLabel("SLUG-BAR-CHART-X-AXIS-DELETION-LABEL".localizedVariant, spacing: 12)
+        .chartYAxisLabel("SLUG-BAR-CHART-Y-AXIS-SIGNUP-LABEL".localizedVariant, spacing: 12)
         .chartYAxis {
             AxisMarks(preset: .aligned, position: .leading) { _ in
                 AxisTick()
@@ -194,7 +194,7 @@ struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
         }
         // We customize the X-axis, to only have a few sections.
         .chartXScale(domain: _chartDomain ?? minimumDate...maximumDate)
-        .chartXAxisLabel("SLUG-BAR-CHART-Y-AXIS-DELETION-LABEL".localizedVariant, alignment: .top)
+        .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-SIGNUP-LABEL".localizedVariant, alignment: .top)
         .chartXAxis {
             AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in
                 AxisTick(length: 8)
@@ -218,7 +218,7 @@ struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                     let currentX = max(0, min(chart.plotSize.width, value.location.x - geometry[frame].origin.x))
                                     guard let date = chart.value(atX: currentX, as: Date.self) else { return }
                                     if let newValue = _dataFiltered.nearestTo(date) {
-                                        selectedValuesString = String(format: "SLUG-DELETED-TYPES-DESC-STRING-FORMAT".localizedVariant,
+                                        selectedValuesString = String(format: "SLUG-SIGNUP-TYPES-DESC-STRING-FORMAT".localizedVariant,
                                                                        dateFormatter.string(from: newValue.date),
                                                                        newValue.data[0].value,
                                                                        newValue.data[1].value,

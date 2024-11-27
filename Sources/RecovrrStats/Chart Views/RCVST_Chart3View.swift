@@ -17,9 +17,9 @@ import CoreHaptics
 struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
     /* ################################################################## */
     /**
-     This is the title to display over the chart.
+     This is the selected type of activity we are displaying. It is affected by the segmented picker.
      */
-    @State var title: String
+    @State private var _selectedActivityRange: Int = 1
 
     /* ################################################################## */
     /**
@@ -35,20 +35,21 @@ struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
 
     /* ################################################################## */
     /**
+     This is the title to display over the chart.
+     */
+    @State var title: String
+
+    /* ################################################################## */
+    /**
      This is the actual dataframe wrapper for the stats.
      */
-    @State var data: RCVST_DataProvider?
+    @Binding var data: RCVST_DataProvider?
 
     /* ################################################################## */
     /**
      The string that displays the data for the selected bar.
      */
-    @State var selectedValuesString: String = " "
-    
-    /* ################################################################## */
-    /**
-     */
-    @State var selectedActivityRange: Int = 1
+    @Binding var selectedValuesString: String
 
     /* ################################################################## */
     /**
@@ -73,7 +74,7 @@ struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
             GroupBox(title) {
                 VStack {
                     // This picker allows us to view the various activity ranges.
-                    Picker("Activity", selection: $selectedActivityRange) {
+                    Picker("Activity", selection: $_selectedActivityRange) {
                         Text("1").tag(1)
                         Text("7").tag(7)
                         Text("30").tag(30)
@@ -81,16 +82,9 @@ struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
                         Text("SLUG-BAR-CHART-ACTIVE-TYPES-AVERAGE".localizedVariant).tag(0)
                     }
                     .pickerStyle(.segmented)
-                    .onChange(of: selectedActivityRange) { triggerHaptic(intensity: 0.5, sharpness: 0.25) }
+                    .onChange(of: _selectedActivityRange) { triggerHaptic(intensity: 0.5, sharpness: 0.25) }
                     
-                    // This displays the value of the selected bar.
-                    Text(selectedValuesString)
-                        .minimumScaleFactor(0.5)
-                        .lineLimit(1)
-                        .font(.subheadline)
-                        .foregroundStyle(.red)
-                    
-                    UserActivityChart(data: data, selectedValuesString: $selectedValuesString, selectedActivityRange: $selectedActivityRange)
+                    UserActivityChart(data: $data, selectedValuesString: $selectedValuesString, selectedActivityRange: $_selectedActivityRange)
                         .frame(
                             minHeight: inGeometry.size.width,
                             maxHeight: .infinity,
@@ -123,17 +117,13 @@ struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
  You also have an "Average," which is the average of all users' last sign in from the time of the sample (in days).
  */
 struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
+    // MARK: Private Properties
+
     /* ################################################################## */
     /**
      Tracks scene activity.
      */
     @Environment(\.scenePhase) private var _scenePhase
-
-    /* ################################################################## */
-    /**
-     The general user type data.
-     */
-    @State var data: RCVST_DataProvider?
 
     /* ################################################################## */
     /**
@@ -153,22 +143,110 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
      */
     @State private var _selectedValue: RCVST_DataProvider.Row?
 
+    // MARK: External Bindings
+
+    /* ################################################################## */
+    /**
+     The general user type data.
+     */
+    @Binding var data: RCVST_DataProvider?
+
     /* ################################################################## */
     /**
      The string that displays the data for the selected bar.
      */
     @Binding var selectedValuesString: String
-    
+
     /* ################################################################## */
     /**
+     This is the selected type of activity we are displaying. It is affected by the segmented picker.
      */
     @Binding var selectedActivityRange: Int
 
+    // MARK: Private Functions
+
+    /* ################################################################## */
+    /**
+     This returns whether or not the selected data bar is being dragged.
+     
+     - parameter inRowData: The selected bar.
+     - returns: True, if the bar is being selected.
+     */
+    private func _isLineDragged(_ inRowData: RCVST_DataProvider.Row) -> Bool {
+        _isDragging && nil != inRowData.sampleDate && inRowData.sampleDate == _selectedValue?.sampleDate
+    }
+
+    /* ################################################################## */
+    /**
+     This returns a set of strings and integers, to be displayed to the user, depending on the given row.
+     
+     - parameter inRowData: The selected bar.
+     - returns: The number of active users, depending on the segmented selection.
+     */
+    private func _getDataValue(for inRowData: RCVST_DataProvider.Row) -> Int {
+        switch selectedActivityRange {
+        case 1:
+            return inRowData.activeInLast24Hours
+        case 7:
+            return inRowData.activeInLastWeek
+        case 30:
+            return inRowData.activeInLast30Days
+        case 90:
+            return inRowData.activeInLast90Days
+        default:
+            return inRowData.averageLastActiveInDays
+        }
+    }
+
+    /* ################################################################## */
+    /**
+     This returns a set of strings and integers, to be displayed to the user, depending on the given row.
+     
+     - parameter inRowData: The selected bar.
+     - returns: A tuple, with the relevant data to use for the string.
+     */
+    private func _getDataItem(for inRowData: RCVST_DataProvider.Row) -> (activePeriodString: String, activeUsersNew: Int) {
+        let activePeriodString = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-\(selectedActivityRange)".localizedVariant
+        var activeUsersNew = 0
+        switch selectedActivityRange {
+        case 1:
+            activeUsersNew = inRowData.activeInLast24Hours
+        case 7:
+            activeUsersNew = inRowData.activeInLastWeek
+        case 30:
+            activeUsersNew = inRowData.activeInLast30Days
+        case 90:
+            activeUsersNew = inRowData.activeInLast90Days
+        default:
+            activeUsersNew = inRowData.averageLastActiveInDays
+        }
+        
+        return (activePeriodString: activePeriodString, activeUsersNew: activeUsersNew)
+    }
+
+    // MARK: RCVST_HapticHopper Conformance
+    
     /* ################################################################## */
     /**
      This is used to give us haptic feedback for dragging.
      */
     @State var hapticEngine: CHHapticEngine?
+
+    /* ################################################################## */
+    /**
+     This prepares our haptic engine.
+     */
+    func prepareHaptics() {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics,
+              let hapticEngineTemp = try? CHHapticEngine()
+        else { return }
+        
+        hapticEngine = hapticEngineTemp
+        
+        try? hapticEngine?.start()
+    }
+
+    // MARK: Computed Properties
     
     /* ################################################################## */
     /**
@@ -191,79 +269,6 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
 
     /* ################################################################## */
     /**
-     This prepares our haptic engine.
-     */
-    func prepareHaptics() {
-        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics,
-              let hapticEngineTemp = try? CHHapticEngine()
-        else { return }
-        
-        hapticEngine = hapticEngineTemp
-        
-        try? hapticEngine?.start()
-    }
-
-    /* ################################################################## */
-    /**
-     This returns whether or not the selected data bar is being dragged.
-     
-     - parameter inRowData: The selected bar.
-     - returns: True, if the bar is being selected.
-     */
-    private func _isLineDragged(_ inRowData: RCVST_DataProvider.Row) -> Bool {
-        _isDragging && nil != inRowData.sampleDate && inRowData.sampleDate == _selectedValue?.sampleDate
-    }
-
-    /* ################################################################## */
-    /**
-     This returns a set of strings and integers, to be displayed to the user, depending on the given row.
-     
-     - parameter inRowData: The selected bar.
-     - returns: The number of active users, depending on the segmented selection.
-     */
-    private func getDataValue(for inRowData: RCVST_DataProvider.Row) -> Int {
-        switch selectedActivityRange {
-        case 1:
-            return inRowData.activeInLast24Hours
-        case 7:
-            return inRowData.activeInLastWeek
-        case 30:
-            return inRowData.activeInLast30Days
-        case 90:
-            return inRowData.activeInLast90Days
-        default:
-            return inRowData.averageLastActiveInDays
-        }
-    }
-
-    /* ################################################################## */
-    /**
-     This returns a set of strings and integers, to be displayed to the user, depending on the given row.
-     
-     - parameter inRowData: The selected bar.
-     - returns: A tuple, with the relevant data to use for the string.
-     */
-    private func getDataItem(for inRowData: RCVST_DataProvider.Row) -> (activePeriodString: String, activeUsersNew: Int) {
-        let activePeriodString = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-\(selectedActivityRange)".localizedVariant
-        var activeUsersNew = 0
-        switch selectedActivityRange {
-        case 1:
-            activeUsersNew = inRowData.activeInLast24Hours
-        case 7:
-            activeUsersNew = inRowData.activeInLastWeek
-        case 30:
-            activeUsersNew = inRowData.activeInLast30Days
-        case 90:
-            activeUsersNew = inRowData.activeInLast90Days
-        default:
-            activeUsersNew = inRowData.averageLastActiveInDays
-        }
-        
-        return (activePeriodString: activePeriodString, activeUsersNew: activeUsersNew)
-    }
-    
-    /* ################################################################## */
-    /**
      The main chart body.
      */
     var body: some View {
@@ -280,7 +285,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
         // The main chart view. It is a simple bar chart.
         Chart(_dataFiltered) { inRowData in
             let date = inRowData.sampleDate ?? .now
-            let active = getDataValue(for: inRowData)
+            let active = _getDataValue(for: inRowData)
             BarMark(
                 x: .value("SLUG-BAR-CHART-TYPES-X".localizedVariant, date, unit: .day),
                 y: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y".localizedVariant, active)
@@ -333,8 +338,8 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                        let newDate = newValue.sampleDate {
                                         let dateString = dateFormatter.string(from: newDate)
                                         let allUsers = newValue.activeUsers
-                                        let activeUsersNew = getDataItem(for: newValue).activeUsersNew
-                                        let activePeriodString = getDataItem(for: newValue).activePeriodString
+                                        let activeUsersNew = _getDataItem(for: newValue).activeUsersNew
+                                        let activePeriodString = _getDataItem(for: newValue).activePeriodString
                                         let percentage =  Int((100 * activeUsersNew) / allUsers)
                                         if 0 == selectedActivityRange {
                                             selectedValuesString = String(format: "SLUG-CHART-3-AVERAGE-DESC-STRING-FORMAT".localizedVariant,
