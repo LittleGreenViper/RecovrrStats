@@ -122,7 +122,8 @@ struct RootStackView: View {
     private static let _navigationNames: [String] = ["SLUG-USER-TOTALS-CHART-TITLE".localizedVariant,
                                                      "SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant,
                                                      "SLUG-CHART-3-TITLE".localizedVariant,
-                                                     "SLUG-CHART-4-TITLE".localizedVariant
+                                                     "SLUG-CHART-4-TITLE".localizedVariant,
+                                                     "SLUG-CHART-5-TITLE".localizedVariant
                                                     ]
 
     /* ################################################################## */
@@ -160,6 +161,7 @@ struct RootStackView: View {
                 NavigationLink(Self._navigationNames[1]) { RCVST_Chart2View(title: Self._navigationNames[1], data: $_data, selectedValuesString: $_selectedValuesString) }
                 NavigationLink(Self._navigationNames[2]) { RCVST_Chart3View(title: Self._navigationNames[2], data: $_data, selectedValuesString: $_selectedValuesString) }
                 NavigationLink(Self._navigationNames[3]) { RCVST_Chart4View(title: Self._navigationNames[3], data: $_data, selectedValuesString: $_selectedValuesString) }
+                NavigationLink(Self._navigationNames[4]) { RCVST_Chart5View(title: Self._navigationNames[4], data: $_data, selectedValuesString: $_selectedValuesString) }
             }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
             // Reacts to "pull to refresh," to reload the file.

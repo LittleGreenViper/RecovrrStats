@@ -507,6 +507,12 @@ public extension RCVST_DataProvider {
 
         /* ############################################################## */
         /**
+         These are the number of users that logged into their accounts for the first time, since the last sample.
+         */
+        public var newFirstTimeLogins: Int { Swift.max(0, newDeletedInactive - changeInNewUsers) }
+
+        /* ############################################################## */
+        /**
          The number of signup requests since the last sample.
          */
         public var newRequests: Int { totalRequests - _previousTotalRequests }
@@ -537,6 +543,7 @@ public extension RCVST_DataProvider {
 
         /* ############################################################## */
         /**
+         These are the number of users that deleted their own accounts, since the last sample.
          */
         public var newSelfDeleted: Int { abs(Swift.max(0, newDeletedActive - changeInActiveUsers)) }
 
@@ -817,7 +824,7 @@ public extension RCVST_DataProvider {
         
         let rows = allRows
         
-        guard !rows.isEmpty else { return ret }
+        guard 1 < rows.count else { return ret }
 
         for index in stride(from: 1, to: rows.count, by: 2) {
             let dailySample = rows[index]
@@ -946,7 +953,7 @@ public extension RCVST_DataProvider {
         
         let rows = allRows
         
-        guard !rows.isEmpty else { return ret }
+        guard 1 < rows.count else { return ret }
 
         for index in stride(from: 1, to: rows.count, by: 2) {
             let sample1 = rows[index - 1]
@@ -1002,10 +1009,10 @@ public extension RCVST_DataProvider {
     }
     
     /* ################################################################################################################################## */
-    // MARK: A Single Signup Data Point
+    // MARK: A Single Deletion Data Point
     /* ################################################################################################################################## */
     /**
-     This struct is one data point (count of signup types).
+     This struct is one data point (count of deletion types).
      */
     struct RowDeleteTypesPlottableData: Identifiable {
         /* ############################################################## */
@@ -1040,10 +1047,10 @@ public extension RCVST_DataProvider {
     }
     
     /* ################################################################################################################################## */
-    // MARK: A Collection of Data Points For One Signup Types Sample.
+    // MARK: A Collection of Data Points For One Deletion Types Sample.
     /* ################################################################################################################################## */
     /**
-     This provides signup type totals for one date.
+     This provides deletion type totals for one date.
      */
     struct RowDeletePlottableData: Identifiable, RCVST_DataProvider_ElementHasDate {
         /* ############################################################## */
@@ -1087,8 +1094,8 @@ public extension RCVST_DataProvider {
         
         let rows = allRows
         
-        guard !rows.isEmpty else { return ret }
-        
+        guard 1 < rows.count else { return ret }
+
         for index in stride(from: 1, to: rows.count, by: 2) {
             let sample1 = rows[index - 1]
             let sample2 = rows[index]
@@ -1103,6 +1110,70 @@ public extension RCVST_DataProvider {
             let deletedInactive = RowDeleteTypesPlottableData(deletionType: .deletedInactive, value: sample1InactiveValue + sample2InactiveValue)
             let deletedSelf = RowDeleteTypesPlottableData(deletionType: .selfDeleted, value: sample1SelfValue + sample2SelfValue)
             ret.append(RowDeletePlottableData(date: date, data: [deletedActive, deletedInactive, deletedSelf]))
+        }
+        
+        return ret
+    }
+}
+
+/* ###################################################################################################################################### */
+// MARK: - Adds Chart Plottable Stuff For New First-Time Logins -
+/* ###################################################################################################################################### */
+public extension RCVST_DataProvider {
+    /* ################################################################################################################################## */
+    // MARK: A Collection of Data Points For One Signup Types Sample.
+    /* ################################################################################################################################## */
+    /**
+     This provides signup type totals for one date.
+     */
+    struct RowFirstTimeLoginsPlottableData: Identifiable, RCVST_DataProvider_ElementHasDate {
+        /* ############################################################## */
+        /**
+         Make me identifiable.
+         */
+        public var id = UUID()
+
+        /* ############################################################## */
+        /**
+         The date the sample was taken.
+         */
+        let date: Date
+
+        /* ############################################################## */
+        /**
+         The total number of new first-time logins, for this sample.
+         */
+        var data: Int
+        
+        /* ############################################################## */
+        /**
+         Initializer
+         
+         - parameter date: The sample date. Optional. Default is .distantPast.
+         - parameter data: The totals of the new first-time logins. Optional. Default is 0.
+         */
+        init(date inDate: Date = .distantPast, data inData: Int = 0) {
+            date = inDate
+            data = inData
+        }
+    }
+    
+    /* ############################################################## */
+    /**
+     This returns all the samples in a simplified manner for new first-time logins, suitable for plotting in a chart.
+     This combines two samples into one (we sample every twelve hours, so this makes it daily).
+     */
+    var newLoginsPlottable: [RowFirstTimeLoginsPlottableData] {
+        var ret = [RowFirstTimeLoginsPlottableData]()
+        
+        let rows = allRows
+        
+        guard 1 < rows.count else { return ret }
+
+        for index in stride(from: 1, to: rows.count, by: 2) {
+            let sample1 = rows[index - 1]
+            let sample2 = rows[index]
+            ret.append(RowFirstTimeLoginsPlottableData(date: sample2.date, data: sample1.newFirstTimeLogins + sample2.newFirstTimeLogins))
         }
         
         return ret

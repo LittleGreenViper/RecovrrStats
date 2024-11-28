@@ -81,3 +81,12 @@
 "SLUG-BAR-CHART-DELETION-TYPES-LEGEND"      =   "Signup Status";
 "SLUG-BAR-CHART-Y-AXIS-DELETION-LABEL"      =   "Deletions";
 "SLUG-BAR-CHART-X-AXIS-DELETION-LABEL"      =   "Date";
+
+"SLUG-CHART-5-TITLE"                        =   "First-Time Logins";
+"SLUG-NEW-LOGINS-DESC-STRING-FORMAT"        =   "%@: New Logins: %d";
+"SLUG-NEW-LOGINS-LEGEND-LABEL"              =   "New Logins";
+"SLUG-BAR-CHART-NEW-LOGINS-Y"               =   "Logins";
+"SLUG-BAR-CHART-NEW-LOGINS-X"               =   "Date";
+"SLUG-BAR-CHART-NEW-LOGINS-LEGEND"          =   "New First-Time Logins";
+"SLUG-BAR-CHART-Y-AXIS-NEW-LOGINS-LABEL"    =   "New Logins";
+"SLUG-BAR-CHART-X-AXIS-NEW-LOGINS-LABEL"    =   "Date";

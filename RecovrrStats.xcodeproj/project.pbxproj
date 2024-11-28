@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		D433ED262CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox in Frameworks */ = {isa = PBXBuildFile; productRef = D433ED252CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox */; };
+		D4ACE79F2CF8F878003ADEBB /* RCVST_Chart5View.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ACE79E2CF8F878003ADEBB /* RCVST_Chart5View.swift */; };
 		D4ADD8262CF5F13E0030B789 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4ADD81A2CF5F13E0030B789 /* Assets.xcassets */; };
 		D4ADD8292CF5F13E0030B789 /* RCVST_App.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ADD81D2CF5F13E0030B789 /* RCVST_App.swift */; };
 		D4ADD82A2CF5F13E0030B789 /* RCVST_Chart1View.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ADD81E2CF5F13E0030B789 /* RCVST_Chart1View.swift */; };
@@ -23,6 +24,7 @@
 /* Begin PBXFileReference section */
 		D4484A452CBEA80B0019BC0E /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Warnings.xcconfig; sourceTree = "<group>"; };
 		D4A62DD52CC9372D001DD8A9 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
+		D4ACE79E2CF8F878003ADEBB /* RCVST_Chart5View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_Chart5View.swift; sourceTree = "<group>"; };
 		D4ADD81A2CF5F13E0030B789 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D4ADD81B2CF5F13E0030B789 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D4ADD81C2CF5F13E0030B789 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 				D4ADD81F2CF5F13E0030B789 /* RCVST_Chart2View.swift */,
 				D4ADD8202CF5F13E0030B789 /* RCVST_Chart3View.swift */,
 				D4ADD8212CF5F13E0030B789 /* RCVST_Chart4View.swift */,
+				D4ACE79E2CF8F878003ADEBB /* RCVST_Chart5View.swift */,
 			);
 			path = "Chart Views";
 			sourceTree = "<group>";
@@ -241,6 +244,7 @@
 				D4ADD8302CF5F13E0030B789 /* Localizable.strings in Sources */,
 				D4ADD82E2CF5F13E0030B789 /* RCVST_DataProvider.swift in Sources */,
 				D4ADD82F2CF5F13E0030B789 /* RCVST_InitialContentView.swift in Sources */,
+				D4ACE79F2CF8F878003ADEBB /* RCVST_Chart5View.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
