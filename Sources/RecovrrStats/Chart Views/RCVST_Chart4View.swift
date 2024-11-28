@@ -182,6 +182,7 @@ struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
         // These define the three items in the legend, as well as the colors we'll use in the bars.
         .chartForegroundStyleScale(["SLUG-DELETED-ACTIVE-LEGEND-LABEL".localizedVariant: .green,
                                     "SLUG-DELETED-INACTIVE-LEGEND-LABEL".localizedVariant: .blue,
+                                    "SLUG-DELETED-SELF-LEGEND-LABEL".localizedVariant: .yellow,
                                     "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
                                    ])
         // We leave the Y-axis almost default, except that we want it on the left.
@@ -220,10 +221,11 @@ struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                     guard let date = chart.value(atX: currentX, as: Date.self) else { return }
                                     if let newValue = _dataFiltered.nearestTo(date) {
                                         selectedValuesString = String(format: "SLUG-DELETED-TYPES-DESC-STRING-FORMAT".localizedVariant,
-                                                                       dateFormatter.string(from: newValue.date),
-                                                                       newValue.data[0].value,
-                                                                       newValue.data[1].value,
-                                                                       newValue.data[0].value + newValue.data[1].value
+                                                                      dateFormatter.string(from: newValue.date),
+                                                                      newValue.data[0].value,
+                                                                      newValue.data[1].value,
+                                                                      newValue.data[2].value,
+                                                                      newValue.data[0].value + newValue.data[1].value + newValue.data[2].value
                                         )
                                         if newValue.date != _selectedValue?.date {
                                             triggerHaptic()

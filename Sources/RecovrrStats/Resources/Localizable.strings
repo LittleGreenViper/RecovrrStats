@@ -69,11 +69,13 @@
 "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-0"      =   "average";
 
 "SLUG-CHART-4-TITLE"                        =   "Account Deletions";
-"SLUG-DELETED-TYPES-DESC-STRING-FORMAT"     =   "%@: Active: %d, Inactive: %d, Total: %d";
+"SLUG-DELETED-TYPES-DESC-STRING-FORMAT"     =   "%@: Active: %d, Inactive: %d, Self: %d, Total: %d";
 "SLUG-DELETED-ACTIVE-LEGEND-LABEL"          =   "Active";
 "SLUG-DELETED-INACTIVE-LEGEND-LABEL"        =   "Inactive";
+"SLUG-DELETED-SELF-LEGEND-LABEL"            =   "Self-Deleted";
 "SLUG-DELETION-COLUMN-NAME-deletedActive"   =   "Deleted Active";
 "SLUG-DELETION-COLUMN-NAME-deletedInactive" =   "Deleted Inactive";
+"SLUG-DELETION-COLUMN-NAME-selfDeleted"     =   "Self-Deleted";
 "SLUG-BAR-CHART-DELETION-TYPES-Y"           =   "Deletions";
 "SLUG-BAR-CHART-DELETION-TYPES-X"           =   "Date";
 "SLUG-BAR-CHART-DELETION-TYPES-LEGEND"      =   "Signup Status";

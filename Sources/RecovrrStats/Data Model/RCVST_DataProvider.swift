@@ -534,7 +534,12 @@ public extension RCVST_DataProvider {
          The number of inactive users deleted by the administrators since the last sample.
          */
         public var newDeletedInactive: Int { deletedInactive - _previousDeletedInactive }
-        
+
+        /* ############################################################## */
+        /**
+         */
+        public var newSelfDeleted: Int { abs(Swift.max(0, newDeletedActive - changeInActiveUsers)) }
+
         // MARK: RCVST_DataProvider_ElementHasDate Conformance
         
         /* ############################################################## */
@@ -1092,9 +1097,12 @@ public extension RCVST_DataProvider {
             let sample2ActiveValue = sample2.newDeletedActive
             let sample1InactiveValue = sample1.newDeletedInactive
             let sample2InactiveValue = sample2.newDeletedInactive
+            let sample1SelfValue = sample1.newSelfDeleted
+            let sample2SelfValue = sample2.newSelfDeleted
             let deletedActive = RowDeleteTypesPlottableData(deletionType: .deletedActive, value: sample1ActiveValue + sample2ActiveValue)
             let deletedInactive = RowDeleteTypesPlottableData(deletionType: .deletedInactive, value: sample1InactiveValue + sample2InactiveValue)
-            ret.append(RowDeletePlottableData(date: date, data: [deletedActive, deletedInactive]))
+            let deletedSelf = RowDeleteTypesPlottableData(deletionType: .selfDeleted, value: sample1SelfValue + sample2SelfValue)
+            ret.append(RowDeletePlottableData(date: date, data: [deletedActive, deletedInactive, deletedSelf]))
         }
         
         return ret
