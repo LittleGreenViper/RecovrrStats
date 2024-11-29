@@ -140,6 +140,12 @@ struct RootStackView: View {
 
     /* ################################################################## */
     /**
+     This has the data range we will be looking at.
+     */
+    @State private var _dataWindow = Date.distantPast...Date.distantFuture
+
+    /* ################################################################## */
+    /**
      The string that displays the data for the selected bar. Everything from here, on, will be bound to this.
      */
     @State private var _selectedValuesString: String = " "
@@ -157,11 +163,11 @@ struct RootStackView: View {
             .foregroundStyle(.red)
         NavigationStack {
             List {
-                NavigationLink(Self._navigationNames[0]) { RCVST_Chart1View(title: Self._navigationNames[0], data: $_data, selectedValuesString: $_selectedValuesString) }
-                NavigationLink(Self._navigationNames[1]) { RCVST_Chart2View(title: Self._navigationNames[1], data: $_data, selectedValuesString: $_selectedValuesString) }
-                NavigationLink(Self._navigationNames[2]) { RCVST_Chart3View(title: Self._navigationNames[2], data: $_data, selectedValuesString: $_selectedValuesString) }
-                NavigationLink(Self._navigationNames[3]) { RCVST_Chart4View(title: Self._navigationNames[3], data: $_data, selectedValuesString: $_selectedValuesString) }
-                NavigationLink(Self._navigationNames[4]) { RCVST_Chart5View(title: Self._navigationNames[4], data: $_data, selectedValuesString: $_selectedValuesString) }
+                NavigationLink(Self._navigationNames[0]) { RCVST_Chart1View(title: Self._navigationNames[0], data: $_data, dataWindow: $_dataWindow, selectedValuesString: $_selectedValuesString) }
+                NavigationLink(Self._navigationNames[1]) { RCVST_Chart2View(title: Self._navigationNames[1], data: $_data, dataWindow: $_dataWindow, selectedValuesString: $_selectedValuesString) }
+                NavigationLink(Self._navigationNames[2]) { RCVST_Chart3View(title: Self._navigationNames[2], data: $_data, dataWindow: $_dataWindow, selectedValuesString: $_selectedValuesString) }
+                NavigationLink(Self._navigationNames[3]) { RCVST_Chart4View(title: Self._navigationNames[3], data: $_data, dataWindow: $_dataWindow, selectedValuesString: $_selectedValuesString) }
+                NavigationLink(Self._navigationNames[4]) { RCVST_Chart5View(title: Self._navigationNames[4], data: $_data, dataWindow: $_dataWindow, selectedValuesString: $_selectedValuesString) }
             }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
             // Reacts to "pull to refresh," to reload the file.

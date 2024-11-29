@@ -572,8 +572,11 @@ public extension RCVST_DataProvider {
      The range, in dates, of the samples.
      */
     var dateRange: ClosedRange<Date> {
-        let startDate = statusDataFrame?.rows.first?[_Columns.sample_date.rawValue] as? Date ?? .now
-        let endDate = statusDataFrame?.rows.last?[_Columns.sample_date.rawValue] as? Date ?? .now
+        guard let rows = statusDataFrame?.rows,
+              !rows.isEmpty
+        else { return Date.now...Date.now }
+        let startDate = rows[0][_Columns.sample_date.rawValue] as? Date ?? .now
+        let endDate = rows[rows.count - 1][_Columns.sample_date.rawValue] as? Date ?? .now
         return startDate...endDate
     }
     
@@ -646,24 +649,21 @@ public extension RCVST_DataProvider {
     /**
      This returns all the samples between two dates.
      
-     - parameter startDate: The first date (inclusive). Optional. If not provided, then all rows until `endDate` will be returned.
-     - parameter endDate: The last date (inclusive). Optional. If not provided, then we assume everything until the last.
+     - parameter dataWindow: A date range for the samples (closed). If not provided, all samples are returned.
      
      - returns: An array of Row instances, with the filtered rows. They are ordered from earliest to latest.
      */
-    func rows(startDate inStartDate: Date = .distantPast, endDate inEndDate: Date = .distantFuture) -> [Row] {
-        guard inEndDate >= inStartDate,
-              let dataFrameRows = statusDataFrame?.rows,
+    func rows(dataWindow inDataWindow: ClosedRange<Date> = Date.distantPast...Date.distantFuture) -> [Row] {
+        guard let dataFrameRows = statusDataFrame?.rows,
               !dataFrameRows.isEmpty
         else { return [] }
         
-        let filterRange = inStartDate...inEndDate
         var ret = [Row]()
         var index = 0
         
         dataFrameRows.forEach { inRow in
             if let date = inRow[0] as? Date,
-               filterRange.contains(date) {
+               inDataWindow.contains(date) {
                 ret.append(Row(dataProvider: self, rowIndex: index))
             }
             

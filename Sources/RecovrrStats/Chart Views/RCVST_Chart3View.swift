@@ -47,6 +47,12 @@ struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
 
     /* ################################################################## */
     /**
+     This has the data range we will be looking at.
+     */
+    @Binding var dataWindow: ClosedRange<Date>
+
+    /* ################################################################## */
+    /**
      The string that displays the data for the selected bar.
      */
     @Binding var selectedValuesString: String
@@ -84,7 +90,7 @@ struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
                     .pickerStyle(.segmented)
                     .onChange(of: _selectedActivityRange) { triggerHaptic(intensity: 0.5, sharpness: 0.25) }
                     
-                    UserActivityChart(data: $data, selectedValuesString: $selectedValuesString, selectedActivityRange: $_selectedActivityRange)
+                    UserActivityChart(data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString, selectedActivityRange: $_selectedActivityRange)
                         .frame(
                             minHeight: inGeometry.size.width,
                             maxHeight: .infinity,
@@ -150,6 +156,12 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
      The general user type data.
      */
     @Binding var data: RCVST_DataProvider?
+
+    /* ################################################################## */
+    /**
+     This has the data range we will be looking at.
+     */
+    @Binding var dataWindow: ClosedRange<Date>
 
     /* ################################################################## */
     /**
@@ -274,8 +286,11 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
     var body: some View {
         let numberOfXValues = TimeInterval(4)
         // This gives us "breathing room" around the X-axis.
-        let minimumDate = _dataFiltered.first?.date.addingTimeInterval(-43200) ?? .now
-        let maximumDate = _dataFiltered.last?.date.addingTimeInterval(43200) ?? .now
+        let minimumClipDate = Date.distantPast < dataWindow.lowerBound ? dataWindow.lowerBound : _dataFiltered.first?.date ?? .now
+        let maximumClipDate = Date.distantFuture > dataWindow.upperBound ? dataWindow.upperBound : _dataFiltered.last?.date ?? .now
+        let minimumDate = minimumClipDate.addingTimeInterval(-43200)
+        let maximumDate = maximumClipDate.addingTimeInterval(43200)
+
         // We use this to set a fixed number of X-axis dates.
         let step = (maximumDate - minimumDate) / numberOfXValues
         // Set up an array of dates to use as values for the X-axis.
@@ -286,17 +301,17 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
         Chart(_dataFiltered) { inRowData in
             let date = inRowData.date
             let active = _getDataValue(for: inRowData)
-            BarMark(
-                x: .value("SLUG-BAR-CHART-TYPES-X".localizedVariant, date, unit: .day),
-                y: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y".localizedVariant, active)
-            )
-            .foregroundStyle(by: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant,
-                                        _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : "SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant)
-            )
+            if (minimumClipDate...maximumClipDate).contains(inRowData.date) {
+                BarMark(
+                    x: .value("SLUG-BAR-CHART-TYPES-X".localizedVariant, date, unit: .day),
+                    y: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y".localizedVariant, active)
+                )
+                .foregroundStyle(by: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant,
+                                            _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : "SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant)
+                )
+            }
         }
-        .onAppear {
-            _chartDomain = _chartDomain ?? minimumDate...maximumDate
-        }
+        .onAppear { _chartDomain = _chartDomain ?? minimumDate...maximumDate }
         .chartForegroundStyleScale(["SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant: .green,
                                     "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
                                    ])

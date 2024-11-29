@@ -29,6 +29,12 @@ struct RCVST_Chart4View: RCVST_DataDisplay, RCVST_UsesData {
 
     /* ################################################################## */
     /**
+     This has the data range we will be looking at.
+     */
+    @Binding var dataWindow: ClosedRange<Date>
+
+    /* ################################################################## */
+    /**
      The string that displays the data for the selected bar.
      */
     @Binding var selectedValuesString: String
@@ -40,7 +46,7 @@ struct RCVST_Chart4View: RCVST_DataDisplay, RCVST_UsesData {
     var body: some View {
         GeometryReader { inGeometry in
             GroupBox(title) {
-                DeleteChart(data: $data, selectedValuesString: $selectedValuesString)
+                DeleteChart(data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString)
                     .frame(
                         minHeight: inGeometry.size.width,
                         maxHeight: .infinity,
@@ -101,6 +107,12 @@ struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
 
     /* ################################################################## */
     /**
+     This has the data range we will be looking at.
+     */
+    @Binding var dataWindow: ClosedRange<Date>
+
+    /* ################################################################## */
+    /**
      The string that displays the data for the selected bar.
      */
     @Binding var selectedValuesString: String
@@ -155,8 +167,11 @@ struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
     var body: some View {
         let numberOfXValues = TimeInterval(4)
         // This gives us "breathing room" around the X-axis.
-        let minimumDate = _dataFiltered.first?.date.addingTimeInterval(-43200) ?? .now
-        let maximumDate = _dataFiltered.last?.date.addingTimeInterval(43200) ?? .now
+        let minimumClipDate = Date.distantPast < dataWindow.lowerBound ? dataWindow.lowerBound : _dataFiltered.first?.date ?? .now
+        let maximumClipDate = Date.distantFuture > dataWindow.upperBound ? dataWindow.upperBound : _dataFiltered.last?.date ?? .now
+        let minimumDate = minimumClipDate.addingTimeInterval(-43200)
+        let maximumDate = maximumClipDate.addingTimeInterval(43200)
+
         // We use this to set a fixed number of X-axis dates.
         let step = (maximumDate - minimumDate) / numberOfXValues
         // Set up an array of dates to use as values for the X-axis.
@@ -166,19 +181,19 @@ struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
         
         // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
         Chart(_dataFiltered) { inRowData in
-            ForEach(inRowData.data, id: \.deletionType) { inDeletionType in
-                BarMark(
-                    x: .value("SLUG-BAR-CHART-DELETION-TYPES-X".localizedVariant, inRowData.date, unit: .day),
-                    y: .value("SLUG-BAR-CHART-DELETION-TYPES-Y".localizedVariant, inDeletionType.value)
-                )
-                .foregroundStyle(by: .value("SLUG-BAR-CHART-DELETION-TYPES-LEGEND".localizedVariant,
-                                            _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inDeletionType.descriptionString)
-                )
+            if (minimumClipDate...maximumClipDate).contains(inRowData.date) {
+                ForEach(inRowData.data, id: \.deletionType) { inDeletionType in
+                    BarMark(
+                        x: .value("SLUG-BAR-CHART-DELETION-TYPES-X".localizedVariant, inRowData.date, unit: .day),
+                        y: .value("SLUG-BAR-CHART-DELETION-TYPES-Y".localizedVariant, inDeletionType.value)
+                    )
+                    .foregroundStyle(by: .value("SLUG-BAR-CHART-DELETION-TYPES-LEGEND".localizedVariant,
+                                                _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inDeletionType.descriptionString)
+                    )
+                }
             }
         }
-        .onAppear {
-            _chartDomain = _chartDomain ?? minimumDate...maximumDate
-        }
+        .onAppear { _chartDomain = _chartDomain ?? minimumDate...maximumDate }
         // These define the three items in the legend, as well as the colors we'll use in the bars.
         .chartForegroundStyleScale(["SLUG-DELETED-ACTIVE-LEGEND-LABEL".localizedVariant: .green,
                                     "SLUG-DELETED-INACTIVE-LEGEND-LABEL".localizedVariant: .blue,
