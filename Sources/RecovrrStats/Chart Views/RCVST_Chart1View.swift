@@ -17,6 +17,18 @@ import CoreHaptics
 struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
     /* ################################################################## */
     /**
+     This contains the range, as we pinch to zoom.
+     */
+    @State private var _currentRange: ClosedRange<Date>?
+    
+    /* ################################################################## */
+    /**
+     This is true, if we are currently doing a pinch-to-zoom.
+     */
+    @State private var _isZooming: Bool = false
+    
+    /* ################################################################## */
+    /**
      This is the title to display over the chart.
      */
     @State var title: String
@@ -46,11 +58,52 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
     var body: some View {
         GeometryReader { inGeometry in
             GroupBox(title) {
-                UserTypesChart(data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString)
+                UserTypesChart(isZooming: $_isZooming, data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString)
                     .frame(
                         minHeight: inGeometry.size.width,
                         maxHeight: .infinity,
                         alignment: .topLeading
+                    )
+                    .onAppear {
+                        guard var minDateTemp = data?.allRows.first?.date,
+                              var maxDateTemp = data?.allRows.last?.date
+                        else { return }
+                        
+                        minDateTemp = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
+                        maxDateTemp = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
+                        
+                        dataWindow = minDateTemp...maxDateTemp
+                    }
+                    .gesture(
+                        MagnifyGesture()
+                            .onChanged { value in
+                                _isZooming = true
+                                guard let minimumClipDate = data?.allRows.first?.date,
+                                      let maximumClipDate = data?.allRows.last?.date
+                                else { return }
+                                
+                                let minimumDate = minimumClipDate.addingTimeInterval(-43200)
+                                let maximumDate = maximumClipDate.addingTimeInterval(43200)
+
+                                let range = (dataWindow.upperBound.timeIntervalSinceReferenceDate - dataWindow.lowerBound.timeIntervalSinceReferenceDate) / 2
+                                let location = TimeInterval(value.startAnchor.x)
+                                
+                                let centerDateInSeconds = (location * (range * 2)) + minimumDate.timeIntervalSinceReferenceDate
+                                let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
+                                
+                                let newRange = max(86400, range / value.magnification)
+                                
+                                let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
+                                let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
+                                
+                                _currentRange = newStartDate...newEndDate
+                            }
+                            .onEnded { _ in
+                                guard let newRange = _currentRange else { return }
+                                _isZooming = false
+                                dataWindow = newRange
+                                _currentRange = nil
+                            }
                     )
             }
             .frame(
@@ -92,17 +145,24 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
 
     /* ################################################################## */
     /**
-     This is the range displayed by the chart.
-     */
-    @State private var _chartDomain: ClosedRange<Date>?
-
-    /* ################################################################## */
-    /**
      The value being selected by the user, while dragging.
      */
     @State private var _selectedValue: RCVST_DataProvider.RowUserPlottableData?
 
     // MARK: External Bindings
+    /* ################################################################## */
+    /**
+     This is true, if we are currently doing a pinch-to-zoom.
+     */
+    @Binding var isZooming: Bool {
+        didSet {
+            if isZooming {
+                _selectedValue = nil
+                _isDragging = false
+                selectedValuesString = " "
+            }
+        }
+    }
 
     /* ################################################################## */
     /**
@@ -172,11 +232,11 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
     var body: some View {
         let numberOfXValues = TimeInterval(4)
         // This gives us "breathing room" around the X-axis.
-        let minimumClipDate = Date.distantPast < dataWindow.lowerBound ? dataWindow.lowerBound : _dataFiltered.first?.date ?? .now
-        let maximumClipDate = Date.distantFuture > dataWindow.upperBound ? dataWindow.upperBound : _dataFiltered.last?.date ?? .now
+        let minimumClipDate = Date.distantPast < dataWindow.lowerBound ? dataWindow.lowerBound : data?.allRows.first?.date ?? Date.now
+        let maximumClipDate = Date.distantFuture > dataWindow.upperBound ? dataWindow.upperBound : data?.allRows.last?.date ?? Date.now
         let minimumDate = minimumClipDate.addingTimeInterval(-43200)
         let maximumDate = maximumClipDate.addingTimeInterval(43200)
-
+        let clipRange = minimumClipDate.addingTimeInterval(43200)...maximumClipDate.addingTimeInterval(-43200)
         // We use this to set a fixed number of X-axis dates.
         let step = (maximumDate - minimumDate) / numberOfXValues
         // Set up an array of dates to use as values for the X-axis.
@@ -187,7 +247,7 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
         // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
         Chart(_dataFiltered) { inRowData in
             ForEach(inRowData.data, id: \.userType) { inUserTypeData in
-                if (minimumClipDate...maximumClipDate).contains(inRowData.date) {
+                if clipRange.contains(inRowData.date) {
                     BarMark(
                         x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date, unit: .day),
                         y: .value("SLUG-BAR-CHART-USER-TYPES-Y".localizedVariant, inUserTypeData.value)
@@ -198,7 +258,12 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
                 }
             }
         }
-        .onAppear { _chartDomain = _chartDomain ?? minimumDate...maximumDate }
+        .onAppear {
+            if Date.distantPast == dataWindow.lowerBound,
+               Date.distantFuture == dataWindow.upperBound {
+                dataWindow = minimumDate...maximumDate
+            }
+        }
         // These define the three items in the legend, as well as the colors we'll use in the bars.
         .chartForegroundStyleScale(["SLUG-ACTIVE-LEGEND-LABEL".localizedVariant: .green,
                                     "SLUG-NEW-LEGEND-LABEL".localizedVariant: .blue,
@@ -214,7 +279,7 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
             }
         }
         // We customize the X-axis, to only have a few sections.
-        .chartXScale(domain: _chartDomain ?? minimumDate...maximumDate)
+        .chartXScale(domain: dataWindow)
         .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-LABEL".localizedVariant, alignment: .top)
         .chartXAxis {
             AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in
