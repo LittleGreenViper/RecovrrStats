@@ -57,62 +57,75 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
      */
     var body: some View {
         GeometryReader { inGeometry in
-            GroupBox(title) {
-                UserTypesChart(isZooming: $_isZooming, data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString)
-                    .frame(
-                        minHeight: inGeometry.size.width,
-                        maxHeight: .infinity,
-                        alignment: .topLeading
-                    )
-                    .onAppear {
-                        guard var minDateTemp = data?.allRows.first?.date,
-                              var maxDateTemp = data?.allRows.last?.date
-                        else { return }
-                        
-                        minDateTemp = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
-                        maxDateTemp = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
-                        
-                        dataWindow = minDateTemp...maxDateTemp
-                    }
-                    .gesture(
-                        MagnifyGesture()
-                            .onChanged { value in
-                                _isZooming = true
-                                guard let minimumClipDate = data?.allRows.first?.date,
-                                      let maximumClipDate = data?.allRows.last?.date
-                                else { return }
-                                
-                                let minimumDate = minimumClipDate.addingTimeInterval(-43200)
-                                let maximumDate = maximumClipDate.addingTimeInterval(43200)
-
-                                let range = (dataWindow.upperBound.timeIntervalSinceReferenceDate - dataWindow.lowerBound.timeIntervalSinceReferenceDate) / 2
-                                let location = TimeInterval(value.startAnchor.x)
-                                
-                                let centerDateInSeconds = (location * (range * 2)) + minimumDate.timeIntervalSinceReferenceDate
-                                let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
-                                
-                                let newRange = max(86400, range / value.magnification)
-                                
-                                let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
-                                let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
-                                
-                                _currentRange = newStartDate...newEndDate
-                            }
-                            .onEnded { _ in
-                                guard let newRange = _currentRange else { return }
-                                _isZooming = false
-                                dataWindow = newRange
-                                _currentRange = nil
-                            }
-                    )
+            VStack(spacing: 8) {
+                GroupBox(title) {
+                    UserTypesChart(isZooming: $_isZooming, data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString)
+                        .frame(
+                            minHeight: inGeometry.size.width,
+                            maxHeight: .infinity,
+                            alignment: .topLeading
+                        )
+                }
+                .frame(
+                    minWidth: inGeometry.size.width,
+                    maxWidth: inGeometry.size.width,
+                    minHeight: inGeometry.size.width,
+                    maxHeight: inGeometry.size.width,
+                    alignment: .topLeading
+                )
+            
+                ViewThatFits {
+                    Text("PINCH HERE")
+                        .padding()
+                }
+                .frame(
+                    maxWidth: .infinity,
+                    maxHeight: .infinity,
+                    alignment: .center
+                )
+                .background(Color.blue)
+                .onAppear {
+                    guard var minDateTemp = data?.allRows.first?.date,
+                          var maxDateTemp = data?.allRows.last?.date
+                    else { return }
+                    
+                    minDateTemp = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
+                    maxDateTemp = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
+                    
+                    dataWindow = minDateTemp...maxDateTemp
+                }
+                .gesture(
+                    MagnifyGesture()
+                        .onChanged { value in
+                            _isZooming = true
+                            guard let minimumClipDate = data?.allRows.first?.date,
+                                  let maximumClipDate = data?.allRows.last?.date
+                            else { return }
+                            
+                            let minimumDate = minimumClipDate.addingTimeInterval(-43200)
+                            let maximumDate = maximumClipDate.addingTimeInterval(43200)
+                            
+                            let range = (dataWindow.upperBound.timeIntervalSinceReferenceDate - dataWindow.lowerBound.timeIntervalSinceReferenceDate) / 2
+                            let location = TimeInterval(value.startAnchor.x)
+                            
+                            let centerDateInSeconds = (location * (range * 2)) + minimumDate.timeIntervalSinceReferenceDate
+                            let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
+                            
+                            let newRange = max(86400, range / value.magnification)
+                            
+                            let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
+                            let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
+                            
+                            _currentRange = newStartDate...newEndDate
+                        }
+                        .onEnded { _ in
+                            guard let newRange = _currentRange else { return }
+                            _isZooming = false
+                            dataWindow = newRange
+                            _currentRange = nil
+                        }
+                )
             }
-            .frame(
-                minWidth: inGeometry.size.width,
-                maxWidth: inGeometry.size.width,
-                minHeight: inGeometry.size.width,
-                maxHeight: inGeometry.size.width,
-                alignment: .topLeading
-            )
         }
     }
 }
