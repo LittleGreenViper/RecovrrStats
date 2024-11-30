@@ -54,7 +54,7 @@ struct RCVST_Chart2View: View, RCVST_UsesData {
                             alignment: .topLeading
                         )
                     
-                    ZoomControl(data: $data, dataWindow: $dataWindow)
+                    RCVST_ZoomControl(data: $data, dataWindow: $dataWindow)
                 }
                 .frame(
                     minWidth: inGeometry.size.width,

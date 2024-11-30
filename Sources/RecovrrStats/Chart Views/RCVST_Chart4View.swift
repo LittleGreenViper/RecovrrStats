@@ -54,7 +54,7 @@ struct RCVST_Chart4View: RCVST_DataDisplay, RCVST_UsesData {
                             alignment: .topLeading
                         )
                         
-                    ZoomControl(data: $data, dataWindow: $dataWindow)
+                    RCVST_ZoomControl(data: $data, dataWindow: $dataWindow)
                 }
             }
             .frame(

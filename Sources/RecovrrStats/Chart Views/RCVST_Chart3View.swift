@@ -98,7 +98,7 @@ struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
                                 alignment: .topLeading
                             )
                         
-                        ZoomControl(data: $data, dataWindow: $dataWindow)
+                        RCVST_ZoomControl(data: $data, dataWindow: $dataWindow)
                     }
                 }
             }
