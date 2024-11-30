@@ -190,15 +190,18 @@ struct RootStackView: View {
 // MARK: - Pinch To Zoom Area -
 /* ###################################################################################################################################### */
 /**
+ This is a control that integrates with the chart, and allows the user to pinch to magnify into the chart.
  */
 struct ZoomControl: View {
     /* ################################################################## */
     /**
+     This contains the data window, at the start of the gesture.
      */
     @State private var _firstRange: ClosedRange<Date> = Date.distantPast...Date.distantFuture
     
     /* ################################################################## */
     /**
+     This is set to true, while we are in the middle of a gesture.
      */
     @State private var _isPinching: Bool = false
     
@@ -216,6 +219,7 @@ struct ZoomControl: View {
 
     /* ################################################################## */
     /**
+     The control, itself.
      */
     var body: some View {
         ViewThatFits {
@@ -259,6 +263,7 @@ struct ZoomControl: View {
                     let centerDateInSeconds = (location * (range * 2)) + minimumDate.timeIntervalSinceReferenceDate
                     let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
                     
+                    // No less than 1 day.
                     let newRange = max(86400, range / value.magnification)
                     
                     let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))

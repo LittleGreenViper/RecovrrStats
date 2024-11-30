@@ -53,6 +53,8 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
                             maxHeight: .infinity,
                             alignment: .topLeading
                         )
+                    
+                    ZoomControl(data: $data, dataWindow: $dataWindow)
                 }
                 .frame(
                     minWidth: inGeometry.size.width,
@@ -61,8 +63,6 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
                     maxHeight: inGeometry.size.width,
                     alignment: .topLeading
                 )
-                
-                ZoomControl(data: $data, dataWindow: $dataWindow)
             }
         }
     }
