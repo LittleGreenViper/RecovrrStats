@@ -169,6 +169,7 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
         let minimumDate = minimumClipDate.addingTimeInterval(-43200)
         let maximumDate = maximumClipDate.addingTimeInterval(43200)
         let clipRange = minimumClipDate.addingTimeInterval(43200)...maximumClipDate.addingTimeInterval(-43200)
+        
         // We use this to set a fixed number of X-axis dates.
         let step = (maximumDate - minimumDate) / numberOfXValues
         // Set up an array of dates to use as values for the X-axis.

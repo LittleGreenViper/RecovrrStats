@@ -78,24 +78,28 @@ struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
     var body: some View {
         GeometryReader { inGeometry in
             GroupBox(title) {
-                VStack {
-                    // This picker allows us to view the various activity ranges.
-                    Picker("Activity", selection: $_selectedActivityRange) {
-                        Text("1").tag(1)
-                        Text("7").tag(7)
-                        Text("30").tag(30)
-                        Text("90").tag(90)
-                        Text("SLUG-BAR-CHART-ACTIVE-TYPES-AVERAGE".localizedVariant).tag(0)
+                VStack(spacing: 8) {
+                    VStack {
+                        // This picker allows us to view the various activity ranges.
+                        Picker("Activity", selection: $_selectedActivityRange) {
+                            Text("1").tag(1)
+                            Text("7").tag(7)
+                            Text("30").tag(30)
+                            Text("90").tag(90)
+                            Text("SLUG-BAR-CHART-ACTIVE-TYPES-AVERAGE".localizedVariant).tag(0)
+                        }
+                        .pickerStyle(.segmented)
+                        .onChange(of: _selectedActivityRange) { triggerHaptic(intensity: 0.5, sharpness: 0.25) }
+                        
+                        UserActivityChart(data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString, selectedActivityRange: $_selectedActivityRange)
+                            .frame(
+                                minHeight: inGeometry.size.width,
+                                maxHeight: .infinity,
+                                alignment: .topLeading
+                            )
+                        
+                        ZoomControl(data: $data, dataWindow: $dataWindow)
                     }
-                    .pickerStyle(.segmented)
-                    .onChange(of: _selectedActivityRange) { triggerHaptic(intensity: 0.5, sharpness: 0.25) }
-                    
-                    UserActivityChart(data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString, selectedActivityRange: $_selectedActivityRange)
-                        .frame(
-                            minHeight: inGeometry.size.width,
-                            maxHeight: .infinity,
-                            alignment: .topLeading
-                        )
                 }
             }
             .frame(
@@ -290,6 +294,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
         let maximumClipDate = Date.distantFuture > dataWindow.upperBound ? dataWindow.upperBound : _dataFiltered.last?.date ?? .now
         let minimumDate = minimumClipDate.addingTimeInterval(-43200)
         let maximumDate = maximumClipDate.addingTimeInterval(43200)
+        let clipRange = minimumClipDate.addingTimeInterval(43200)...maximumClipDate.addingTimeInterval(-43200)
 
         // We use this to set a fixed number of X-axis dates.
         let step = (maximumDate - minimumDate) / numberOfXValues
@@ -301,7 +306,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
         Chart(_dataFiltered) { inRowData in
             let date = inRowData.date
             let active = _getDataValue(for: inRowData)
-            if (minimumClipDate...maximumClipDate).contains(inRowData.date) {
+            if clipRange.contains(inRowData.date) {
                 BarMark(
                     x: .value("SLUG-BAR-CHART-TYPES-X".localizedVariant, date, unit: .day),
                     y: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y".localizedVariant, active)
@@ -325,7 +330,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
             }
         }
         // We customize the X-axis, to only have a few sections.
-        .chartXScale(domain: _chartDomain ?? minimumDate...maximumDate)
+        .chartXScale(domain: dataWindow)
         .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-CHART-3-LABEL".localizedVariant, alignment: .top)
         .chartXAxis {
             AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in

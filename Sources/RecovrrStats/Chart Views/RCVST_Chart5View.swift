@@ -46,12 +46,16 @@ struct RCVST_Chart5View: RCVST_DataDisplay, RCVST_UsesData {
     var body: some View {
         GeometryReader { inGeometry in
             GroupBox(title) {
-                NewLoginChart(data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString)
-                    .frame(
-                        minHeight: inGeometry.size.width,
-                        maxHeight: .infinity,
-                        alignment: .topLeading
-                    )
+                VStack(spacing: 8) {
+                    NewLoginChart(data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString)
+                        .frame(
+                            minHeight: inGeometry.size.width,
+                            maxHeight: .infinity,
+                            alignment: .topLeading
+                        )
+                        
+                    ZoomControl(data: $data, dataWindow: $dataWindow)
+                }
             }
             .frame(
                 minWidth: inGeometry.size.width,
@@ -171,6 +175,7 @@ struct NewLoginChart: View, RCVST_UsesData, RCVST_HapticHopper {
         let maximumClipDate = Date.distantFuture > dataWindow.upperBound ? dataWindow.upperBound : _dataFiltered.last?.date ?? .now
         let minimumDate = minimumClipDate.addingTimeInterval(-43200)
         let maximumDate = maximumClipDate.addingTimeInterval(43200)
+        let clipRange = minimumClipDate.addingTimeInterval(43200)...maximumClipDate.addingTimeInterval(-43200)
 
         // We use this to set a fixed number of X-axis dates.
         let step = (maximumDate - minimumDate) / numberOfXValues
@@ -181,7 +186,7 @@ struct NewLoginChart: View, RCVST_UsesData, RCVST_HapticHopper {
         
         // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
         Chart(_dataFiltered) { inRowData in
-            if (minimumClipDate...maximumClipDate).contains(inRowData.date) {
+            if clipRange.contains(inRowData.date) {
                 BarMark(
                     x: .value("SLUG-BAR-CHART-NEW-LOGINS-X".localizedVariant, inRowData.date, unit: .day),
                     y: .value("SLUG-BAR-CHART-NEW-LOGINS-Y".localizedVariant, inRowData.data)
@@ -206,7 +211,7 @@ struct NewLoginChart: View, RCVST_UsesData, RCVST_HapticHopper {
             }
         }
         // We customize the X-axis, to only have a few sections.
-        .chartXScale(domain: _chartDomain ?? minimumDate...maximumDate)
+        .chartXScale(domain: dataWindow)
         .chartXAxisLabel("SLUG-BAR-CHART-Y-AXIS-NEW-LOGINS-LABEL".localizedVariant, alignment: .top)
         .chartXAxis {
             AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in
