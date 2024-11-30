@@ -17,18 +17,6 @@ import CoreHaptics
 struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
     /* ################################################################## */
     /**
-     This contains the range, as we pinch to zoom.
-     */
-    @State private var _currentRange: ClosedRange<Date>?
-    
-    /* ################################################################## */
-    /**
-     This is true, if we are currently doing a pinch-to-zoom.
-     */
-    @State private var _isZooming: Bool = false
-    
-    /* ################################################################## */
-    /**
      This is the title to display over the chart.
      */
     @State var title: String
@@ -59,7 +47,7 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
         GeometryReader { inGeometry in
             VStack(spacing: 8) {
                 GroupBox(title) {
-                    UserTypesChart(isZooming: $_isZooming, data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString)
+                    UserTypesChart(data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString)
                         .frame(
                             minHeight: inGeometry.size.width,
                             maxHeight: .infinity,
@@ -73,60 +61,90 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
                     maxHeight: inGeometry.size.width,
                     alignment: .topLeading
                 )
-            
-                ViewThatFits {
-                    Text("PINCH HERE")
-                        .padding()
-                }
-                .frame(
-                    maxWidth: .infinity,
-                    maxHeight: .infinity,
-                    alignment: .center
-                )
-                .background(Color.blue)
-                .onAppear {
-                    guard var minDateTemp = data?.allRows.first?.date,
-                          var maxDateTemp = data?.allRows.last?.date
-                    else { return }
-                    
-                    minDateTemp = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
-                    maxDateTemp = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
-                    
-                    dataWindow = minDateTemp...maxDateTemp
-                }
-                .gesture(
-                    MagnifyGesture()
-                        .onChanged { value in
-                            _isZooming = true
-                            guard let minimumClipDate = data?.allRows.first?.date,
-                                  let maximumClipDate = data?.allRows.last?.date
-                            else { return }
-                            
-                            let minimumDate = minimumClipDate.addingTimeInterval(-43200)
-                            let maximumDate = maximumClipDate.addingTimeInterval(43200)
-                            
-                            let range = (dataWindow.upperBound.timeIntervalSinceReferenceDate - dataWindow.lowerBound.timeIntervalSinceReferenceDate) / 2
-                            let location = TimeInterval(value.startAnchor.x)
-                            
-                            let centerDateInSeconds = (location * (range * 2)) + minimumDate.timeIntervalSinceReferenceDate
-                            let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
-                            
-                            let newRange = max(86400, range / value.magnification)
-                            
-                            let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
-                            let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
-                            
-                            _currentRange = newStartDate...newEndDate
-                        }
-                        .onEnded { _ in
-                            guard let newRange = _currentRange else { return }
-                            _isZooming = false
-                            dataWindow = newRange
-                            _currentRange = nil
-                        }
-                )
+                
+                ZoomControl(data: $data, dataWindow: $dataWindow)
             }
         }
+    }
+}
+
+/* ###################################################################################################################################### */
+// MARK: - Pinch To Zoom Area -
+/* ###################################################################################################################################### */
+/**
+ */
+struct ZoomControl: View {
+    /* ################################################################## */
+    /**
+     This contains the range, as we pinch to zoom.
+     */
+    @State private var _currentRange: ClosedRange<Date>?
+    
+    /* ################################################################## */
+    /**
+     This is the actual dataframe wrapper for the stats.
+     */
+    @Binding var data: RCVST_DataProvider?
+
+    /* ################################################################## */
+    /**
+     This has the data range we will be looking at.
+     */
+    @Binding var dataWindow: ClosedRange<Date>
+
+    /* ################################################################## */
+    /**
+     */
+    var body: some View {
+        ViewThatFits {
+            Text("PINCH HERE")
+                .padding()
+        }
+        .frame(
+            maxWidth: .infinity,
+            maxHeight: .infinity,
+            alignment: .center
+        )
+        .background(Color.blue)
+        .onAppear {
+            guard var minDateTemp = data?.allRows.first?.date,
+                  var maxDateTemp = data?.allRows.last?.date
+            else { return }
+            
+            minDateTemp = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
+            maxDateTemp = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
+            
+            dataWindow = minDateTemp...maxDateTemp
+        }
+        .gesture(
+            MagnifyGesture()
+                .onChanged { value in
+                    guard let minimumClipDate = data?.allRows.first?.date,
+                          let maximumClipDate = data?.allRows.last?.date
+                    else { return }
+                    
+                    let minimumDate = minimumClipDate.addingTimeInterval(-43200)
+                    let maximumDate = maximumClipDate.addingTimeInterval(43200)
+                    
+                    let range = (dataWindow.upperBound.timeIntervalSinceReferenceDate - dataWindow.lowerBound.timeIntervalSinceReferenceDate) / 2
+                    let location = TimeInterval(value.startAnchor.x)
+                    
+                    let centerDateInSeconds = (location * (range * 2)) + minimumDate.timeIntervalSinceReferenceDate
+                    let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
+                    
+                    let newRange = max(86400, range / value.magnification)
+                    
+                    let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
+                    let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
+                    
+                    _currentRange = newStartDate...newEndDate
+                }
+                .onEnded { _ in
+                    guard let newRange = _currentRange else { return }
+                    dataWindow = newRange
+                    _currentRange = nil
+                }
+        )
     }
 }
 
@@ -163,20 +181,6 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
     @State private var _selectedValue: RCVST_DataProvider.RowUserPlottableData?
 
     // MARK: External Bindings
-    /* ################################################################## */
-    /**
-     This is true, if we are currently doing a pinch-to-zoom.
-     */
-    @Binding var isZooming: Bool {
-        didSet {
-            if isZooming {
-                _selectedValue = nil
-                _isDragging = false
-                selectedValuesString = " "
-            }
-        }
-    }
-
     /* ################################################################## */
     /**
      The general user type data.
