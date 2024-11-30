@@ -293,8 +293,10 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
         let minimumClipDate = Date.distantPast < dataWindow.lowerBound ? dataWindow.lowerBound : _dataFiltered.first?.date ?? .now
         let maximumClipDate = Date.distantFuture > dataWindow.upperBound ? dataWindow.upperBound : _dataFiltered.last?.date ?? .now
         let minimumDate = minimumClipDate.addingTimeInterval(-43200)
-        let maximumDate = maximumClipDate.addingTimeInterval(43200)
-        let clipRange = minimumClipDate.addingTimeInterval(43200)...maximumClipDate.addingTimeInterval(-43200)
+        let maximumDate = max(minimumClipDate, maximumClipDate).addingTimeInterval(43200)
+        let minClip = minimumClipDate.addingTimeInterval(43200)
+        let maxClip = maximumClipDate.addingTimeInterval(-43200)
+        let clipRange = Swift.min(minClip, maxClip)...Swift.max(minClip, maxClip)
 
         // We use this to set a fixed number of X-axis dates.
         let step = (maximumDate - minimumDate) / numberOfXValues

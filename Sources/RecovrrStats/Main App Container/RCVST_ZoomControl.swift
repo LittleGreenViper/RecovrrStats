@@ -25,6 +25,16 @@ struct RCVST_ZoomControl: View {
     
     /* ################################################################## */
     /**
+     */
+    @State private var _innerPosition: ClosedRange<CGFloat> = 0...1
+    
+    /* ################################################################## */
+    /**
+     */
+    @State private var _magnification: CGFloat = 1
+
+    /* ################################################################## */
+    /**
      This is the actual dataframe wrapper for the stats.
      */
     @Binding var data: RCVST_DataProvider?
@@ -40,21 +50,21 @@ struct RCVST_ZoomControl: View {
      The control, itself.
      */
     var body: some View {
-        ViewThatFits {
-            Text("PINCH HERE")
-                .padding()
+        ViewThatFits { }
+        .padding([.top, .bottom])
+        .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
+            if axis == .vertical {
+                return length
+            } else {
+                return length * _magnification
+            }
         }
-        .frame(
-            maxWidth: .infinity,
-            maxHeight: .infinity,
-            alignment: .center
-        )
         .background(Color.blue)
         .onAppear {
             guard var minDateTemp = data?.allRows.first?.date,
                   var maxDateTemp = data?.allRows.last?.date
             else { return }
-            
+
             minDateTemp = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
             maxDateTemp = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
             
@@ -83,6 +93,8 @@ struct RCVST_ZoomControl: View {
                     
                     // No less than 1 day.
                     let newRange = max(86400, range * value.magnification)
+                    
+                    _magnification = min(1.0, value.magnification)
                     
                     let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
                     let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
