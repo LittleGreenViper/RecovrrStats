@@ -91,11 +91,6 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
 
     /* ################################################################## */
     /**
-     */
-    @State private var _startingPoint: (minimumSeconds: Double, maximumSeconds: Double)?
-
-    /* ################################################################## */
-    /**
      The value being selected by the user, while dragging.
      */
     @State private var _selectedValue: RCVST_DataProvider.RowUserPlottableData?
