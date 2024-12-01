@@ -22,16 +22,16 @@ struct RCVST_ZoomControl: View {
      This is set to true, while we are in the middle of a gesture.
      */
     @State private var _isPinching: Bool = false
-    
-    /* ################################################################## */
-    /**
-     */
-    @State private var _innerPosition: CGFloat = 0
-    
+
     /* ################################################################## */
     /**
      */
     @State private var _magnification: CGFloat = 1
+
+    /* ################################################################## */
+    /**
+     */
+    @State private var _position: CGFloat = 1
 
     /* ################################################################## */
     /**
@@ -44,31 +44,46 @@ struct RCVST_ZoomControl: View {
      This has the data range we will be looking at.
      */
     @Binding var dataWindow: ClosedRange<Date>
-
+    
     /* ################################################################## */
     /**
      The control, itself.
      */
     var body: some View {
-        ViewThatFits(in: .horizontal) { }
-            .padding([.top, .bottom], 40)
-            .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
-                if axis == .vertical {
-                    return length
-                } else {
-                    return length * _magnification
+        ViewThatFits(in: .horizontal) {
+            GeometryReader { inGeometry in
+                ViewThatFits {
+                    Rectangle( )
+                        .padding([.top, .bottom], 20)
+                        .background(Color.yellow)
+                        .frame(width: inGeometry.size.width * _magnification, alignment: .leading)
+                        .position(x: _position, y: 0)
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let size = inGeometry.size.width * _magnification
+                                    let minX = inGeometry.frame(in: .local).minX + (size / 2)
+                                    let maxX = inGeometry.frame(in: .local).maxX - (size / 2)
+                                    _position = min(maxX, max(minX, value.startLocation.x + value.translation.width))
+                                }
+                        )
+                        .onAppear {
+                            _position = inGeometry.size.width / 2
+                        }
                 }
             }
+        }
+            .padding([.top, .bottom], 40)
             .background(Color.blue)
             .onAppear {
-                guard var minDateTemp = data?.allRows.first?.date,
-                      var maxDateTemp = data?.allRows.last?.date
+                guard let minDateTemp = data?.allRows.first?.date,
+                      let maxDateTemp = data?.allRows.last?.date
                 else { return }
                 
-                minDateTemp = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
-                maxDateTemp = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
+                let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
+                let maxDate = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
                 
-                dataWindow = minDateTemp...maxDateTemp
+                dataWindow = minDate...maxDate
             }
             .gesture(
                 MagnifyGesture()
@@ -80,7 +95,6 @@ struct RCVST_ZoomControl: View {
                         if !_isPinching {
                             _isPinching = true
                             _firstRange = dataWindow
-                            _innerPosition = value.startAnchor.x
                         }
                         
                         let minimumDate = minimumClipDate.addingTimeInterval(-43200)
@@ -104,6 +118,6 @@ struct RCVST_ZoomControl: View {
                         dataWindow = newStartDate...newEndDate
                     }
                     .onEnded { _ in _isPinching = false }
-            )
+           )
     }
 }
