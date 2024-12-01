@@ -53,8 +53,12 @@ struct RCVST_Chart4View: RCVST_DataDisplay, RCVST_UsesData {
                             maxHeight: .infinity,
                             alignment: .topLeading
                         )
-                        
+                    
                     RCVST_ZoomControl(data: $data, dataWindow: $dataWindow)
+                        .frame(
+                            maxWidth: inGeometry.size.width * 0.8,
+                            alignment: .bottom
+                        )
                 }
             }
             .frame(

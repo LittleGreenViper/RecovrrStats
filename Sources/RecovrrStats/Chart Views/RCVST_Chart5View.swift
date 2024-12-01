@@ -55,6 +55,10 @@ struct RCVST_Chart5View: RCVST_DataDisplay, RCVST_UsesData {
                         )
                         
                     RCVST_ZoomControl(data: $data, dataWindow: $dataWindow)
+                        .frame(
+                            maxWidth: inGeometry.size.width * 0.8,
+                            alignment: .bottom
+                        )
                 }
             }
             .frame(

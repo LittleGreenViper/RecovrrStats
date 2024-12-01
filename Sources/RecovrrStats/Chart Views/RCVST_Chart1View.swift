@@ -45,25 +45,29 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
      */
     var body: some View {
         GeometryReader { inGeometry in
-            VStack(spacing: 8) {
-                GroupBox(title) {
+            GroupBox(title) {
+                VStack(spacing: 8) {
                     UserTypesChart(data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString)
                         .frame(
                             minHeight: inGeometry.size.width,
                             maxHeight: .infinity,
-                            alignment: .topLeading
+                            alignment: .top
                         )
                     
                     RCVST_ZoomControl(data: $data, dataWindow: $dataWindow)
+                        .frame(
+                            maxWidth: inGeometry.size.width * 0.8,
+                            alignment: .bottom
+                        )
                 }
-                .frame(
-                    minWidth: inGeometry.size.width,
-                    maxWidth: inGeometry.size.width,
-                    minHeight: inGeometry.size.width,
-                    maxHeight: inGeometry.size.width,
-                    alignment: .topLeading
-                )
             }
+            .frame(
+                minWidth: inGeometry.size.width,
+                maxWidth: inGeometry.size.width,
+                minHeight: inGeometry.size.width,
+                maxHeight: inGeometry.size.width,
+                alignment: .top
+            )
         }
     }
 }

@@ -26,7 +26,7 @@ struct RCVST_ZoomControl: View {
     /* ################################################################## */
     /**
      */
-    @State private var _innerPosition: ClosedRange<CGFloat> = 0...1
+    @State private var _innerPosition: CGFloat = 0
     
     /* ################################################################## */
     /**
@@ -50,58 +50,60 @@ struct RCVST_ZoomControl: View {
      The control, itself.
      */
     var body: some View {
-        ViewThatFits { }
-        .padding([.top, .bottom])
-        .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
-            if axis == .vertical {
-                return length
-            } else {
-                return length * _magnification
-            }
-        }
-        .background(Color.blue)
-        .onAppear {
-            guard var minDateTemp = data?.allRows.first?.date,
-                  var maxDateTemp = data?.allRows.last?.date
-            else { return }
-
-            minDateTemp = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
-            maxDateTemp = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
-            
-            dataWindow = minDateTemp...maxDateTemp
-        }
-        .gesture(
-            MagnifyGesture()
-                .onChanged { value in
-                    guard let minimumClipDate = data?.allRows.first?.date,
-                          let maximumClipDate = data?.allRows.last?.date
-                    else { return }
-                    
-                    if !_isPinching {
-                        _isPinching = true
-                        _firstRange = dataWindow
-                    }
-                    
-                    let minimumDate = minimumClipDate.addingTimeInterval(-43200)
-                    let maximumDate = maximumClipDate.addingTimeInterval(43200)
-                    
-                    let range = (_firstRange.upperBound.timeIntervalSinceReferenceDate - _firstRange.lowerBound.timeIntervalSinceReferenceDate) / 2
-                    let location = TimeInterval(value.startAnchor.x)
-                    
-                    let centerDateInSeconds = (location * (range * 2)) + minimumDate.timeIntervalSinceReferenceDate
-                    let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
-                    
-                    // No less than 1 day.
-                    let newRange = max(86400, range * value.magnification)
-                    
-                    _magnification = min(1.0, value.magnification)
-                    
-                    let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
-                    let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
-                    
-                    dataWindow = newStartDate...newEndDate
+        ViewThatFits(in: .horizontal) { }
+            .padding([.top, .bottom], 40)
+            .containerRelativeFrame(.horizontal, alignment: .center) { length, axis in
+                if axis == .vertical {
+                    return length
+                } else {
+                    return length * _magnification
                 }
-                .onEnded { _ in _isPinching = false }
-        )
+            }
+            .background(Color.blue)
+            .onAppear {
+                guard var minDateTemp = data?.allRows.first?.date,
+                      var maxDateTemp = data?.allRows.last?.date
+                else { return }
+                
+                minDateTemp = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
+                maxDateTemp = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
+                
+                dataWindow = minDateTemp...maxDateTemp
+            }
+            .gesture(
+                MagnifyGesture()
+                    .onChanged { value in
+                        guard let minimumClipDate = data?.allRows.first?.date,
+                              let maximumClipDate = data?.allRows.last?.date
+                        else { return }
+                        
+                        if !_isPinching {
+                            _isPinching = true
+                            _firstRange = dataWindow
+                            _innerPosition = value.startAnchor.x
+                        }
+                        
+                        let minimumDate = minimumClipDate.addingTimeInterval(-43200)
+                        let maximumDate = maximumClipDate.addingTimeInterval(43200)
+                        let multiplier = CGFloat(_firstRange.upperBound.timeIntervalSinceReferenceDate - _firstRange.lowerBound.timeIntervalSinceReferenceDate) / (maximumDate.timeIntervalSinceReferenceDate - minimumDate.timeIntervalSinceReferenceDate)
+                        
+                        let range = (_firstRange.upperBound.timeIntervalSinceReferenceDate - _firstRange.lowerBound.timeIntervalSinceReferenceDate) / 2
+                        let location = TimeInterval(value.startAnchor.x)
+                        
+                        let centerDateInSeconds = (location * (range * 2)) + minimumDate.timeIntervalSinceReferenceDate
+                        let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
+                        
+                        // No less than 1 day.
+                        let newRange = max(86400, range * value.magnification * 1.2)
+                        
+                        _magnification = min(1.0, value.magnification * multiplier)
+                        
+                        let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
+                        let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
+                        
+                        dataWindow = newStartDate...newEndDate
+                    }
+                    .onEnded { _ in _isPinching = false }
+            )
     }
 }

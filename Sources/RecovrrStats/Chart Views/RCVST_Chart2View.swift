@@ -45,8 +45,8 @@ struct RCVST_Chart2View: View, RCVST_UsesData {
      */
     var body: some View {
         GeometryReader { inGeometry in
-            VStack(spacing: 8) {
-                GroupBox(title) {
+            GroupBox(title) {
+                VStack(spacing: 8) {
                     SignupActivityChart(data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString)
                         .frame(
                             minHeight: inGeometry.size.width,
@@ -55,15 +55,19 @@ struct RCVST_Chart2View: View, RCVST_UsesData {
                         )
                     
                     RCVST_ZoomControl(data: $data, dataWindow: $dataWindow)
+                        .frame(
+                            maxWidth: inGeometry.size.width * 0.8,
+                            alignment: .bottom
+                        )
                 }
-                .frame(
-                    minWidth: inGeometry.size.width,
-                    maxWidth: inGeometry.size.width,
-                    minHeight: inGeometry.size.width,
-                    maxHeight: inGeometry.size.width,
-                    alignment: .topLeading
-                )
             }
+            .frame(
+                minWidth: inGeometry.size.width,
+                maxWidth: inGeometry.size.width,
+                minHeight: inGeometry.size.width,
+                maxHeight: inGeometry.size.width,
+                alignment: .top
+            )
         }
     }
 }

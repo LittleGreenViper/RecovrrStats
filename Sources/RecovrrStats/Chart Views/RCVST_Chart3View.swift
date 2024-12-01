@@ -97,9 +97,13 @@ struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
                                 maxHeight: .infinity,
                                 alignment: .topLeading
                             )
-                        
-                        RCVST_ZoomControl(data: $data, dataWindow: $dataWindow)
                     }
+                    
+                    RCVST_ZoomControl(data: $data, dataWindow: $dataWindow)
+                        .frame(
+                            maxWidth: inGeometry.size.width * 0.8,
+                            alignment: .bottom
+                        )
                 }
             }
             .frame(
@@ -107,7 +111,7 @@ struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
                 maxWidth: inGeometry.size.width,
                 minHeight: inGeometry.size.width,
                 maxHeight: inGeometry.size.width,
-                alignment: .topLeading
+                alignment: .top
             )
             // This makes sure the haptics are set up, every time we are activated.
             .onChange(of: _scenePhase, initial: true) {
