@@ -59,12 +59,43 @@ struct RCVST_ZoomControl: View {
                         .frame(width: inGeometry.size.width * _magnification, alignment: .leading)
                         .position(x: _position, y: 0)
                         .gesture(
+                            TapGesture(count: 2).onEnded {
+                                _magnification = 1
+                                guard let minDateTemp = data?.allRows.first?.date,
+                                      let maxDateTemp = data?.allRows.last?.date
+                                else { return }
+                                
+                                let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
+                                let maxDate = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
+                                dataWindow = minDate...maxDate
+                                _position = inGeometry.frame(in: .local).midX
+                            }
+                            )
+                        .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
+                                    guard let minDateTemp = data?.allRows.first?.date,
+                                          let maxDateTemp = data?.allRows.last?.date
+                                    else { return }
+                                    
+                                    let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
+                                    let maxDate = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
+                                    
+                                    let totalDateRangeInSeconds = maxDate.timeIntervalSinceReferenceDate - minDate.timeIntervalSinceReferenceDate
+                                    let dateRangeInSeconds = dataWindow.upperBound.timeIntervalSinceReferenceDate - dataWindow.lowerBound.timeIntervalSinceReferenceDate
+                                    
                                     let size = inGeometry.size.width * _magnification
                                     let minX = inGeometry.frame(in: .local).minX + (size / 2)
                                     let maxX = inGeometry.frame(in: .local).maxX - (size / 2)
                                     _position = min(maxX, max(minX, value.startLocation.x + value.translation.width))
+                                    let startingPosition = (_position - (size / 2)) - minX
+                                    
+                                    let multiplier = startingPosition / (maxX - minX)
+                                    let newStartingDateInSeconds = minDate.timeIntervalSinceReferenceDate + (multiplier * totalDateRangeInSeconds)
+                                    let newMinDate = Date(timeIntervalSinceReferenceDate: newStartingDateInSeconds)
+                                    let newMaxDate = newMinDate.addingTimeInterval(dateRangeInSeconds)
+                                    
+                                    dataWindow = newMinDate...newMaxDate
                                 }
                         )
                         .onAppear {
