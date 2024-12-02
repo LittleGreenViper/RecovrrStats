@@ -17,6 +17,23 @@ import CoreHaptics
 struct RCVST_Chart2View: View, RCVST_UsesData {
     /* ################################################################## */
     /**
+     This contains the data window, at the start of the gesture.
+     */
+    @State private var _firstRange: ClosedRange<Date> = Date.distantPast...Date.distantFuture
+    
+    /* ################################################################## */
+    /**
+     This is set to true, while we are in the middle of a gesture.
+     */
+    @State private var _isPinching: Bool = false
+
+    /* ################################################################## */
+    /**
+     */
+    @State private var _magnification: CGFloat = 1
+
+    /* ################################################################## */
+    /**
      This is the title to display over the chart.
      */
     @State var title: String
@@ -53,10 +70,44 @@ struct RCVST_Chart2View: View, RCVST_UsesData {
                             maxHeight: .infinity,
                             alignment: .topLeading
                         )
-                    
-                    RCVST_ZoomControl(data: $data, dataWindow: $dataWindow)
+                        .gesture(
+                            MagnifyGesture()
+                                .onChanged { value in
+                                    guard let minimumClipDate = data?.allRows.first?.date,
+                                          let maximumClipDate = data?.allRows.last?.date
+                                    else { return }
+                                    
+                                    if !_isPinching {
+                                        _isPinching = true
+                                        _firstRange = dataWindow
+                                    }
+                                    
+                                    let minimumDate = minimumClipDate.addingTimeInterval(-43200)
+                                    let maximumDate = maximumClipDate.addingTimeInterval(43200)
+                                    let multiplier = CGFloat(_firstRange.upperBound.timeIntervalSinceReferenceDate - _firstRange.lowerBound.timeIntervalSinceReferenceDate) / (maximumDate.timeIntervalSinceReferenceDate - minimumDate.timeIntervalSinceReferenceDate)
+                                    
+                                    let range = (_firstRange.upperBound.timeIntervalSinceReferenceDate - _firstRange.lowerBound.timeIntervalSinceReferenceDate) / 2
+                                    let location = TimeInterval(value.startAnchor.x)
+                                    
+                                    let centerDateInSeconds = (location * (range * 2)) + minimumDate.timeIntervalSinceReferenceDate
+                                    let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
+                                    
+                                    // No less than 1 day.
+                                    let newRange = max(86400, range * value.magnification * 1.2)
+                                    
+                                    _magnification = min(1.0, value.magnification * multiplier)
+                                    
+                                    let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
+                                    let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
+                                    
+                                    dataWindow = newStartDate...newEndDate
+                                }
+                                .onEnded { _ in _isPinching = false }
+                       )
+
+                    RCVST_ZoomControl(data: $data, dataWindow: $dataWindow, magnification: $_magnification)
                         .frame(
-                            maxWidth: inGeometry.size.width * 0.8,
+                            maxWidth: inGeometry.size.width * 0.9,
                             alignment: .bottom
                         )
                 }
