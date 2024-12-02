@@ -25,6 +25,7 @@ struct RCVST_ZoomControl: View {
 
     /* ################################################################## */
     /**
+     This is the horizontal position of the "thumb," in the "slider."
      */
     @State private var _position: CGFloat = 0
 
@@ -42,6 +43,7 @@ struct RCVST_ZoomControl: View {
 
     /* ################################################################## */
     /**
+     This is the selected magnification level of the data window.
      */
     @Binding var magnification: CGFloat
 
@@ -57,20 +59,36 @@ struct RCVST_ZoomControl: View {
                         .padding([.top, .bottom], 16)
                         .background(Color.yellow)
                         .frame(width: inGeometry.size.width * magnification, alignment: .leading)
-                        .position(x: _position, y: 0)
-                        .gesture(
-                            TapGesture(count: 2).onEnded {
-                                magnification = 1
-                                guard let minDateTemp = data?.allRows.first?.date,
-                                      let maxDateTemp = data?.allRows.last?.date
-                                else { return }
-                                
-                                let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
-                                let maxDate = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
-                                dataWindow = minDate...maxDate
+                        .onChange(of: magnification) {
+                            guard let minDateTemp = data?.allRows.first?.date,
+                                  let maxDateTemp = data?.allRows.last?.date
+                            else { return }
+                            
+                            let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
+                            let maxDate = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
+                            
+                            let minDateSeconds = minDate.timeIntervalSinceReferenceDate
+                            let maxDateSeconds = maxDate.timeIntervalSinceReferenceDate
+                            
+                            let dateRangeLower = dataWindow.lowerBound.timeIntervalSinceReferenceDate
+                            let dateRangeUpper = dataWindow.upperBound.timeIntervalSinceReferenceDate
+
+                            let totalDateRangeInSeconds = maxDateSeconds - minDateSeconds
+                            let dateRangeInSeconds = dateRangeUpper - dateRangeLower
+                            
+                            if dateRangeInSeconds < totalDateRangeInSeconds {
+                                let thumbSize = (inGeometry.size.width * magnification) / 2
+                                let centerInSeconds = ((dateRangeUpper + dateRangeLower) / 2) - minDateSeconds
+                                let centerPos = centerInSeconds / totalDateRangeInSeconds
+                                let positionFactor = (centerPos * inGeometry.size.width) + inGeometry.frame(in: .local).minX
+                                let minX = inGeometry.frame(in: .local).minX + thumbSize
+                                let maxX = inGeometry.frame(in: .local).maxX - thumbSize
+                                _position = min(maxX, max(minX, positionFactor))
+                            } else {
                                 _position = inGeometry.frame(in: .local).midX
                             }
-                            )
+                        }
+                        .position(x: _position, y: 0)
                         .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
@@ -107,10 +125,21 @@ struct RCVST_ZoomControl: View {
                                     }
                                 }
                         )
-                        .onAppear {
+                        .onAppear { _position = inGeometry.frame(in: .local).midX }
+                }
+                .gesture(
+                        TapGesture(count: 2).onEnded {
+                            magnification = 1
+                            guard let minDateTemp = data?.allRows.first?.date,
+                                  let maxDateTemp = data?.allRows.last?.date
+                            else { return }
+                            
+                            let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
+                            let maxDate = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
+                            dataWindow = minDate...maxDate
                             _position = inGeometry.frame(in: .local).midX
                         }
-                }
+                    )
             }
         }
             .padding([.top, .bottom], 20)
