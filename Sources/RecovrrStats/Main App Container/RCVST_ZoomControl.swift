@@ -26,7 +26,7 @@ struct RCVST_ZoomControl: View {
     /* ################################################################## */
     /**
      */
-    @State private var _position: CGFloat = 1
+    @State private var _position: CGFloat = 0
 
     /* ################################################################## */
     /**
@@ -54,7 +54,7 @@ struct RCVST_ZoomControl: View {
             GeometryReader { inGeometry in
                 ViewThatFits {
                     Rectangle( )
-                        .padding([.top, .bottom], 20)
+                        .padding([.top, .bottom], 16)
                         .background(Color.yellow)
                         .frame(width: inGeometry.size.width * magnification, alignment: .leading)
                         .position(x: _position, y: 0)
@@ -72,7 +72,7 @@ struct RCVST_ZoomControl: View {
                             }
                             )
                         .gesture(
-                            DragGesture(minimumDistance: 1)
+                            DragGesture(minimumDistance: 0)
                                 .onChanged { value in
                                     guard let minDateTemp = data?.allRows.first?.date,
                                           let maxDateTemp = data?.allRows.last?.date
@@ -95,7 +95,8 @@ struct RCVST_ZoomControl: View {
                                         let areaSize = inGeometry.size.width
                                         let minX = inGeometry.frame(in: .local).minX + thumbSize
                                         let maxX = inGeometry.frame(in: .local).maxX - thumbSize
-                                        _position = min(maxX, max(minX, value.startLocation.x + value.translation.width))
+                                        let movement = (value.startLocation.x + value.translation.width)
+                                        _position = min(maxX, max(minX, movement))
                                         let startingPosition = _position - minX
                                         
                                         let newStartingDateInSeconds = minDateSeconds + ((startingPosition * totalDateRangeInSeconds) / areaSize)
@@ -107,12 +108,12 @@ struct RCVST_ZoomControl: View {
                                 }
                         )
                         .onAppear {
-                            _position = inGeometry.size.width / 2
+                            _position = inGeometry.frame(in: .local).midX
                         }
                 }
             }
         }
-            .padding([.top, .bottom], 40)
+            .padding([.top, .bottom], 20)
             .background(Color.blue)
             .onAppear {
                 guard let minDateTemp = data?.allRows.first?.date,

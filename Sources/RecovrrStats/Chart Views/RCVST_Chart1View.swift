@@ -97,8 +97,8 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
                                     
                                     _magnification = min(1.0, value.magnification * multiplier)
                                     
-                                    let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
-                                    let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
+                                    let newStartDate = min(maximumDate, max(minimumDate, centerDate.addingTimeInterval(-newRange)))
+                                    let newEndDate = max(minimumDate, min(maximumDate, centerDate.addingTimeInterval(newRange)))
                                     
                                     dataWindow = newStartDate...newEndDate
                                 }
