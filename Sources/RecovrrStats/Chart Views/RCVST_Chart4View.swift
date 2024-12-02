@@ -89,7 +89,7 @@ struct RCVST_Chart4View: RCVST_DataDisplay, RCVST_UsesData {
                                     let range = (_firstRange.upperBound.timeIntervalSinceReferenceDate - _firstRange.lowerBound.timeIntervalSinceReferenceDate) / 2
                                     let location = TimeInterval(value.startAnchor.x)
                                     
-                                    let centerDateInSeconds = (location * (range * 2)) + minimumDate.timeIntervalSinceReferenceDate
+                                    let centerDateInSeconds = (location * (range * 2)) + _firstRange.lowerBound.timeIntervalSinceReferenceDate
                                     let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
                                     
                                     // No less than 1 day.
