@@ -88,7 +88,21 @@ struct RCVST_ZoomControl: View {
                                 _position = inGeometry.frame(in: .local).midX
                             }
                         }
+                        .onAppear { _position = inGeometry.frame(in: .local).midX }
                         .position(x: _position, y: 0)
+                        .gesture(
+                                TapGesture(count: 2).onEnded {
+                                    magnification = 1
+                                    guard let minDateTemp = data?.allRows.first?.date,
+                                          let maxDateTemp = data?.allRows.last?.date
+                                    else { return }
+                                    
+                                    let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
+                                    let maxDate = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
+                                    dataWindow = minDate...maxDate
+                                    _position = inGeometry.frame(in: .local).midX
+                                }
+                            )
                         .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
@@ -125,21 +139,7 @@ struct RCVST_ZoomControl: View {
                                     }
                                 }
                         )
-                        .onAppear { _position = inGeometry.frame(in: .local).midX }
                 }
-                .gesture(
-                        TapGesture(count: 2).onEnded {
-                            magnification = 1
-                            guard let minDateTemp = data?.allRows.first?.date,
-                                  let maxDateTemp = data?.allRows.last?.date
-                            else { return }
-                            
-                            let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
-                            let maxDate = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
-                            dataWindow = minDate...maxDate
-                            _position = inGeometry.frame(in: .local).midX
-                        }
-                    )
             }
         }
             .padding([.top, .bottom], 20)
