@@ -93,9 +93,9 @@ struct RCVST_Chart5View: RCVST_DataDisplay, RCVST_UsesData {
                                     let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
                                     
                                     // No less than 1 day.
-                                    let newRange = max(86400, range * value.magnification * 1.2)
+                                    let newRange = max(86400, range * (1 / value.magnification) * 1.2)
                                     
-                                    _magnification = min(1.0, value.magnification * multiplier)
+                                    _magnification = min(1.0, (1 / value.magnification) * multiplier)
                                     
                                     let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
                                     let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
@@ -148,7 +148,13 @@ struct NewLoginChart: View, RCVST_UsesData, RCVST_HapticHopper {
     /**
      The value being selected by the user, while dragging.
      */
-    @State private var _selectedValue: RCVST_DataProvider.RowFirstTimeLoginsPlottableData?
+    @State private var _selectedValue: RCVST_DataProvider.RowFirstTimeLoginsPlottableData? {
+        didSet {
+            if nil == _selectedValue {
+                selectedValuesString = " "
+            }
+        }
+    }
 
     /* ################################################################## */
     /**
@@ -253,6 +259,7 @@ struct NewLoginChart: View, RCVST_UsesData, RCVST_HapticHopper {
                 )
             }
         }
+        .onChange(of: dataWindow) { _selectedValue = nil }
         .onAppear { _chartDomain = _chartDomain ?? minimumDate...maximumDate }
         // These define the three items in the legend, as well as the colors we'll use in the bars.
         .chartForegroundStyleScale(["SLUG-NEW-LOGINS-LEGEND-LABEL".localizedVariant: .blue,

@@ -137,9 +137,9 @@ struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
                                         let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
                                         
                                         // No less than 1 day.
-                                        let newRange = max(86400, range * value.magnification * 1.2)
+                                        let newRange = max(86400, range * (1 / value.magnification) * 1.2)
                                         
-                                        _magnification = min(1.0, value.magnification * multiplier)
+                                        _magnification = min(1.0, (1 / value.magnification) * multiplier)
                                         
                                         let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
                                         let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
@@ -206,7 +206,13 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
     /**
      The value being selected by the user, while dragging.
      */
-    @State private var _selectedValue: RCVST_DataProvider.Row?
+    @State private var _selectedValue: RCVST_DataProvider.Row? {
+        didSet {
+            if nil == _selectedValue {
+                selectedValuesString = " "
+            }
+        }
+    }
 
     // MARK: External Bindings
 
@@ -373,6 +379,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                 )
             }
         }
+        .onChange(of: dataWindow) { _selectedValue = nil }
         .onAppear { _chartDomain = _chartDomain ?? minimumDate...maximumDate }
         .chartForegroundStyleScale(["SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant: .green,
                                     "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red

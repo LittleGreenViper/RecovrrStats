@@ -93,9 +93,9 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
                                     let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
                                     
                                     // No less than 1 day.
-                                    let newRange = max(86400, range * value.magnification * 1.2)
+                                    let newRange = max(86400, range * (1 / value.magnification) * 1.2)
                                     
-                                    _magnification = min(1.0, value.magnification * multiplier)
+                                    _magnification = min(1.0, (1 / value.magnification) * multiplier)
                                     
                                     let newStartDate = min(maximumDate, max(minimumDate, centerDate.addingTimeInterval(-newRange)))
                                     let newEndDate = max(minimumDate, min(maximumDate, centerDate.addingTimeInterval(newRange)))
@@ -107,7 +107,7 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
 
                     RCVST_ZoomControl(data: $data, dataWindow: $dataWindow, magnification: $_magnification)
                         .frame(
-                            maxWidth: inGeometry.size.width * 0.9,
+                            maxWidth: inGeometry.size.width * 0.95,
                             alignment: .bottom
                         )
                 }
@@ -148,7 +148,13 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
     /**
      The value being selected by the user, while dragging.
      */
-    @State private var _selectedValue: RCVST_DataProvider.RowUserPlottableData?
+    @State private var _selectedValue: RCVST_DataProvider.RowUserPlottableData? {
+        didSet {
+            if nil == _selectedValue {
+                selectedValuesString = " "
+            }
+        }
+    }
 
     // MARK: External Bindings
     /* ################################################################## */
@@ -248,6 +254,7 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
                 }
             }
         }
+        .onChange(of: dataWindow) { _selectedValue = nil }
         .onAppear {
             if Date.distantPast == dataWindow.lowerBound,
                Date.distantFuture == dataWindow.upperBound {

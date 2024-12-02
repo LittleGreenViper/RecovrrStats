@@ -93,9 +93,9 @@ struct RCVST_Chart2View: View, RCVST_UsesData {
                                     let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
                                     
                                     // No less than 1 day.
-                                    let newRange = max(86400, range * value.magnification * 1.2)
+                                    let newRange = max(86400, range * (1 / value.magnification) * 1.2)
                                     
-                                    _magnification = min(1.0, value.magnification * multiplier)
+                                    _magnification = min(1.0, (1 / value.magnification) * multiplier)
                                     
                                     let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
                                     let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
@@ -154,7 +154,13 @@ struct SignupActivityChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHoppe
     /**
      The value being selected by the user, while dragging.
      */
-    @State private var _selectedValue: RCVST_DataProvider.RowSignupPlottableData?
+    @State private var _selectedValue: RCVST_DataProvider.RowSignupPlottableData? {
+        didSet {
+            if nil == _selectedValue {
+                selectedValuesString = " "
+            }
+        }
+    }
 
     // MARK: External Bindings
 
@@ -255,6 +261,7 @@ struct SignupActivityChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHoppe
                 }
             }
         }
+        .onChange(of: dataWindow) { _selectedValue = nil }
         .onAppear { _chartDomain = _chartDomain ?? minimumDate...maximumDate }
         .chartForegroundStyleScale(["SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL".localizedVariant: .green,
                                     "SLUG-REJECTED-SIGNUP-LEGEND-LABEL".localizedVariant: .orange,
