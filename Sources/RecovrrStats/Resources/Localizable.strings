@@ -90,3 +90,4 @@
 "SLUG-BAR-CHART-NEW-LOGINS-LEGEND"          =   "New First-Time Logins";
 "SLUG-BAR-CHART-Y-AXIS-NEW-LOGINS-LABEL"    =   "New Logins";
 "SLUG-BAR-CHART-X-AXIS-NEW-LOGINS-LABEL"    =   "Date";
+"SLUG-SCROLLER-LABEL-FORMAT"                =   "%d Days";

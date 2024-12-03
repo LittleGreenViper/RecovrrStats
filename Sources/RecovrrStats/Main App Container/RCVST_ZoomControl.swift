@@ -19,6 +19,12 @@ struct RCVST_ZoomControl: View {
     
     /* ################################################################## */
     /**
+     This has the number of days that we will display in the text item.
+     */
+    @State private var _days: Int = 0
+    
+    /* ################################################################## */
+    /**
      This is set to true, while we are in the middle of a gesture.
      */
     @State private var _isPinching: Bool = false
@@ -54,10 +60,10 @@ struct RCVST_ZoomControl: View {
     var body: some View {
         ViewThatFits(in: .horizontal) {
             GeometryReader { inGeometry in
-                ViewThatFits {
-                    Rectangle( )
-                        .padding([.top, .bottom], 16)
-                        .background(Color.yellow)
+                ZStack {
+                    Rectangle()
+                        .padding([.top, .bottom], 12)
+                        .background(Color(red: 1, green: 1, blue: 0))
                         .frame(width: inGeometry.size.width * magnification, alignment: .leading)
                         .onChange(of: magnification) {
                             guard let minDateTemp = data?.allRows.first?.date,
@@ -76,6 +82,8 @@ struct RCVST_ZoomControl: View {
                             let totalDateRangeInSeconds = maxDateSeconds - minDateSeconds
                             let dateRangeInSeconds = dateRangeUpper - dateRangeLower
                             
+                            _days = Int(dateRangeInSeconds / 86400)
+
                             if dateRangeInSeconds < totalDateRangeInSeconds {
                                 let thumbSize = (inGeometry.size.width * magnification) / 2
                                 let centerInSeconds = ((dateRangeUpper + dateRangeLower) / 2) - minDateSeconds
@@ -139,11 +147,19 @@ struct RCVST_ZoomControl: View {
                                     }
                                 }
                         )
+                    Text(String(format: "SLUG-SCROLLER-LABEL-FORMAT".localizedVariant, _days))
+                        .allowsHitTesting(false)
+                        .scaledToFill()
+                        .minimumScaleFactor(0.5)
+                        .lineLimit(1)
+                        .foregroundColor(.black)
+                        .frame(height: inGeometry.size.height)
+                        .font(.system(size: inGeometry.size.height, weight: .bold))
                 }
             }
         }
-            .padding([.top, .bottom], 20)
-            .background(Color.blue)
+            .padding([.top, .bottom], 12)
+            .background(Color(red: 0.4, green: 0.7, blue: 1))
             .onAppear {
                 guard let minDateTemp = data?.allRows.first?.date,
                       let maxDateTemp = data?.allRows.last?.date
@@ -152,6 +168,7 @@ struct RCVST_ZoomControl: View {
                 let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
                 let maxDate = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
                 
+                _days = Int((maxDate.timeIntervalSinceReferenceDate - minDate.timeIntervalSinceReferenceDate) / 86400)
                 dataWindow = minDate...maxDate
             }
     }
