@@ -374,11 +374,13 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                     x: .value("SLUG-BAR-CHART-TYPES-X".localizedVariant, date, unit: .day),
                     y: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y".localizedVariant, active)
                 )
+                .cornerRadius(4)
                 .foregroundStyle(by: .value("SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant,
                                             _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : "SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant)
                 )
             }
         }
+        .clipped()
         .onChange(of: dataWindow) { _selectedValue = nil }
         .onAppear { _chartDomain = _chartDomain ?? minimumDate...maximumDate }
         .chartForegroundStyleScale(["SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant: .green,

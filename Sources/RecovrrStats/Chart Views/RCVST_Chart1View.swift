@@ -232,7 +232,7 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
         let minClip = minimumClipDate.addingTimeInterval(43200)
         let maxClip = maximumClipDate.addingTimeInterval(-43200)
         let clipRange = Swift.min(minClip, maxClip)...Swift.max(minClip, maxClip)
-        
+
         // We use this to set a fixed number of X-axis dates.
         let step = (maximumDate - minimumDate) / numberOfXValues
         // Set up an array of dates to use as values for the X-axis.
@@ -248,12 +248,14 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
                         x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date, unit: .day),
                         y: .value("SLUG-BAR-CHART-USER-TYPES-Y".localizedVariant, inUserTypeData.value)
                     )
+                    .cornerRadius(4)
                     .foregroundStyle(by: .value("SLUG-BAR-CHART-USER-TYPES-LEGEND".localizedVariant,
                                                 _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inUserTypeData.descriptionString)
                     )
                 }
             }
         }
+        .clipped()
         .onChange(of: dataWindow) { _selectedValue = nil }
         .onAppear {
             if Date.distantPast == dataWindow.lowerBound,

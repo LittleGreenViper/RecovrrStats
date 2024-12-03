@@ -254,11 +254,13 @@ struct NewLoginChart: View, RCVST_UsesData, RCVST_HapticHopper {
                     x: .value("SLUG-BAR-CHART-NEW-LOGINS-X".localizedVariant, inRowData.date, unit: .day),
                     y: .value("SLUG-BAR-CHART-NEW-LOGINS-Y".localizedVariant, inRowData.data)
                 )
+                .cornerRadius(4)
                 .foregroundStyle(by: .value("SLUG-BAR-CHART-NEW-LOGINS-LEGEND".localizedVariant,
                                             _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : "SLUG-NEW-LOGINS-LEGEND-LABEL".localizedVariant)
                 )
             }
         }
+        .clipped()
         .onChange(of: dataWindow) { _selectedValue = nil }
         .onAppear { _chartDomain = _chartDomain ?? minimumDate...maximumDate }
         // These define the three items in the legend, as well as the colors we'll use in the bars.
