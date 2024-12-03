@@ -311,55 +311,55 @@ public extension RCVST_DataProvider {
         /**
          The total number of users (both active and inactive), for the previous sample.
          */
-        private var _previousTotalUsers: Int { _previousRowData?[1] as? Int ?? 0 }
+        private var _previousTotalUsers: Int { _previousRowData?["total_users"] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The total number of new (inactive) users, for the previous sample.
          */
-        private var _previousNewUsers: Int { _previousRowData?[2] as? Int ?? 0 }
+        private var _previousNewUsers: Int { _previousRowData?["new_users"] as? Int ?? 0 }
+
+        /* ############################################################## */
+        /**
+         The current number of users (both active and new), for the previous sample.
+         */
+        private var _previousNeverSetLocation: Int { _previousRowData?["never_set_location"] as? Int ?? 0 }
+
+        /* ############################################################## */
+        /**
+         The cumulative total number of signup requests, for the previous sample.
+         */
+        private var _previousTotalRequests: Int { _previousRowData?["total_requests"] as? Int ?? 0 }
+
+        /* ############################################################## */
+        /**
+         The cumulative total number of signup requests approved by the administrators, for the previous sample.
+         */
+        private var _previousAcceptedRequests: Int { _previousRowData?["accepted_requests"] as? Int ?? 0 }
+
+        /* ############################################################## */
+        /**
+         The cumulative total number of signup requests rejected by the administrators, for the previous sample.
+         */
+        private var _previousRejectedRequests: Int { _previousRowData?["rejected_requests"] as? Int ?? 0 }
+
+        /* ############################################################## */
+        /**
+         The cumulative number of active users that have been deleted by the administrators, for the previous sample.
+         */
+        private var _previousDeletedActive: Int { _previousRowData?["deleted_active"] as? Int ?? 0 }
+
+        /* ############################################################## */
+        /**
+         The cumulative number of new users that have been deleted by the administrators, for the previous sample.
+         */
+        private var _previousDeletedInactive: Int { _previousRowData?["deleted_inactive"] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The total number of active users, for the previous sample.
          */
         private var _previousActiveUsers: Int { _previousTotalUsers - _previousNewUsers }
-
-        /* ############################################################## */
-        /**
-         The current number of users (both active and new), for the previous sample.
-         */
-        private var _previousNeverSetLocation: Int { _previousRowData?[3] as? Int ?? 0 }
-
-        /* ############################################################## */
-        /**
-         The cumulative total number of signup requests, for the previous sample.
-         */
-        private var _previousTotalRequests: Int { _previousRowData?[4] as? Int ?? 0 }
-
-        /* ############################################################## */
-        /**
-         The cumulative total number of signup requests approved by the administrators, for the previous sample.
-         */
-        private var _previousAcceptedRequests: Int { _previousRowData?[5] as? Int ?? 0 }
-
-        /* ############################################################## */
-        /**
-         The cumulative total number of signup requests rejected by the administrators, for the previous sample.
-         */
-        private var _previousRejectedRequests: Int { _previousRowData?[6] as? Int ?? 0 }
-
-        /* ############################################################## */
-        /**
-         The cumulative number of active users that have been deleted by the administrators, for the previous sample.
-         */
-        private var _previousDeletedActive: Int { _previousRowData?[13] as? Int ?? 0 }
-
-        /* ############################################################## */
-        /**
-         The cumulative number of new users that have been deleted by the administrators, for the previous sample.
-         */
-        private var _previousDeletedInactive: Int { _previousRowData?[14] as? Int ?? 0 }
 
         // MARK: Public Stored Properties
         
@@ -393,85 +393,85 @@ public extension RCVST_DataProvider {
         /**
          The total number of users (both active and inactive), at the time the sample was taken.
          */
-        public var totalUsers: Int { _rowData?[1] as? Int ?? 0 }
+        public var totalUsers: Int { _rowData?["total_users"] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The total number of new (inactive) users, at the time the sample was taken.
          */
-        public var newUsers: Int { _rowData?[2] as? Int ?? 0 }
+        public var newUsers: Int { _rowData?["new_users"] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The current number of users (both active and new), that have a nil location (never set one).
          */
-        public var neverSetLocation: Int { _rowData?[3] as? Int ?? 0 }
+        public var neverSetLocation: Int { _rowData?["never_set_location"] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The cumulative total number of signup requests.
          */
-        public var totalRequests: Int { _rowData?[4] as? Int ?? 0 }
+        public var totalRequests: Int { _rowData?["total_requests"] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The cumulative total number of signup requests approved by the administrators.
          */
-        public var acceptedRequests: Int { _rowData?[5] as? Int ?? 0 }
+        public var acceptedRequests: Int { _rowData?["accepted_requests"] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The cumulative total number of signup requests rejected by the administrators.
          */
-        public var rejectedRequests: Int { _rowData?[6] as? Int ?? 0 }
+        public var rejectedRequests: Int { _rowData?["rejected_requests"] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The current number of signup requests that have not been addressed by the administrators.
          */
-        public var openRequests: Int { _rowData?[7] as? Int ?? 0 }
+        public var openRequests: Int { _rowData?["open_requests"] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The current number of active (not new) users that have signed in, within the last 24 hours.
          */
-        public var activeInLast24Hours: Int { _rowData?[8] as? Int ?? 0 }
+        public var activeInLast24Hours: Int { _rowData?["active_1"] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The current number of active (not new) users that have signed in, within the last 7 days.
          */
-        public var activeInLastWeek: Int { _rowData?[9] as? Int ?? 0 }
+        public var activeInLastWeek: Int { _rowData?["active_7"] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The current number of active (not new) users that have signed in, within the last 30 days.
          */
-        public var activeInLast30Days: Int { _rowData?[10] as? Int ?? 0 }
+        public var activeInLast30Days: Int { _rowData?["active_30"] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The current number of active (not new) users that have signed in, within the last 90 days.
          */
-        public var activeInLast90Days: Int { _rowData?[11] as? Int ?? 0 }
+        public var activeInLast90Days: Int { _rowData?["active_90"] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The current simple average last activity period for all active users, in days.
          */
-        public var averageLastActiveInDays: Int { _rowData?[12] as? Int ?? 0 }
+        public var averageLastActiveInDays: Int { _rowData?["active_avg"] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The cumulative number of active users that have been deleted by the administrators.
          */
-        public var deletedActive: Int { _rowData?[13] as? Int ?? 0 }
+        public var deletedActive: Int { _rowData?["deleted_active"] as? Int ?? 0 }
 
         /* ############################################################## */
         /**
          The cumulative number of new users that have been deleted by the administrators.
          */
-        public var deletedInactive: Int { _rowData?[14] as? Int ?? 0 }
+        public var deletedInactive: Int { _rowData?["deleted_inactive"] as? Int ?? 0 }
 
         // MARK: Interpreted Data
 
@@ -533,7 +533,11 @@ public extension RCVST_DataProvider {
         /**
          The number of active users deleted by the administrators since the last sample.
          */
-        public var newDeletedActive: Int { deletedActive - _previousDeletedActive }
+        public var newDeletedActive: Int {
+            let deletedActive = deletedActive
+            let previousDeletedActive = _previousDeletedActive
+            return deletedActive - previousDeletedActive
+        }
 
         /* ############################################################## */
         /**
@@ -545,7 +549,11 @@ public extension RCVST_DataProvider {
         /**
          These are the number of users that deleted their own accounts, since the last sample.
          */
-        public var newSelfDeleted: Int { abs(Swift.max(0, newDeletedActive - changeInActiveUsers)) }
+        public var newSelfDeleted: Int {
+            let newDeletedActive = -newDeletedActive
+            let changeInActiveUsers = changeInActiveUsers
+            return abs(Swift.max(0, newDeletedActive - changeInActiveUsers))
+        }
 
         // MARK: RCVST_DataProvider_ElementHasDate Conformance
         
@@ -553,7 +561,7 @@ public extension RCVST_DataProvider {
         /**
          The date the sample was taken. If error, it will be .distantFuture
          */
-        public var date: Date { _rowData?[0] as? Date ?? .distantFuture }
+        public var date: Date { _rowData?["sample_date"] as? Date ?? .distantFuture }
     }
 }
 
