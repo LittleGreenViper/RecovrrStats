@@ -509,7 +509,7 @@ public extension RCVST_DataProvider {
         /**
          These are the number of users that logged into their accounts for the first time, since the last sample.
          */
-        public var newFirstTimeLogins: Int { Swift.max(0, newDeletedInactive - changeInNewUsers) }
+        public var newFirstTimeLogins: Int { Swift.max(0, changeInNewUsers - newDeletedInactive) }
 
         /* ############################################################## */
         /**
