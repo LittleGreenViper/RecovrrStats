@@ -3,6 +3,7 @@
 */
 
 import SwiftUI
+import CoreHaptics
 
 /* ###################################################################################################################################### */
 // MARK: - Pinch To Zoom Area -
@@ -10,7 +11,13 @@ import SwiftUI
 /**
  This is a control that integrates with the chart, and allows the user to pinch to magnify into the chart.
  */
-struct RCVST_ZoomControl: View {
+struct RCVST_ZoomControl: View, RCVST_HapticHopper {
+    /* ################################################################## */
+    /**
+     This is our haptic engine, used to provide feedback.
+     */
+    @State var hapticEngine: CHHapticEngine?
+
     /* ################################################################## */
     /**
      This contains the data window, at the start of the gesture.
@@ -158,7 +165,10 @@ struct RCVST_ZoomControl: View {
                 }
             }
         }
-            .onChange(of: dataWindow) { _days = Int((dataWindow.upperBound.timeIntervalSinceReferenceDate - dataWindow.lowerBound.timeIntervalSinceReferenceDate) / 86400) }
+            .onChange(of: dataWindow) {
+                _days = Int((dataWindow.upperBound.timeIntervalSinceReferenceDate - dataWindow.lowerBound.timeIntervalSinceReferenceDate) / 86400)
+                triggerHaptic(intensity: 0.25, sharpness: 0.5)
+            }
             .padding([.top, .bottom], 12)
             .background(Color(red: 0.4, green: 0.7, blue: 1))
             .onAppear {
@@ -170,6 +180,21 @@ struct RCVST_ZoomControl: View {
                 let maxDate = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
                 dataWindow = minDate...maxDate
                 _days = Int((maxDate.timeIntervalSinceReferenceDate - minDate.timeIntervalSinceReferenceDate) / 86400)
+                prepareHaptics()
             }
+    }
+
+    /* ################################################################## */
+    /**
+     This prepares our haptic engine.
+     */
+    func prepareHaptics() {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics,
+              let hapticEngineTemp = try? CHHapticEngine()
+        else { return }
+        
+        hapticEngine = hapticEngineTemp
+        
+        try? hapticEngine?.start()
     }
 }
