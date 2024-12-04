@@ -171,6 +171,7 @@ struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
                 }
             }
         }
+        .padding([.leading, .trailing], 12)
     }
 }
 

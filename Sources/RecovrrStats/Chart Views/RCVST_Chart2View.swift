@@ -120,6 +120,7 @@ struct RCVST_Chart2View: View, RCVST_UsesData {
                 alignment: .top
             )
         }
+        .padding([.leading, .trailing], 12)
     }
 }
 

@@ -82,7 +82,7 @@ struct RCVST_ZoomControl: View {
                             let totalDateRangeInSeconds = maxDateSeconds - minDateSeconds
                             let dateRangeInSeconds = dateRangeUpper - dateRangeLower
                             
-                            _days = Int((dateRangeInSeconds + 86399) / 86400)
+                            _days = Int((dateRangeInSeconds + 86399) / 86400) - 1
 
                             if dateRangeInSeconds < totalDateRangeInSeconds {
                                 let thumbSize = (inGeometry.size.width * magnification) / 2
@@ -158,6 +158,7 @@ struct RCVST_ZoomControl: View {
                 }
             }
         }
+            .onChange(of: dataWindow) { _days = Int((dataWindow.upperBound.timeIntervalSinceReferenceDate - dataWindow.lowerBound.timeIntervalSinceReferenceDate) / 86400) }
             .padding([.top, .bottom], 12)
             .background(Color(red: 0.4, green: 0.7, blue: 1))
             .onAppear {
@@ -167,9 +168,8 @@ struct RCVST_ZoomControl: View {
                 
                 let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
                 let maxDate = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
-                
-                _days = Int(((maxDate.timeIntervalSinceReferenceDate - minDate.timeIntervalSinceReferenceDate) + 86399) / 86400)
                 dataWindow = minDate...maxDate
+                _days = Int((maxDate.timeIntervalSinceReferenceDate - minDate.timeIntervalSinceReferenceDate) / 86400)
             }
     }
 }
