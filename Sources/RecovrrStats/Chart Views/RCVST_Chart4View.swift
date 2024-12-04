@@ -225,6 +225,33 @@ struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
      The segregated user type data.
      */
     private var _dataFiltered: [RCVST_DataProvider.RowDeletePlottableData] { data?.deleteTypePlottable ?? [] }
+    
+    /* ################################################################## */
+    /**
+     This returns the maximum possible Y-value, rounded up to the nearest ten.
+     */
+    private var _maximumYValue: Int {
+        let minimumClipDate = data?.allRows.first?.date ?? Date.now
+        let maximumClipDate = data?.allRows.last?.date ?? Date.now
+        let minClip = minimumClipDate.addingTimeInterval(43200)
+        let maxClip = maximumClipDate.addingTimeInterval(-43200)
+        let clipRange = Swift.min(minClip, maxClip)...Swift.max(minClip, maxClip)
+        
+        let ret = _dataFiltered.reduce(0) { current, next in
+            var ret = current
+            
+            if clipRange.contains(next.date) {
+                let count = next.data.reduce(0) { curr, next in curr + next.value }
+                ret = Swift.max(ret, Swift.max(ret, count))
+            }
+            
+            return ret
+        }
+        
+        let multiplier = 499 < ret ? 100 : 99 < ret ? 10 : 19 < ret ? 5 : 7 < ret ? 2 : 1
+
+        return ((ret + (multiplier - 1)) / multiplier) * multiplier
+    }
 
     /* ################################################################## */
     /**
@@ -272,8 +299,10 @@ struct DeleteChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                     "SLUG-DELETED-SELF-LEGEND-LABEL".localizedVariant: .yellow,
                                     "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
                                    ])
-        // We leave the Y-axis almost default, except that we want it on the left.
+        // We fix the Y-axis, because we want the scale to be the same, if we zoom in.
+        .chartYScale(domain: 0...Int(_maximumYValue))
         .chartYAxisLabel("SLUG-BAR-CHART-X-AXIS-DELETION-LABEL".localizedVariant, spacing: 12)
+        // We leave the Y-axis almost default, except that we want it on the left.
         .chartYAxis {
             AxisMarks(preset: .aligned, position: .leading) { _ in
                 AxisTick()

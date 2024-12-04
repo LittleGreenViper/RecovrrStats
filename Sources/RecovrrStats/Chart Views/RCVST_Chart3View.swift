@@ -344,6 +344,32 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
         
         return ret
     }
+    
+    /* ################################################################## */
+    /**
+     This returns the maximum possible Y-value, rounded up to the nearest ten.
+     */
+    private var _maximumYValue: Int {
+        let minimumClipDate = data?.allRows.first?.date ?? Date.now
+        let maximumClipDate = data?.allRows.last?.date ?? Date.now
+        let minClip = minimumClipDate.addingTimeInterval(43200)
+        let maxClip = maximumClipDate.addingTimeInterval(-43200)
+        let clipRange = Swift.min(minClip, maxClip)...Swift.max(minClip, maxClip)
+        
+        let ret = _dataFiltered.reduce(0) { current, next in
+            var ret = current
+            
+            if clipRange.contains(next.date) {
+                ret = Swift.max(ret, Swift.max(ret, _getDataValue(for: next)))
+            }
+            
+            return ret
+        }
+        
+        let multiplier = 499 < ret ? 100 : 99 < ret ? 10 : 19 < ret ? 5 : 7 < ret ? 2 : 1
+
+        return ((ret + (multiplier - 1)) / multiplier) * multiplier
+    }
 
     /* ################################################################## */
     /**
@@ -387,8 +413,10 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
         .chartForegroundStyleScale(["SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant: .green,
                                     "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
                                    ])
-        // We leave the Y-axis almost default, except that we want it on the left.
+        // We fix the Y-axis, because we want the scale to be the same, if we zoom in.
+        .chartYScale(domain: 0...Int(_maximumYValue))
         .chartYAxisLabel("SLUG-BAR-CHART-Y-AXIS-CHART-3-LABEL".localizedVariant, spacing: 12)
+        // We leave the Y-axis almost default, except that we want it on the left.
         .chartYAxis {
             AxisMarks(preset: .aligned, position: .leading) { _ in
                 AxisTick()
