@@ -15,6 +15,20 @@ import CoreHaptics
  It is selectable, and dragging your finger across the chart, shows exact numbers.
  */
 struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
+    // MARK: Private Properties
+    
+    /* ################################################################## */
+    /**
+     Tracks scene activity.
+     */
+    @Environment(\.scenePhase) private var _scenePhase
+
+    /* ################################################################## */
+    /**
+     This allows us to unwind the stack, when we go into the background.
+     */
+    @Environment(\.dismiss) private var _dismiss
+
     /* ################################################################## */
     /**
      This contains the data window, at the start of the gesture.
@@ -121,6 +135,12 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
             )
         }
         .padding([.leading, .trailing], 12)
+        // This makes sure that we go back, if the app is backgrounded.
+        .onChange(of: _scenePhase, initial: true) {
+            if .background == _scenePhase {
+                _dismiss()
+            }
+        }
    }
 }
 
@@ -133,12 +153,6 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
 struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
     // MARK: Private Properties
     
-    /* ################################################################## */
-    /**
-     Tracks scene activity.
-     */
-    @Environment(\.scenePhase) private var _scenePhase
-
     /* ################################################################## */
     /**
      True, if the user is dragging across the chart.
@@ -268,103 +282,100 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
         // Set up an array of strings to use as labels for the X-axis.
         let dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
                 
-        // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
-        Chart(_dataFiltered) { inRowData in
-            ForEach(inRowData.data, id: \.userType) { inUserTypeData in
-                if clipRange.contains(inRowData.date) {
-                    BarMark(
-                        x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date, unit: .day),
-                        y: .value("SLUG-BAR-CHART-USER-TYPES-Y".localizedVariant, inUserTypeData.value)
-                    )
-                    .cornerRadius(4)
-                    .foregroundStyle(by: .value("SLUG-BAR-CHART-USER-TYPES-LEGEND".localizedVariant,
-                                                _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inUserTypeData.descriptionString)
-                    )
+        GeometryReader { inGeometry in
+            // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
+            Chart(_dataFiltered) { inRowData in
+                ForEach(inRowData.data, id: \.userType) { inUserTypeData in
+                    if clipRange.contains(inRowData.date) {
+                        BarMark(
+                            x: .value("SLUG-BAR-CHART-USER-TYPES-X".localizedVariant, inRowData.date, unit: .day),
+                            y: .value("SLUG-BAR-CHART-USER-TYPES-Y".localizedVariant, inUserTypeData.value)
+                        )
+                        .cornerRadius(4)
+                        .foregroundStyle(by: .value("SLUG-BAR-CHART-USER-TYPES-LEGEND".localizedVariant,
+                                                    _isLineDragged(inRowData) ? "SLUG-SELECTED-LEGEND-LABEL".localizedVariant : inUserTypeData.descriptionString)
+                        )
+                    }
                 }
             }
-        }
-        .clipped()
-        .onChange(of: dataWindow) { _selectedValue = nil }
-        .onAppear {
-            if Date.distantPast == dataWindow.lowerBound,
-               Date.distantFuture == dataWindow.upperBound {
-                dataWindow = minimumDate...maximumDate
+            .clipped()
+            .onChange(of: dataWindow) { _selectedValue = nil }
+            .onAppear {
+                if Date.distantPast == dataWindow.lowerBound,
+                   Date.distantFuture == dataWindow.upperBound {
+                    dataWindow = minimumDate...maximumDate
+                }
             }
-        }
-        // These define the three items in the legend, as well as the colors we'll use in the bars.
-        .chartForegroundStyleScale(["SLUG-ACTIVE-LEGEND-LABEL".localizedVariant: .green,
-                                    "SLUG-NEW-LEGEND-LABEL".localizedVariant: .blue,
-                                    "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
-                                   ])
-        // We fix the Y-axis, because we want the scale to be the same, if we zoom in.
-        .chartYScale(domain: 0...Int(_maximumYValue))
-        .chartYAxisLabel("SLUG-BAR-CHART-Y-AXIS-LABEL".localizedVariant, spacing: 12)
-        // We leave the Y-axis almost default, except that we want it on the left.
-        .chartYAxis {
-            AxisMarks(preset: .aligned, position: .leading) { _ in
-                AxisTick()
-                AxisGridLine()
-                AxisValueLabel(anchor: .trailing)
+            // These define the three items in the legend, as well as the colors we'll use in the bars.
+            .chartForegroundStyleScale(["SLUG-ACTIVE-LEGEND-LABEL".localizedVariant: .green,
+                                        "SLUG-NEW-LEGEND-LABEL".localizedVariant: .blue,
+                                        "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
+                                       ])
+            // We fix the Y-axis, because we want the scale to be the same, if we zoom in.
+            .chartYScale(domain: 0...Int(_maximumYValue))
+            .chartYAxisLabel("SLUG-BAR-CHART-Y-AXIS-LABEL".localizedVariant, spacing: 12)
+            // We leave the Y-axis almost default, except that we want it on the left.
+            .chartYAxis {
+                AxisMarks(preset: .aligned, position: .leading) { _ in
+                    AxisTick()
+                    AxisGridLine()
+                    AxisValueLabel(anchor: .trailing)
+                }
             }
-        }
-        // We customize the X-axis, to only have a few sections.
-        .chartXScale(domain: dataWindow)
-        .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-LABEL".localizedVariant, alignment: .top)
-        .chartXAxis {
-            AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in
-                AxisTick(length: 8)
-                AxisGridLine()
-                AxisValueLabel(dateString[inValue.index])
+            // We customize the X-axis, to only have a few sections.
+            .chartXScale(domain: dataWindow)
+            .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-LABEL".localizedVariant, alignment: .top)
+            .chartXAxis {
+                AxisMarks(preset: .aligned, position: .bottom, values: dates) { inValue in
+                    AxisTick(length: 8)
+                    AxisGridLine()
+                    AxisValueLabel(dateString[inValue.index])
+                }
             }
-        }
-        // This mess is the finger tracker.
-        .chartOverlay { chart in
-            GeometryReader { inGeom in
-                Rectangle()
-                    .fill(Color.clear)
-                    .contentShape(Rectangle())
+            // This mess is the finger tracker.
+            .chartOverlay { chart in
+                GeometryReader { inGeom in
+                    Rectangle()
+                        .fill(Color.clear)
+                        .contentShape(Rectangle())
                     // This allows pinch-to-zoom (horizonatl axis).
-                    .gesture(
-                        DragGesture(minimumDistance: 0)
-                            .onChanged { value in
-                                let dateFormatter = DateFormatter()
-                                dateFormatter.dateStyle = .short
-                                dateFormatter.timeStyle = .none
-                                if let frame = chart.plotFrame {
-                                    let currentX = max(0, min(chart.plotSize.width, value.location.x - inGeom[frame].origin.x))
-                                    guard let date = chart.value(atX: currentX, as: Date.self) else { return }
-                                    if let newValue = _dataFiltered.nearestTo(date) {
-                                        selectedValuesString = String(format: "SLUG-USER-TYPES-DESC-STRING-FORMAT".localizedVariant,
-                                                                       dateFormatter.string(from: newValue.date),
-                                                                       newValue.data[0].value,
-                                                                       newValue.data[1].value,
-                                                                       newValue.data[0].value + newValue.data[1].value
-                                        )
-                                        if newValue.date != _selectedValue?.date {
-                                            triggerHaptic()
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let dateFormatter = DateFormatter()
+                                    dateFormatter.dateStyle = .short
+                                    dateFormatter.timeStyle = .none
+                                    if let frame = chart.plotFrame {
+                                        let currentX = max(0, min(chart.plotSize.width, value.location.x - inGeom[frame].origin.x))
+                                        guard let date = chart.value(atX: currentX, as: Date.self) else { return }
+                                        if let newValue = _dataFiltered.nearestTo(date) {
+                                            selectedValuesString = String(format: "SLUG-USER-TYPES-DESC-STRING-FORMAT".localizedVariant,
+                                                                          dateFormatter.string(from: newValue.date),
+                                                                          newValue.data[0].value,
+                                                                          newValue.data[1].value,
+                                                                          newValue.data[0].value + newValue.data[1].value
+                                            )
+                                            if newValue.date != _selectedValue?.date {
+                                                triggerHaptic()
+                                            }
+                                            _selectedValue = newValue
                                         }
-                                        _selectedValue = newValue
+                                        
+                                        _isDragging = true
                                     }
-                                    
-                                    _isDragging = true
                                 }
-                            }
-                            .onEnded { _ in
-                                triggerHaptic()
-                                _isDragging = false
-                                _selectedValue = nil
-                                selectedValuesString = " "
-                            }
-                    )
+                                .onEnded { _ in
+                                    triggerHaptic()
+                                    _isDragging = false
+                                    _selectedValue = nil
+                                    selectedValuesString = " "
+                                }
+                        )
+                }
             }
-        }
-        // This gives the last X axis label room to display.
-        .padding([.trailing], RCVST_App.sidePadding)
-        // This makes sure the haptics are set up, every time we are activated.
-        .onChange(of: _scenePhase, initial: true) {
-            if .active == _scenePhase {
-                prepareHaptics()
-            }
+            // This gives the last X axis label room to display.
+            .padding([.trailing], RCVST_App.sidePadding)
+            .onChange(of: inGeometry.frame(in: .global)) { prepareHaptics() }
         }
     }
 }

@@ -103,6 +103,20 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
                                 _position = inGeometry.frame(in: .local).midX
                             }
                         }
+                        // If the user rotates the device, or adjusts the split, we revert to total.
+                        .onChange(of: inGeometry.frame(in: .global)) {
+                            guard let minDateTemp = data?.allRows.first?.date,
+                                  let maxDateTemp = data?.allRows.last?.date
+                            else { return }
+                            
+                            let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
+                            let maxDate = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
+                            dataWindow = minDate...maxDate
+                            _days = Int((maxDate.timeIntervalSinceReferenceDate - minDate.timeIntervalSinceReferenceDate) / 86400)
+                            prepareHaptics()
+                            magnification = 1
+                            _position = inGeometry.frame(in: .local).midX
+                        }
                         .onAppear { _position = inGeometry.frame(in: .local).midX }
                         .position(x: _position, y: 0)
                         .gesture(
@@ -163,7 +177,7 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
                         .frame(height: inGeometry.size.height)
                         .font(.system(size: inGeometry.size.height, weight: .bold))
                 }
-            }
+           }
         }
             .onChange(of: dataWindow) {
                 _days = Int((dataWindow.upperBound.timeIntervalSinceReferenceDate - dataWindow.lowerBound.timeIntervalSinceReferenceDate) / 86400)
@@ -181,6 +195,7 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
                 dataWindow = minDate...maxDate
                 _days = Int((maxDate.timeIntervalSinceReferenceDate - minDate.timeIntervalSinceReferenceDate) / 86400)
                 prepareHaptics()
+                magnification = 1
             }
     }
 

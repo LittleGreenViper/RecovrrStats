@@ -15,6 +15,20 @@ import CoreHaptics
  It is selectable, and dragging your finger across the chart, shows exact numbers.
  */
 struct RCVST_Chart5View: RCVST_DataDisplay, RCVST_UsesData {
+    // MARK: Private Properties
+    
+    /* ################################################################## */
+    /**
+     Tracks scene activity.
+     */
+    @Environment(\.scenePhase) private var _scenePhase
+
+    /* ################################################################## */
+    /**
+     This allows us to unwind the stack, when we go into the background.
+     */
+    @Environment(\.dismiss) private var _dismiss
+
     /* ################################################################## */
     /**
      This contains the data window, at the start of the gesture.
@@ -121,6 +135,12 @@ struct RCVST_Chart5View: RCVST_DataDisplay, RCVST_UsesData {
             )
         }
         .padding([.leading, .trailing], 12)
+        // This makes sure that we go back, if the app is backgrounded.
+        .onChange(of: _scenePhase, initial: true) {
+            if .background == _scenePhase {
+                _dismiss()
+            }
+        }
     }
 }
 
@@ -132,12 +152,6 @@ struct RCVST_Chart5View: RCVST_DataDisplay, RCVST_UsesData {
  */
 struct NewLoginChart: View, RCVST_UsesData, RCVST_HapticHopper {
     // MARK: Private Properties
-
-    /* ################################################################## */
-    /**
-     Tracks scene activity.
-     */
-    @Environment(\.scenePhase) private var _scenePhase
 
     /* ################################################################## */
     /**
@@ -317,7 +331,7 @@ struct NewLoginChart: View, RCVST_UsesData, RCVST_HapticHopper {
         }
         // This mess is the finger tracker.
         .chartOverlay { chart in
-            GeometryReader { geometry in
+            GeometryReader { inGeometry in
                 Rectangle()
                     .fill(Color.clear)
                     .contentShape(Rectangle())
@@ -328,7 +342,7 @@ struct NewLoginChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                 dateFormatter.dateStyle = .short
                                 dateFormatter.timeStyle = .none
                                 if let frame = chart.plotFrame {
-                                    let currentX = max(0, min(chart.plotSize.width, value.location.x - geometry[frame].origin.x))
+                                    let currentX = max(0, min(chart.plotSize.width, value.location.x - inGeometry[frame].origin.x))
                                     guard let date = chart.value(atX: currentX, as: Date.self) else { return }
                                     if let newValue = _dataFiltered.nearestTo(date) {
                                         selectedValuesString = String(format: "SLUG-NEW-LOGINS-DESC-STRING-FORMAT".localizedVariant,
@@ -351,15 +365,10 @@ struct NewLoginChart: View, RCVST_UsesData, RCVST_HapticHopper {
                                 selectedValuesString = " "
                             }
                     )
+                    .onChange(of: inGeometry.frame(in: .global)) { prepareHaptics() }
             }
         }
         // This gives the last X axis label room to display.
         .padding([.trailing], RCVST_App.sidePadding)
-        // This makes sure the haptics are set up, every time we are activated.
-        .onChange(of: _scenePhase, initial: true) {
-            if .active == _scenePhase {
-                prepareHaptics()
-            }
-        }
     }
 }
