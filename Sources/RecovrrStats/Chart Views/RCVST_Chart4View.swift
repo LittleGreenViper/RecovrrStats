@@ -138,6 +138,7 @@ struct RCVST_Chart4View: RCVST_DataDisplay, RCVST_UsesData {
         // This makes sure that we go back, if the app is backgrounded.
         .onChange(of: _scenePhase, initial: true) {
             if .background == _scenePhase {
+                selectedValuesString = " "
                 _dismiss()
             }
         }
