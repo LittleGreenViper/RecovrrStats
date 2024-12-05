@@ -136,14 +136,12 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
         }
         .padding([.leading, .trailing], 12)
         // This makes sure that we go back, if the app is backgrounded.
-        .onChange(of: _scenePhase, initial: true) {
+        .onChange(of: _scenePhase, initial: false) {
             if .background == _scenePhase {
                 _dismiss()
             }
         }
-        .onDisappear {
-            selectedValuesString = " "
-        }
+        .onDisappear { selectedValuesString = " " }
    }
 }
 
@@ -238,7 +236,7 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
     
     /* ################################################################## */
     /**
-     This returns the maximum possible Y-value, rounded up to the nearest ten.
+     This returns the maximum possible Y-value, rounded up to the nearest multiple of 4.
      */
     private var _maximumYValue: Int {
         let minimumClipDate = data?.allRows.first?.date ?? Date.now
@@ -248,19 +246,17 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
         let clipRange = Swift.min(minClip, maxClip)...Swift.max(minClip, maxClip)
         
         let ret = _dataFiltered.reduce(0) { current, next in
-            var ret = current
+            var new = current
             
             if clipRange.contains(next.date) {
                 let count = next.data.reduce(0) { curr, next in curr + next.value }
-                ret = Swift.max(ret, Swift.max(ret, count))
+                new = Swift.max(new, count)
             }
             
-            return ret
+            return new
         }
-        
-        let multiplier = 499 < ret ? 100 : 99 < ret ? 10 : 19 < ret ? 5 : 7 < ret ? 2 : 1
 
-        return ((ret + (multiplier - 1)) / multiplier) * multiplier
+        return ((ret + 3) / 4) * 4
     }
 
     /* ################################################################## */
