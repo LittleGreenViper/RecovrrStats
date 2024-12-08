@@ -412,6 +412,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
         .clipped()
         .onChange(of: dataWindow) { _selectedValue = nil }
         .onAppear { _chartDomain = _chartDomain ?? minimumDate...maximumDate }
+        // These define the two items in the legend, as well as the colors we'll use in the bars.
         .chartForegroundStyleScale(["SLUG-BAR-CHART-ACTIVE-TYPES-Y-LEGEND".localizedVariant: .green,
                                     "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
                                    ])
@@ -443,6 +444,7 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                     .fill(Color.clear)
                     .contentShape(Rectangle())
                     .gesture(
+                        // This allows pinch-to-zoom (horizontal axis).
                         DragGesture(minimumDistance: 0)
                             .onChanged { value in
                                 let dateFormatter = DateFormatter()

@@ -533,11 +533,7 @@ public extension RCVST_DataProvider {
         /**
          The number of active users deleted by the administrators since the last sample.
          */
-        public var newDeletedActive: Int {
-            let deletedActive = deletedActive
-            let previousDeletedActive = _previousDeletedActive
-            return deletedActive - previousDeletedActive
-        }
+        public var newDeletedActive: Int { deletedActive - _previousDeletedActive }
 
         /* ############################################################## */
         /**
@@ -550,9 +546,8 @@ public extension RCVST_DataProvider {
          These are the number of users that deleted their own accounts, since the last sample.
          */
         public var newSelfDeleted: Int {
-            let newDeletedActive = -newDeletedActive
-            let changeInActiveUsers = changeInActiveUsers
-            return abs(Swift.max(0, newDeletedActive - changeInActiveUsers))
+            let newNegativeDeletedActive = -newDeletedActive
+            return abs(Swift.max(0, newNegativeDeletedActive - changeInActiveUsers))
         }
 
         // MARK: RCVST_DataProvider_ElementHasDate Conformance

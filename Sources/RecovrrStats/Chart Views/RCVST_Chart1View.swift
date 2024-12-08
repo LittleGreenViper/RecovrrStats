@@ -337,7 +337,7 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
                     Rectangle()
                         .fill(Color.clear)
                         .contentShape(Rectangle())
-                    // This allows pinch-to-zoom (horizonatl axis).
+                        // This allows pinch-to-zoom (horizontal axis).
                         .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in

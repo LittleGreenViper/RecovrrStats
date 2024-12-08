@@ -288,7 +288,7 @@ struct SignupActivityChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHoppe
         // Set up an array of strings to use as labels for the X-axis.
         let dateString = dates.map { $0.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)) }
         
-        // The main chart view. It is a simple bar chart, with each bar, segregated by user type.
+        // The main chart view. It is a simple bar chart, with each bar, segregated by signup resolution (accepted/rejected) type.
         Chart(_dataFiltered) { inRowData in
             ForEach(inRowData.data, id: \.signupType) { inSignupTypeData in
                 if clipRange.contains(inRowData.date) {
@@ -306,7 +306,8 @@ struct SignupActivityChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHoppe
         .clipped()
         .onChange(of: dataWindow) { _selectedValue = nil }
         .onAppear { _chartDomain = _chartDomain ?? minimumDate...maximumDate }
-        .chartForegroundStyleScale(["SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL".localizedVariant: .green,
+        // These define the three items in the legend, as well as the colors we'll use in the bars.
+        .chartForegroundStyleScale(["SLUG-ACCEPTED-SIGNUP-LEGEND-LABEL".localizedVariant: .blue,
                                     "SLUG-REJECTED-SIGNUP-LEGEND-LABEL".localizedVariant: .orange,
                                     "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
                                    ])
@@ -338,6 +339,7 @@ struct SignupActivityChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHoppe
                     .fill(Color.clear)
                     .contentShape(Rectangle())
                     .gesture(
+                        // This allows pinch-to-zoom (horizontal axis).
                         DragGesture(minimumDistance: 0)
                             .onChanged { value in
                                 let dateFormatter = DateFormatter()

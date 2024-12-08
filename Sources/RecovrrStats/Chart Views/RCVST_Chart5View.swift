@@ -303,8 +303,8 @@ struct NewLoginChart: View, RCVST_UsesData, RCVST_HapticHopper {
         .clipped()
         .onChange(of: dataWindow) { _selectedValue = nil }
         .onAppear { _chartDomain = _chartDomain ?? minimumDate...maximumDate }
-        // These define the three items in the legend, as well as the colors we'll use in the bars.
-        .chartForegroundStyleScale(["SLUG-NEW-LOGINS-LEGEND-LABEL".localizedVariant: .blue,
+        // These define the two items in the legend, as well as the colors we'll use in the bars.
+        .chartForegroundStyleScale(["SLUG-NEW-LOGINS-LEGEND-LABEL".localizedVariant: .green,
                                     "SLUG-SELECTED-LEGEND-LABEL".localizedVariant: .red
                                    ])
         // We fix the Y-axis, because we want the scale to be the same, if we zoom in.
@@ -335,6 +335,7 @@ struct NewLoginChart: View, RCVST_UsesData, RCVST_HapticHopper {
                     .fill(Color.clear)
                     .contentShape(Rectangle())
                     .gesture(
+                        // This allows pinch-to-zoom (horizontal axis).
                         DragGesture(minimumDistance: 0)
                             .onChanged { value in
                                 let dateFormatter = DateFormatter()
