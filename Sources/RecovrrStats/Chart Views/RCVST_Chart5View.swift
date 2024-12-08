@@ -45,6 +45,8 @@ struct RCVST_Chart5View: RCVST_DataDisplay, RCVST_UsesData {
     /**
      */
     @State private var _magnification: CGFloat = 1
+    
+    @State private var _total = 0
 
     /* ################################################################## */
     /**
@@ -124,6 +126,11 @@ struct RCVST_Chart5View: RCVST_DataDisplay, RCVST_UsesData {
                             maxWidth: inGeometry.size.width * 0.9,
                             alignment: .bottom
                         )
+                    
+                    Text(String(_total)).padding()
+                        .onAppear {
+                            _total += (data?.reduce(0, { current, next in current + next.newFirstTimeLogins }) ?? 0)
+                        }
                 }
             }
             .frame(

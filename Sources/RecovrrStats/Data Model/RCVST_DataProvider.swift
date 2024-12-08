@@ -509,7 +509,7 @@ public extension RCVST_DataProvider {
         /**
          These are the number of users that logged into their accounts for the first time, since the last sample.
          */
-        public var newFirstTimeLogins: Int { Swift.max(0, changeInNewUsers - newDeletedInactive) }
+        public var newFirstTimeLogins: Int { Swift.max(0, changeInActiveUsers - newDeletedActive) }
 
         /* ############################################################## */
         /**
@@ -1124,7 +1124,7 @@ public extension RCVST_DataProvider {
 /* ###################################################################################################################################### */
 public extension RCVST_DataProvider {
     /* ################################################################################################################################## */
-    // MARK: A Collection of Data Points For One Signup Types Sample.
+    // MARK: A Collection of Data Points For One First Time Login Sample.
     /* ################################################################################################################################## */
     /**
      This provides signup type totals for one date.
@@ -1174,9 +1174,7 @@ public extension RCVST_DataProvider {
         guard 1 < rows.count else { return ret }
 
         for index in stride(from: 1, to: rows.count, by: 2) {
-            let sample1 = rows[index - 1]
-            let sample2 = rows[index]
-            ret.append(RowFirstTimeLoginsPlottableData(date: sample2.date, data: sample1.newFirstTimeLogins + sample2.newFirstTimeLogins))
+            ret.append(RowFirstTimeLoginsPlottableData(date: rows[index].date, data: rows[index - 1].newFirstTimeLogins + rows[index].newFirstTimeLogins))
         }
         
         return ret
