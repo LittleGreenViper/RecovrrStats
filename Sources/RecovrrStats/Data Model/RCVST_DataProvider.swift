@@ -115,9 +115,15 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
      Upon initialization, we go out, and fetch the stats file.
      
      - parameter useMockData: If true (OPTIONAL -default is true), then we load mock data, instead of the actual file.
+     - parameter completion: A simple, no-parameter completion callback. This is always called in the main thread. It is optional.
      */
-    required init(useMockData inUseMockData: Bool = true) {
-        _fetchStats(useMockData: inUseMockData) { inResults in DispatchQueue.main.async { self.statusDataFrame = inResults } }
+    required init(useMockData inUseMockData: Bool = true, completion inCompletion: (() -> Void)? = nil) {
+        _fetchStats(useMockData: inUseMockData) { inResults in
+            DispatchQueue.main.async {
+                self.statusDataFrame = inResults
+                inCompletion?()
+            }
+        }
     }
 }
 

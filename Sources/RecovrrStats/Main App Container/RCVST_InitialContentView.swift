@@ -143,12 +143,35 @@ struct RootStackView: View {
      This has the data range we will be looking at.
      */
     @State private var _dataWindow = Date.distantPast...Date.distantFuture
+    
+    /* ################################################################## */
+    /**
+     The current (last sample) number of active users.
+     */
+    @State var latestActiveTotal: Int = 0
+    
+    /* ################################################################## */
+    /**
+     The current (last sample) number of inactive (new) users.
+     */
+    @State var latestInactiveTotal: Int = 0
 
     /* ################################################################## */
     /**
      The string that displays the data for the selected bar. Everything from here, on, will be bound to this.
      */
     @State private var _selectedValuesString: String = " "
+    
+    /* ################################################################## */
+    /**
+     */
+    func updateTotals() {
+        guard let latestAct = _data?.allRows.last?.activeUsers,
+              let latestInact = _data?.allRows.last?.newUsers
+        else { return }
+        latestActiveTotal = latestAct
+        latestInactiveTotal = latestInact
+    }
 
     /* ################################################################## */
     /**
@@ -161,7 +184,12 @@ struct RootStackView: View {
             .lineLimit(1)
             .font(.subheadline)
             .foregroundStyle(.red)
+        
         NavigationStack {
+            Text(String(format: "SLUG-MAIN-CURRENT-ACTIVE".localizedVariant, latestActiveTotal))
+                .foregroundColor(.green)
+            Text(String(format: "SLUG-MAIN-CURRENT-INACTIVE".localizedVariant, latestInactiveTotal))
+                .foregroundColor(.blue)
             List {
                 NavigationLink(Self._navigationNames[0]) { RCVST_Chart1View(title: Self._navigationNames[0], data: $_data, dataWindow: $_dataWindow, selectedValuesString: $_selectedValuesString) }
                 NavigationLink(Self._navigationNames[1]) { RCVST_Chart2View(title: Self._navigationNames[1], data: $_data, dataWindow: $_dataWindow, selectedValuesString: $_selectedValuesString) }
@@ -171,17 +199,18 @@ struct RootStackView: View {
             }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
             // Reacts to "pull to refresh," to reload the file.
-            .refreshable { _data = RCVST_DataProvider(useMockData: false) }
+            .refreshable { _data = RCVST_DataProvider(useMockData: false, completion: updateTotals) }
         }
-        .onAppear { _data = RCVST_DataProvider(useMockData: false) }
+        .onAppear { _data = RCVST_DataProvider(useMockData: false, completion: updateTotals) }
         // Forces updates, whenever we become active.
         .onChange(of: _scenePhase, initial: true) {
             if .active == _scenePhase,
                nil == _data {
-                _data = RCVST_DataProvider(useMockData: false)
+                _data = RCVST_DataProvider(useMockData: false, completion: updateTotals)
             } else if .background == _scenePhase {
                 _data = nil
             }
         }
+        Spacer()
     }
 }
