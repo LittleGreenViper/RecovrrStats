@@ -1,97 +1,105 @@
-Given a comma-separated-values file, with a fixed number of colums, and a variable number of rows, I would like some data analysis.
+File URL: https://recovrr.org/recovrr/log/stats.csv
 
 The file is a "snapshot" log of a system that has users logging in, and the snapshots are taken every 12 hours, at midnight (00:00:00), and noon (12:00:00).
 
-The system has a "gatekeeper" that approves signup requests. Unless a signup is approved, the user cannot log in, so there are the following basic states for users (or potential users) of the system:
-
-1) Open Signup Request
-
-A potential user has requested an account for the system, and a signup request has been added to the end of a queue. An administrator must either approve or reject the signup request.
-
-2) Approved Signup Request
-
-An administrator has approved a signup request. This means that a new user has been added to the system, and the request has been removed from the signup request queue.
-
-3) Rejected Signup Request
-
-An administrator has rejected a signup request. The request is removed from the signup request queue, and no new user is added to the system.
-
-4) New User
-
-This is a new user that has been created in response to an approved signup request. The user has not yet logged into the system.
-
-A new user has 30 days from approval, to log in. Otherwise, their account may be deleted by an administrator.
-
-5) Active User
-
-This is a user that has logged in. We keep track of their last login.
-
-An active user must log in once a year (or more frequently). Otherwise, their account may be deleted by an administrator.
-
 Users can have a location (long/lat), associated with their account. It is possible for them to not select a location. If they do have a location, it is possible for them to hide their location from other users.
-
-Active users can delete their accounts, which completely removes them from the system.
 
 All of our statistics are anonymized and aggregated. Every 12 hours, a new row is appended to the end of the CSV file.
 
+The system has a "gatekeeper" administrator, that reviews and approves (or rejects) signup requests.
+
+Unless a signup is approved, the user cannot log in, so there are the following basic states for users (or potential users) of the system:
+
+    1) Open Signup Request
+    
+        A potential user has requested an account for the system, and a signup request has been added to the end of a queue. An administrator must either approve or reject the signup request.
+    
+    2) Approved Signup Request
+    
+        An administrator has approved a signup request. This means that a new user has been added to the system, and the request has been removed from the signup request queue.
+    
+    3) Rejected Signup Request
+    
+        An administrator has rejected a signup request. The request is removed from the signup request queue, and no new user is added to the system.
+    
+    4) New User
+    
+        This is a new user that has been created in response to an approved signup request. The user has not yet logged into the system, but has been sent an email, with their login details.
+    
+        A new user has 30 days from approval, to log in. Otherwise, their account may be deleted by an administrator.
+    
+    5) Active User
+    
+        This is a user that has logged in at least once, after approval. We keep track of their last login.
+    
+        An active user must log in once a year (or more frequently). Otherwise, their account may be deleted by an administrator.
+    
+        Active users can delete their own accounts, which completely removes them from the system. We do not track these deletions, but they can be inferred, from the totals in the file.
+
 The column legend for the file is:
 
-sample_date
-
-This is the date the sample was taken, in UNIX Epoch Time (Seconds since 1970-01-01 00:00:00).
-
-total_users
-
-This is the current total of active and new users on the system. It does not include signup requests.
-
-new_users
-
-This is the current total of new users on the system. It does not include signup requests.
-
-never_set_location
-
-This is the current total of users (both active and new) that have never set a location.
-
-total_requests
-
-This is the total number of requests for signups (open, approved, or rejected). It is a cumulative total.
-
-accepted_requests
-
-This is the total number of requests for signups That have been approved by an administrator. It is a cumulative total.
-
-rejected_requests
-
-This is the total number of requests for signups That have been rejected by an administrator. It is a cumulative total.
-
-open_requests
-
-This is the current (non-cumulative) total of signup requests that exist on the signup request queue (have yet to be addressed by an administrator).
-
-active_1
-
-This is the total number of active users that have logged in at least once, within the last 24 hours.
-
-active_7
-
-This is the total number of active users that have logged in at least once, within the last 7 days.
-
-active_30
-
-This is the total number of active users that have logged in at least once, within the last 30 days.
-
-active_90
-
-This is the total number of active users that have logged in at least once, within the last 90 days.
-
-active_avg
-
-This is the average of time active users have allowed to elapse without logging in (in days).
-
-deleted_active
-
-This is the cumulative total of active users that have been explicitly deleted by an administrator.
-
-deleted_inactive
-
-This is the cumulative total of new users that have been explicitly deleted by an administrator.
+    sample_date
+    
+        This is the date the sample was taken, in UNIX Epoch Time (Seconds since 1970-01-01 00:00:00).
+    
+    total_users
+    
+        This is the current total of active and new users on the system. This does not include signup requests. It is a current (non-cumulative) total.
+    
+    new_users
+    
+        This is the current total of new users on the system. It is a current (non-cumulative) total.
+    
+        It does not include signup requests. New users have had their signup request approved, but have never logged in, since having it approved.
+    
+        NOTE: In order to calculate active users (users that have logged in, at least once), simply subtract new_users from total_users.
+    
+    never_set_location
+    
+        This is the current total of users (both active and new) that have never set a location. It is a current (non-cumulative) total.
+        
+        This is different from hiding their location. In this case, there is no location at all. 
+    
+    total_requests
+    
+        This is the total number of requests for signups (open, approved, or rejected). It is a cumulative total.
+    
+    accepted_requests
+    
+        This is the total number of requests for signups That have been approved by an administrator. It is a cumulative total.
+    
+    rejected_requests
+    
+        This is the total number of requests for signups That have been rejected by an administrator. It is a cumulative total.
+    
+    open_requests
+    
+        This is the current (non-cumulative) total of signup requests that exist on the signup request queue (have yet to be addressed by an administrator).
+    
+    active_1
+    
+        This is the total number of active users that have logged in at least once, within the last 24 hours.
+    
+    active_7
+    
+        This is the total number of active users that have logged in at least once, within the last 7 days.
+    
+    active_30
+    
+        This is the total number of active users that have logged in at least once, within the last 30 days.
+    
+    active_90
+    
+        This is the total number of active users that have logged in at least once, within the last 90 days.
+    
+    active_avg
+    
+        This is a simple average of the time since last login, for active users (in days).
+    
+    deleted_active
+    
+        This is the cumulative total of active users that have been explicitly deleted by an administrator.
+    
+    deleted_inactive
+    
+        This is the cumulative total of new users that have been explicitly deleted by an administrator.
