@@ -243,40 +243,79 @@ extension RCVST_DataProvider {
      - parameter completion: A simple completion proc, with a single argument of dataframe, containing the stats.
      */
     private func _fetchStats(useMockData inUseMockData: Bool, completion inCompletion: ((DataFrame?) -> Void)?) {
+        /* ############################################################## */
+        /**
+         Converts CSV data to a DataFrame.
+         
+         - parameter inData: The CSV data to be converted to a DataFrame
+         */
+        func handleCSVData(_ inData: Data) -> DataFrame? {
+            if var dataFrame = try? DataFrame(csvData: inData) {
+                // We convert the integer timestamp to a more usable Date instance.
+                dataFrame.transformColumn(_Columns.sample_date.rawValue) { (inUnixTime: Int) -> Date in Date(timeIntervalSince1970: TimeInterval(inUnixTime)) }
+                #if DEBUG
+                    print("Data Frame Successful Initialization")
+                #endif
+                return dataFrame
+            } else {
+                return nil
+            }
+        }
+        
         // We don't need to do this in the main thread.
         DispatchQueue.global().async {
             if inUseMockData,
-               let mockData = Self._g_mockData,
-               !mockData.isEmpty {
-                do {
-                    var dataFrame = try DataFrame(csvData: mockData)
-                    // We convert the integer timestamp to a more usable Date instance.
-                    dataFrame.transformColumn(_Columns.sample_date.rawValue) { (inUnixTime: Int) -> Date in Date(timeIntervalSince1970: TimeInterval(inUnixTime)) }
-                    #if DEBUG
-                        print("Data Frame Mock Data Successful Initialization")
-                    #endif
+               let data = Self._g_mockData,
+               !data.isEmpty {
+                #if DEBUG
+                    print("Loading Mock CSV Data")
+                #endif
+                if let dataFrame = handleCSVData(data) {
                     inCompletion?(dataFrame)
-                } catch {
+                } else {
                     #if DEBUG
-                        print("Data Frame Mock Data Initialization Error: \(error.localizedDescription)")
+                        print("Data Frame Failed Mock Initialization")
                     #endif
                     inCompletion?(nil)
                 }
             } else if let url = URL(string: Self._g_statsURLString) {
-                do {
-                    var dataFrame = try DataFrame(contentsOfCSVFile: url)
-                    // We convert the integer timestamp to a more usable Date instance.
-                    dataFrame.transformColumn(_Columns.sample_date.rawValue) { (inUnixTime: Int) -> Date in Date(timeIntervalSince1970: TimeInterval(inUnixTime)) }
-                    #if DEBUG
-                        print("Data Frame Successful Initialization")
-                    #endif
-                    inCompletion?(dataFrame)
-                } catch {
-                    #if DEBUG
-                        print("Data Frame Initialization Error: \(error.localizedDescription)")
-                    #endif
-                    inCompletion?(nil)
-                }
+                let urlRequest = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData)
+
+                #if DEBUG
+                    print("CSV URL Request: \(urlRequest.url?.absoluteString ?? "ERROR")")
+                #endif
+                
+                URLSession.shared.dataTask(with: urlRequest) { inData, inResponse, error in
+                    guard let response = inResponse as? HTTPURLResponse,
+                          let data = inData,
+                          nil == error,
+                          !data.isEmpty
+                    else {
+                        #if DEBUG
+                            print("Failed Initial Dataframe Setup")
+                        #endif
+                        inCompletion?(nil)
+                        return
+                    }
+                    
+                    switch response.statusCode {
+                    case 200..<300:
+                        if let dataFrame = handleCSVData(data) {
+                            inCompletion?(dataFrame)
+                        } else {
+                            #if DEBUG
+                                print("Data Frame Failed Initialization")
+                            #endif
+                            inCompletion?(nil)
+                        }
+
+                    default:
+                        #if DEBUG
+                            print("Data Frame Load Returned Status Code \(response.statusCode)")
+                        #endif
+                        inCompletion?(nil)
+                    }
+                }.resume()
             } else {
                 #if DEBUG
                     print("Unknown State. No Mock Data, No URL")
