@@ -126,6 +126,7 @@ struct RCVST_Chart1View: RCVST_DataDisplay, RCVST_UsesData {
                                 alignment: .bottom
                             )
                     }
+                    .padding([.leading, .trailing], 16)
                 }
                 .frame(
                     minWidth: inGeometry.size.width,
@@ -300,7 +301,6 @@ struct UserTypesChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
                     }
                 }
             }
-            .clipped()
             .onChange(of: dataWindow) { _selectedValue = nil }
             .onAppear {
                 if Date.distantPast == dataWindow.lowerBound,

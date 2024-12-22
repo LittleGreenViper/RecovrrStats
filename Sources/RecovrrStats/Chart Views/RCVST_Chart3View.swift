@@ -165,6 +165,7 @@ struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
                                 alignment: .bottom
                             )
                     }
+                    .padding([.leading, .trailing], 16)
                 }
                 .frame(
                     minWidth: inGeometry.size.width,
@@ -412,7 +413,6 @@ struct UserActivityChart: View, RCVST_UsesData, RCVST_HapticHopper {
                 )
             }
         }
-        .clipped()
         .onChange(of: dataWindow) { _selectedValue = nil }
         .onAppear { _chartDomain = _chartDomain ?? minimumDate...maximumDate }
         // These define the two items in the legend, as well as the colors we'll use in the bars.

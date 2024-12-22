@@ -126,6 +126,7 @@ struct RCVST_Chart2View: View, RCVST_UsesData {
                                 alignment: .bottom
                             )
                     }
+                    .padding([.leading, .trailing], 16)
                 }
                 .frame(
                     minWidth: inGeometry.size.width,
@@ -306,7 +307,6 @@ struct SignupActivityChart: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHoppe
                 }
             }
         }
-        .clipped()
         .onChange(of: dataWindow) { _selectedValue = nil }
         .onAppear { _chartDomain = _chartDomain ?? minimumDate...maximumDate }
         // These define the three items in the legend, as well as the colors we'll use in the bars.
