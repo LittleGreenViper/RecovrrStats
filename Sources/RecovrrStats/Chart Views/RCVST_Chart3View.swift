@@ -102,77 +102,80 @@ struct RCVST_Chart3View: RCVST_DataDisplay, RCVST_UsesData, RCVST_HapticHopper {
      */
     var body: some View {
         GeometryReader { inGeometry in
-            GroupBox(title) {
-                VStack(spacing: 8) {
-                    VStack {
-                        // This picker allows us to view the various activity ranges.
-                        Picker("Activity", selection: $_selectedActivityRange) {
-                            Text("1").tag(1)
-                            Text("7").tag(7)
-                            Text("30").tag(30)
-                            Text("90").tag(90)
-                            Text("SLUG-BAR-CHART-ACTIVE-TYPES-AVERAGE".localizedVariant).tag(0)
-                        }
-                        .pickerStyle(.segmented)
-                        .onChange(of: _selectedActivityRange) { triggerHaptic(intensity: 0.5, sharpness: 0.25) }
-                        
-                        UserActivityChart(data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString, selectedActivityRange: $_selectedActivityRange)
-                            .frame(
-                                minHeight: inGeometry.size.width,
-                                maxHeight: .infinity,
-                                alignment: .topLeading
-                            )
-                            .gesture(
-                                MagnifyGesture()
-                                    .onChanged { value in
-                                        guard let minimumClipDate = data?.allRows.first?.date,
-                                              let maximumClipDate = data?.allRows.last?.date
-                                        else { return }
-                                        
-                                        if !_isPinching {
-                                            _isPinching = true
-                                            _firstRange = dataWindow
+            ScrollView(.vertical) {
+                GroupBox(title) {
+                    VStack(spacing: 8) {
+                        VStack {
+                            // This picker allows us to view the various activity ranges.
+                            Picker("Activity", selection: $_selectedActivityRange) {
+                                Text("1").tag(1)
+                                Text("7").tag(7)
+                                Text("30").tag(30)
+                                Text("90").tag(90)
+                                Text("SLUG-BAR-CHART-ACTIVE-TYPES-AVERAGE".localizedVariant).tag(0)
+                            }
+                            .pickerStyle(.segmented)
+                            .onChange(of: _selectedActivityRange) { triggerHaptic(intensity: 0.5, sharpness: 0.25) }
+                            
+                            UserActivityChart(data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString, selectedActivityRange: $_selectedActivityRange)
+                                .frame(
+                                    minHeight: inGeometry.size.width,
+                                    maxHeight: .infinity,
+                                    alignment: .topLeading
+                                )
+                                .gesture(
+                                    MagnifyGesture()
+                                        .onChanged { value in
+                                            guard let minimumClipDate = data?.allRows.first?.date,
+                                                  let maximumClipDate = data?.allRows.last?.date
+                                            else { return }
+                                            
+                                            if !_isPinching {
+                                                _isPinching = true
+                                                _firstRange = dataWindow
+                                            }
+                                            
+                                            let minimumDate = minimumClipDate.addingTimeInterval(-43200)
+                                            let maximumDate = maximumClipDate.addingTimeInterval(43200)
+                                            let multiplier = CGFloat(_firstRange.upperBound.timeIntervalSinceReferenceDate - _firstRange.lowerBound.timeIntervalSinceReferenceDate) / (maximumDate.timeIntervalSinceReferenceDate - minimumDate.timeIntervalSinceReferenceDate)
+                                            
+                                            let range = (_firstRange.upperBound.timeIntervalSinceReferenceDate - _firstRange.lowerBound.timeIntervalSinceReferenceDate) / 2
+                                            let location = TimeInterval(value.startAnchor.x)
+                                            
+                                            let centerDateInSeconds = (location * (range * 2)) + _firstRange.lowerBound.timeIntervalSinceReferenceDate
+                                            let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
+                                            
+                                            // No less than 1 day.
+                                            let newRange = max(86400, range * (1 / value.magnification) * 1.2)
+                                            
+                                            _magnification = min(1.0, (1 / value.magnification) * multiplier)
+                                            
+                                            let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
+                                            let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
+                                            
+                                            dataWindow = newStartDate...newEndDate
                                         }
-                                        
-                                        let minimumDate = minimumClipDate.addingTimeInterval(-43200)
-                                        let maximumDate = maximumClipDate.addingTimeInterval(43200)
-                                        let multiplier = CGFloat(_firstRange.upperBound.timeIntervalSinceReferenceDate - _firstRange.lowerBound.timeIntervalSinceReferenceDate) / (maximumDate.timeIntervalSinceReferenceDate - minimumDate.timeIntervalSinceReferenceDate)
-                                        
-                                        let range = (_firstRange.upperBound.timeIntervalSinceReferenceDate - _firstRange.lowerBound.timeIntervalSinceReferenceDate) / 2
-                                        let location = TimeInterval(value.startAnchor.x)
-                                        
-                                        let centerDateInSeconds = (location * (range * 2)) + _firstRange.lowerBound.timeIntervalSinceReferenceDate
-                                        let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
-                                        
-                                        // No less than 1 day.
-                                        let newRange = max(86400, range * (1 / value.magnification) * 1.2)
-                                        
-                                        _magnification = min(1.0, (1 / value.magnification) * multiplier)
-                                        
-                                        let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
-                                        let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
-                                        
-                                        dataWindow = newStartDate...newEndDate
-                                    }
-                                    .onEnded { _ in _isPinching = false }
-                           )
+                                        .onEnded { _ in _isPinching = false }
+                                )
+                        }
+                        
+                        RCVST_ZoomControl(data: $data, dataWindow: $dataWindow, magnification: $_magnification)
+                            .frame(
+                                maxWidth: inGeometry.size.width * 0.9,
+                                alignment: .bottom
+                            )
                     }
-                    
-                    RCVST_ZoomControl(data: $data, dataWindow: $dataWindow, magnification: $_magnification)
-                        .frame(
-                            maxWidth: inGeometry.size.width * 0.9,
-                            alignment: .bottom
-                        )
                 }
+                .frame(
+                    minWidth: inGeometry.size.width,
+                    maxWidth: inGeometry.size.width,
+                    minHeight: inGeometry.size.width,
+                    maxHeight: inGeometry.size.width,
+                    alignment: .top
+                )
+                .onChange(of: inGeometry.frame(in: .global)) { prepareHaptics() }
             }
-            .frame(
-                minWidth: inGeometry.size.width,
-                maxWidth: inGeometry.size.width,
-                minHeight: inGeometry.size.width,
-                maxHeight: inGeometry.size.width,
-                alignment: .top
-            )
-            .onChange(of: inGeometry.frame(in: .global)) { prepareHaptics() }
+            .defaultScrollAnchor(.top)
         }
         .padding([.leading, .trailing], 12)
         // This makes sure that we go back, if the app is backgrounded.

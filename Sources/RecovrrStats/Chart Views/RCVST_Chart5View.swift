@@ -76,63 +76,66 @@ struct RCVST_Chart5View: RCVST_DataDisplay, RCVST_UsesData {
      */
     var body: some View {
         GeometryReader { inGeometry in
-            GroupBox(title) {
-                VStack(spacing: 8) {
-                    NewLoginChart(data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString)
-                        .frame(
-                            minHeight: inGeometry.size.width,
-                            maxHeight: .infinity,
-                            alignment: .topLeading
-                        )
-                        .gesture(
-                            MagnifyGesture()
-                                .onChanged { value in
-                                    guard let minimumClipDate = data?.allRows.first?.date,
-                                          let maximumClipDate = data?.allRows.last?.date
-                                    else { return }
-                                    
-                                    if !_isPinching {
-                                        _isPinching = true
-                                        _firstRange = dataWindow
+            ScrollView(.vertical) {
+                GroupBox(title) {
+                    VStack(spacing: 8) {
+                        NewLoginChart(data: $data, dataWindow: $dataWindow, selectedValuesString: $selectedValuesString)
+                            .frame(
+                                minHeight: inGeometry.size.width,
+                                maxHeight: .infinity,
+                                alignment: .topLeading
+                            )
+                            .gesture(
+                                MagnifyGesture()
+                                    .onChanged { value in
+                                        guard let minimumClipDate = data?.allRows.first?.date,
+                                              let maximumClipDate = data?.allRows.last?.date
+                                        else { return }
+                                        
+                                        if !_isPinching {
+                                            _isPinching = true
+                                            _firstRange = dataWindow
+                                        }
+                                        
+                                        let minimumDate = minimumClipDate.addingTimeInterval(-43200)
+                                        let maximumDate = maximumClipDate.addingTimeInterval(43200)
+                                        let multiplier = CGFloat(_firstRange.upperBound.timeIntervalSinceReferenceDate - _firstRange.lowerBound.timeIntervalSinceReferenceDate) / (maximumDate.timeIntervalSinceReferenceDate - minimumDate.timeIntervalSinceReferenceDate)
+                                        
+                                        let range = (_firstRange.upperBound.timeIntervalSinceReferenceDate - _firstRange.lowerBound.timeIntervalSinceReferenceDate) / 2
+                                        let location = TimeInterval(value.startAnchor.x)
+                                        
+                                        let centerDateInSeconds = (location * (range * 2)) + _firstRange.lowerBound.timeIntervalSinceReferenceDate
+                                        let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
+                                        
+                                        // No less than 1 day.
+                                        let newRange = max(86400, range * (1 / value.magnification) * 1.2)
+                                        
+                                        _magnification = min(1.0, (1 / value.magnification) * multiplier)
+                                        
+                                        let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
+                                        let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
+                                        
+                                        dataWindow = newStartDate...newEndDate
                                     }
-                                    
-                                    let minimumDate = minimumClipDate.addingTimeInterval(-43200)
-                                    let maximumDate = maximumClipDate.addingTimeInterval(43200)
-                                    let multiplier = CGFloat(_firstRange.upperBound.timeIntervalSinceReferenceDate - _firstRange.lowerBound.timeIntervalSinceReferenceDate) / (maximumDate.timeIntervalSinceReferenceDate - minimumDate.timeIntervalSinceReferenceDate)
-                                    
-                                    let range = (_firstRange.upperBound.timeIntervalSinceReferenceDate - _firstRange.lowerBound.timeIntervalSinceReferenceDate) / 2
-                                    let location = TimeInterval(value.startAnchor.x)
-                                    
-                                    let centerDateInSeconds = (location * (range * 2)) + _firstRange.lowerBound.timeIntervalSinceReferenceDate
-                                    let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
-                                    
-                                    // No less than 1 day.
-                                    let newRange = max(86400, range * (1 / value.magnification) * 1.2)
-                                    
-                                    _magnification = min(1.0, (1 / value.magnification) * multiplier)
-                                    
-                                    let newStartDate = Swift.min(maximumDate, Swift.max(minimumDate, centerDate.addingTimeInterval(-newRange)))
-                                    let newEndDate = Swift.max(minimumDate, Swift.min(maximumDate, centerDate.addingTimeInterval(newRange)))
-                                    
-                                    dataWindow = newStartDate...newEndDate
-                                }
-                                .onEnded { _ in _isPinching = false }
-                       )
-
-                    RCVST_ZoomControl(data: $data, dataWindow: $dataWindow, magnification: $_magnification)
-                        .frame(
-                            maxWidth: inGeometry.size.width * 0.9,
-                            alignment: .bottom
-                        )
+                                    .onEnded { _ in _isPinching = false }
+                            )
+                        
+                        RCVST_ZoomControl(data: $data, dataWindow: $dataWindow, magnification: $_magnification)
+                            .frame(
+                                maxWidth: inGeometry.size.width * 0.9,
+                                alignment: .bottom
+                            )
+                    }
                 }
+                .frame(
+                    minWidth: inGeometry.size.width,
+                    maxWidth: inGeometry.size.width,
+                    minHeight: inGeometry.size.width,
+                    maxHeight: inGeometry.size.width,
+                    alignment: .topLeading
+                )
             }
-            .frame(
-                minWidth: inGeometry.size.width,
-                maxWidth: inGeometry.size.width,
-                minHeight: inGeometry.size.width,
-                maxHeight: inGeometry.size.width,
-                alignment: .topLeading
-            )
+            .defaultScrollAnchor(.top)
         }
         .padding([.leading, .trailing], 12)
         // This makes sure that we go back, if the app is backgrounded.
