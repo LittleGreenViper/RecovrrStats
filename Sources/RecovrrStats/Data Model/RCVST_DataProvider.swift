@@ -7,7 +7,7 @@ import TabularData
 import RVS_Generic_Swift_Toolbox
 
 /* ##################################################### */
-// MARK: One Row Of Data
+// MARK: - One Row Of Data -
 /* ##################################################### */
 /**
  This interprets the untyped DataFrame Row data into data that we find useful.
@@ -27,7 +27,7 @@ public class RCVST_Row: Identifiable, Equatable {
         /**
          This is used to indicate the type of user.
          */
-        fileprivate enum _UserTypes {
+        fileprivate enum UserTypes {
             /* ######################################### */
             /**
              The total number of "new" users (users that have never logged in).
@@ -99,7 +99,7 @@ public class RCVST_Row: Identifiable, Equatable {
         /**
          (Stored Property) This defines the user type this data is representing.
          */
-        fileprivate let _userType: _UserTypes
+        fileprivate let _userType: UserTypes
         
         // MARK: Public API
         
@@ -174,17 +174,17 @@ public class RCVST_Row: Identifiable, Equatable {
     
     /* ################################################# */
     /**
-     (File private Computed Property) The total number of users (both types).
+     (Computed Property) The total number of users (both types).
      */
-    fileprivate var _rowTotalUsers: Int { _totalUsers }
+    var _rowTotalUsers: Int { _totalUsers }
 
     /* ################################################# */
     /**
-     File private initializer
+     initializer
      
      - parameter dataRow: The `DataFrame.Row` for the line we're saving.
      */
-    fileprivate init(dataRow inDataRow: DataFrame.Row) {
+    init(dataRow inDataRow: DataFrame.Row) {
         _dataRow = inDataRow
     }
 
@@ -231,6 +231,11 @@ public class RCVST_Row: Identifiable, Equatable {
     public static func == (lhs: RCVST_Row, rhs: RCVST_Row) -> Bool { lhs.sampleDate == rhs.sampleDate }
 }
 
+/* ##################################################### */
+// MARK: - Protocol For Sending Data to the Charts -
+/* ##################################################### */
+/**
+ */
 protocol DataProviderProtocol {
     /* ##################################################### */
     /**
@@ -257,7 +262,27 @@ protocol DataProviderProtocol {
      This contains an explicit sub-range of the entire data X-axis range. If in error, an empty range is returned. Default means use ``totalDateRange``.
      */
     var currentDataWindowRange: ClosedRange<Date> { get set }
+
+    /* ##################################################### */
+    /**
+     (Computed Property) This provides a legend for the chart.
+     
+     The order of elements is first -> left (active users), last -> right (new users).
+     */
+    var legend: KeyValuePairs<String, Color> { get }
+
+    /* ##################################################### */
+    /**
+     This provides the data frame rows as an array of our own ``Row`` struct, but filtered for the window date range.
+     */
+    var windowedRows: [RCVST_Row] { get }
     
+    /* ##################################################### */
+    /**
+     This is the maximum of users.
+     */
+    var maxUsers: Int { get }
+
     /* ##################################################### */
     /**
      This is a utility function, for extracting discrete user count steps from a user maximum value range. It will "pad" the gridlines to round numbers, depending on the level of the maximum value.
@@ -279,8 +304,43 @@ protocol DataProviderProtocol {
      - returns: An array of `Date` instances, each representing one day. Each date will be at noon. There will be a maximum of `numberOfValues` dates, but there could be less.
      */
     func xAxisDateValues(numberOfValues: Int) -> [Date]
+    
+    /* ##################################################### */
+    /**
+     This will allow you to set the selection of a row, at the given index.
+     
+     > NOTE: The index is in terms of ``totalDateRange``.
+     
+     - parameter inIndex: The 0-based index (in terms of ``totalDateRange``) of the row to be affected.
+     - parameter isSelected: Optional (default is true) state for the new selection (set to false, to deselect a row).
+     
+     - returns: The previous state of the row.
+     */
+    @discardableResult
+    mutating func selectRow(_: Int, isSelected: Bool) -> Bool
+    
+    /* ##################################################### */
+    /**
+     This will allow you to set the selection of a a row, given a copy of the row.
+     
+     - parameter inRow: The row to be selected.
+     - parameter isSelected: Optional (default is true) state for the new selection (set to false, to deselect a row).
+
+     - returns: The previous state of the row.
+     */
+    @discardableResult
+    mutating func selectRow(_: RCVST_Row, isSelected: Bool) -> Bool
+    
+    /* ##################################################### */
+    /**
+     This removes selection from all rows.
+     */
+    mutating func deselectAllRows()
 }
 
+/* ##################################################### */
+// MARK: Defaults For Properties
+/* ##################################################### */
 extension DataProviderProtocol {
     /* ##################################################### */
     /**
@@ -340,10 +400,10 @@ extension DataProviderProtocol {
      The order of elements is first -> left (active users), last -> right (new users).
      */
     var legend: KeyValuePairs<String, Color> {
-        KeyValuePairs<String, Color>(dictionaryLiteral: (description: RCVST_Row.PlottableUserTypes._UserTypes.activeUsers(isSelected: false, numberOfActiveUsers: 0).description,
-                                                         color: RCVST_Row.PlottableUserTypes._UserTypes.activeUsers(isSelected: false, numberOfActiveUsers: 0).color),
-                                                        (description: RCVST_Row.PlottableUserTypes._UserTypes.newUsers(isSelected: false, numberOfNewUsers: 0).description,
-                                                         color: RCVST_Row.PlottableUserTypes._UserTypes.newUsers(isSelected: false, numberOfNewUsers: 0).color),
+        KeyValuePairs<String, Color>(dictionaryLiteral: (description: RCVST_Row.PlottableUserTypes.UserTypes.activeUsers(isSelected: false, numberOfActiveUsers: 0).description,
+                                                         color: RCVST_Row.PlottableUserTypes.UserTypes.activeUsers(isSelected: false, numberOfActiveUsers: 0).color),
+                                                        (description: RCVST_Row.PlottableUserTypes.UserTypes.newUsers(isSelected: false, numberOfNewUsers: 0).description,
+                                                         color: RCVST_Row.PlottableUserTypes.UserTypes.newUsers(isSelected: false, numberOfNewUsers: 0).color),
                                                         (description: RCVST_Row.PlottableUserTypes.selectedDescription,
                                                          color: RCVST_Row.PlottableUserTypes.selectedColor)
         )
@@ -353,9 +413,12 @@ extension DataProviderProtocol {
     /**
      (Computed Property) This is the maximum of users.
      */
-    var maxUsers: Int { rows.reduce(0) { max($0, $1._rowTotalUsers) } }
+    var maxUsers: Int { 0 }
 }
 
+/* ##################################################### */
+// MARK: Defaults For Non-Mutating Functions
+/* ##################################################### */
 extension DataProviderProtocol {
     /* ##################################################### */
     /**
@@ -426,6 +489,119 @@ extension DataProviderProtocol {
         ret.append(last)    // This makes sure we have the last value.
         
         return ret
+    }
+}
+
+/* ##################################################### */
+// MARK: Defaults For Mutating Functions
+/* ##################################################### */
+extension DataProviderProtocol {
+    /* ##################################################### */
+    /**
+     */
+    @discardableResult
+    mutating func selectRow(_ inIndex: Int, isSelected inIsSelected: Bool = true) -> Bool {
+        precondition((0..<rows.count).contains(inIndex), "Index out of bounds")
+        
+        let ret = rows[inIndex].isSelected
+        
+        deselectAllRows()
+        // If we are selecting a row, we make sure to deselect all others. As Connor MacLeod would say, "There can only be one."
+        
+        rows[inIndex].isSelected = inIsSelected
+        
+        return ret
+    }
+    
+    /* ##################################################### */
+    /**
+     */
+    @discardableResult
+    mutating func selectRow(_ inRow: RCVST_Row, isSelected inIsSelected: Bool = true) -> Bool {
+        guard let index = rows.firstIndex(where: { $0 == inRow }) else { return false }
+        return selectRow(index, isSelected: inIsSelected)
+    }
+    
+    /* ##################################################### */
+    /**
+     */
+    mutating func deselectAllRows() {
+        for row in rows.enumerated() { rows[row.offset].isSelected = false }
+    }
+}
+
+/* ##################################################### */
+// MARK: - Array Extension For Arrays of Rows -
+/* ##################################################### */
+extension Array where Element == RCVST_Row {
+    /* ################################################################## */
+    /**
+     This returns the sample closest to the given date.
+     
+     - parameter inDate: The date we want to compare against.
+     
+     - returns: The sample that is closest to (above or below) the given date.
+     */
+    func nearestTo(_ inDate: Date) -> Element? {
+        var ret: Element?
+        
+        forEach {
+            if let compDate = ret?.sampleDate {
+                ret = abs($0.sampleDate.timeIntervalSince(inDate)) < abs(compDate.timeIntervalSince(inDate)) ? $0 : ret
+            } else {
+                ret = $0
+            }
+        }
+        
+        return ret
+    }
+}
+
+/* ##################################################### */
+// MARK: - Main Data Model Struct -
+/* ##################################################### */
+/**
+ 
+ */
+public struct RCVST_DataProvider_Instance: DataProviderProtocol {
+    /* ##################################################### */
+    /**
+     */
+    var rows: [RCVST_Row]
+    
+    /* ##################################################### */
+    /**
+     */
+    var dataWindowRange: ClosedRange<Date> = .distantPast ... .distantPast
+
+    /* ##################################################### */
+    /**
+     Public Default initializer
+     
+     It just loads the DataFrame with the dummy data.
+     */
+    init(with inCSVData: String) {
+        /* ################################################# */
+        /**
+         Converts the dummy CSV data to a `DataFrame`. Nil, if there was an error.
+         */
+        func convertCSVData() -> DataFrame? {
+            if let data = inCSVData.data(using: .utf8),
+               var dataFrame = try? DataFrame(csvData: data) {
+                // We convert the integer timestamp to a more usable Date instance.
+                dataFrame.transformColumn("sample_date") { (inUnixTime: Int) -> Date in Date(timeIntervalSince1970: TimeInterval(inUnixTime)) }
+                return dataFrame
+            } else {
+                return nil
+            }
+        }
+        
+        rows = convertCSVData()?.rows.map { RCVST_Row(dataRow: $0) } ?? []
+        
+        if let lowerBound = rows.first?.sampleDate,
+           let upperBound = rows.last?.sampleDate {
+            dataWindowRange = Calendar.current.startOfDay(for: lowerBound) ... Calendar.current.startOfDay(for: upperBound)
+        }
     }
 }
 

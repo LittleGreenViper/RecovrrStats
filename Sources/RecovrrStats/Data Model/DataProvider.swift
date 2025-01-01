@@ -30,7 +30,7 @@ import TabularData    // For ``DataFrame``
  
  > NOTE: This is not meant to be a demonstration of efficient data handling. It's a small dataset, and this just makes it easy to access.
  */
-public struct DataProvider {
+public struct DataProvider: DataProviderProtocol {
     // MARK: Private Property
     
     /* ##################################################### */
@@ -157,7 +157,7 @@ sample_date,total_users,new_users
             /**
              This is used to indicate the type of user.
              */
-            fileprivate enum _UserTypes {
+            enum UserTypes {
                 /* ######################################### */
                 /**
                  The total number of "new" users (users that have never logged in).
@@ -229,7 +229,7 @@ sample_date,total_users,new_users
             /**
              (Stored Property) This defines the user type this data is representing.
              */
-            fileprivate let _userType: _UserTypes
+            fileprivate let _userType: UserTypes
             
             // MARK: Public API
             
@@ -306,7 +306,7 @@ sample_date,total_users,new_users
         /**
          (File private Computed Property) The total number of users (both types).
          */
-        fileprivate var _rowTotalUsers: Int { _totalUsers }
+        var _rowTotalUsers: Int { _totalUsers }
 
         /* ################################################# */
         /**
@@ -365,7 +365,7 @@ sample_date,total_users,new_users
     /**
      (Stored Property) This provides the data frame rows as an array of our own ``Row`` struct.
      */
-    public var rows: [Row]
+    public var rows: [RCVST_Row]
 
     /* ##################################################### */
     /**
@@ -389,7 +389,7 @@ sample_date,total_users,new_users
             }
         }
         
-        rows = convertCSVData()?.rows.map { Row(dataRow: $0) } ?? []
+        rows = convertCSVData()?.rows.map { RCVST_Row(dataRow: $0) } ?? []
         
         if let lowerBound = rows.first?.sampleDate,
            let upperBound = rows.last?.sampleDate {
@@ -406,7 +406,7 @@ public extension DataProvider {
     /**
      (Computed Property) This provides the data frame rows as an array of our own ``Row`` struct, but filtered for the window date range.
      */
-    var windowedRows: [Row] { rows.filter { dataWindowRange.contains(Calendar.current.startOfDay(for: $0.sampleDate)) } }
+    var windowedRows: [RCVST_Row] { rows.filter { dataWindowRange.contains(Calendar.current.startOfDay(for: $0.sampleDate)) } }
     
     /* ##################################################### */
     /**
@@ -414,7 +414,7 @@ public extension DataProvider {
      
      > NOTE: This may return rows not in the window.
      */
-    var selectedRow: Row? { rows.first(where: { $0.isSelected }) }
+    var selectedRow: RCVST_Row? { rows.first(where: { $0.isSelected }) }
 
     /* ##################################################### */
     /**
@@ -460,10 +460,10 @@ public extension DataProvider {
      The order of elements is first -> left (active users), last -> right (new users).
      */
     var legend: KeyValuePairs<String, Color> {
-        KeyValuePairs<String, Color>(dictionaryLiteral: (description: Row.PlottableUserTypes._UserTypes.activeUsers(isSelected: false, numberOfActiveUsers: 0).description,
-                                                         color: Row.PlottableUserTypes._UserTypes.activeUsers(isSelected: false, numberOfActiveUsers: 0).color),
-                                                        (description: Row.PlottableUserTypes._UserTypes.newUsers(isSelected: false, numberOfNewUsers: 0).description,
-                                                         color: Row.PlottableUserTypes._UserTypes.newUsers(isSelected: false, numberOfNewUsers: 0).color),
+        KeyValuePairs<String, Color>(dictionaryLiteral: (description: Row.PlottableUserTypes.UserTypes.activeUsers(isSelected: false, numberOfActiveUsers: 0).description,
+                                                         color: Row.PlottableUserTypes.UserTypes.activeUsers(isSelected: false, numberOfActiveUsers: 0).color),
+                                                        (description: Row.PlottableUserTypes.UserTypes.newUsers(isSelected: false, numberOfNewUsers: 0).description,
+                                                         color: Row.PlottableUserTypes.UserTypes.newUsers(isSelected: false, numberOfNewUsers: 0).color),
                                                         (description: Row.PlottableUserTypes.selectedDescription,
                                                          color: Row.PlottableUserTypes.selectedColor)
         )
@@ -603,7 +603,7 @@ public extension DataProvider {
      - returns: The previous state of the row.
      */
     @discardableResult
-    mutating func selectRow(_ inRow: Row, isSelected inIsSelected: Bool = true) -> Bool {
+    mutating func selectRow(_ inRow: RCVST_Row, isSelected inIsSelected: Bool = true) -> Bool {
         guard let index = rows.firstIndex(where: { $0 == inRow }) else { return false }
         return selectRow(index, isSelected: inIsSelected)
     }

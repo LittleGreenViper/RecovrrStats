@@ -21,7 +21,6 @@
 		D4ADD8302CF5F13E0030B789 /* Localizable.strings in Sources */ = {isa = PBXBuildFile; fileRef = D4ADD81C2CF5F13E0030B789 /* Localizable.strings */; };
 		D4ADD8362CF610280030B789 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4ADD8352CF610280030B789 /* LaunchScreen.storyboard */; };
 		D4FDE7F92D2590E2007C74A4 /* RCVST_ChartDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FDE7F82D2590E2007C74A4 /* RCVST_ChartDisplay.swift */; };
-		D4FDE7FB2D259118007C74A4 /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FDE7FA2D259118007C74A4 /* DataProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,7 +41,6 @@
 		D4ADD8352CF610280030B789 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D4F14D862CBEA585000C482E /* Recovrr Stats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Recovrr Stats.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4FDE7F82D2590E2007C74A4 /* RCVST_ChartDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_ChartDisplay.swift; sourceTree = "<group>"; };
-		D4FDE7FA2D259118007C74A4 /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,7 +110,6 @@
 			isa = PBXGroup;
 			children = (
 				D4ADD8222CF5F13E0030B789 /* RCVST_DataProvider.swift */,
-				D4FDE7FA2D259118007C74A4 /* DataProvider.swift */,
 			);
 			path = "Data Model";
 			sourceTree = "<group>";
@@ -251,7 +248,6 @@
 				D4ADD82C2CF5F13E0030B789 /* RCVST_Chart3View.swift in Sources */,
 				D4ADD82D2CF5F13E0030B789 /* RCVST_Chart4View.swift in Sources */,
 				D4ADD8302CF5F13E0030B789 /* Localizable.strings in Sources */,
-				D4FDE7FB2D259118007C74A4 /* DataProvider.swift in Sources */,
 				D40D8F902CFBCCAA000F1FB4 /* RCVST_ZoomControl.swift in Sources */,
 				D4FDE7F92D2590E2007C74A4 /* RCVST_ChartDisplay.swift in Sources */,
 				D4ADD82E2CF5F13E0030B789 /* RCVST_DataProvider.swift in Sources */,
