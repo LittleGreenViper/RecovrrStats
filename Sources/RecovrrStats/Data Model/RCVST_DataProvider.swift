@@ -6,6 +6,102 @@ import SwiftUI
 import TabularData
 import RVS_Generic_Swift_Toolbox
 
+/* ############################################# */
+// MARK: Data Type Enums
+/* ############################################# */
+/**
+ This is used to indicate the type of user.
+ */
+public protocol RCVS_DataEnumBase {
+    /* ######################################### */
+    /**
+     (Computed Property) Returns a string we can use for UI. This must be unique (`Hashable`).
+     */
+    var description: String { get }
+    
+    /* ######################################### */
+    /**
+     (Computed Property) Returns a color to use for The bar element.
+     */
+    var color: Color { get }
+    
+    /* ######################################### */
+    /**
+     (Computed Property) Returns the associated value.
+     */
+    var value: Int { get }
+    
+    /* ######################################### */
+    /**
+     (Computed Property) Returns true, if the row is currently selected.
+     */
+    var isSelected: Bool { get set }
+}
+
+public protocol RCVS_PlottableDataProtocol: Identifiable {
+    /* ######################################### */
+    /**
+     (Computed Property) Returns a string we can use for UI. This must be unique (`Hashable`).
+     */
+    var description: String { get }
+    
+    /* ######################################### */
+    /**
+     (Computed Property) Returns a color to use for The bar element. If selected, then we return ``selectedColor``.
+     */
+    var color: Color { get }
+    
+    /* ######################################### */
+    /**
+     (Computed Property) Returns the associated value.
+     */
+    var value: Int { get }
+}
+
+/* ################################################# */
+// MARK: Plottable User Type Data Struct
+/* ################################################# */
+/**
+ This allows us to represent the user type data in a plottable form.
+ */
+public struct RCVS_PlottableData: RCVS_PlottableDataProtocol {
+    /* ############################################# */
+    /**
+     (Stored Property) Make me identifiable.
+     */
+    public var id: UUID
+
+    /* ############################################# */
+    /**
+     (Stored Property) This is the various data associated with this point.
+     */
+    public var associatedData: any RCVS_DataEnumBase
+
+    /* ############################################# */
+    /**
+     (Computed Property) True, if this row is selected.
+     */
+    public var isSelected: Bool = false
+
+    /* ######################################### */
+    /**
+     (Computed Property) Returns a string we can use for UI. This must be unique (`Hashable`).
+     */
+    public var description: String { associatedData.description }
+    
+    /* ######################################### */
+    /**
+     (Computed Property) Returns a color to use for The bar element. If selected, then we return red.
+     */
+    public var color: Color { isSelected ? .red : associatedData.color }
+    
+    /* ######################################### */
+    /**
+     (Computed Property) Returns the associated value.
+     */
+    public var value: Int { associatedData.value }
+}
+
 /* ##################################################### */
 // MARK: - One Row Of Data -
 /* ##################################################### */
@@ -14,179 +110,13 @@ import RVS_Generic_Swift_Toolbox
  > NOTE: This is a class, as opposed to a struct, so it will be referenced.
  */
 public class RCVST_Row: Identifiable, Equatable {
-    /* ################################################# */
-    // MARK: Plottable User Type Data Struct
-    /* ################################################# */
-    /**
-     This allows us to represent the user type data in a plottable form.
-     */
-    public struct PlottableUserTypes: Identifiable {
-        /* ############################################# */
-        // MARK: File Private Data Type Enums
-        /* ############################################# */
-        /**
-         This is used to indicate the type of user.
-         */
-        fileprivate enum UserTypes {
-            /* ######################################### */
-            /**
-             The total number of "new" users (users that have never logged in).
-             */
-            case newUsers(isSelected: Bool, numberOfNewUsers: Int)
-            
-            /* ######################################### */
-            /**
-             The total number of "active" users (users that have logged in, at least once).
-             */
-            case activeUsers(isSelected: Bool, numberOfActiveUsers: Int)
-            
-            /* ######################################### */
-            /**
-             (Computed Property) Returns a string we can use for UI. This must be unique (`Hashable`).
-             */
-            var description: String {
-                switch self {
-                case .activeUsers:
-                    return "Active Users"
-                case .newUsers:
-                    return "New Users"
-                }
-            }
-            
-            /* ######################################### */
-            /**
-             (Computed Property) Returns a color to use for The bar element.
-             */
-            var color: Color {
-                switch self {
-                case .activeUsers:
-                    return .green
-                case .newUsers:
-                    return .blue
-                }
-            }
-            
-            /* ######################################### */
-            /**
-             (Computed Property) Returns the associated value.
-             */
-            var value: Int {
-                switch self {
-                case let .activeUsers(_, inUsers):
-                    return inUsers
-                case let .newUsers(_, inUsers):
-                    return inUsers
-                }
-            }
-            
-            /* ######################################### */
-            /**
-             (Computed Property) Returns true, if the row is currently selected.
-             */
-            var isSelected: Bool {
-                switch self {
-                case let .activeUsers(inIsSelected, _):
-                    return inIsSelected
-                case let .newUsers(inIsSelected, _):
-                    return inIsSelected
-                }
-            }
-        }
-        
-        // MARK: Private Property
-        
-        /* ############################################# */
-        /**
-         (Stored Property) This defines the user type this data is representing.
-         */
-        fileprivate let _userType: UserTypes
-        
-        // MARK: Public API
-        
-        /* ############################################# */
-        /**
-         (Static) The text to use, for a selected row.
-         */
-        public static let selectedDescription: String = "Selected"
-        
-        /* ############################################# */
-        /**
-         (Static) The color to use, for a selected row.
-         */
-        public static let selectedColor: Color = .red
-
-        /* ############################################# */
-        /**
-         (Stored Property) Make me identifiable.
-         */
-        public let id = UUID()
-
-        /* ############################################# */
-        /**
-         (Computed Property) True, if this row is selected.
-         */
-        public var isSelected: Bool { _userType.isSelected }
-
-        /* ######################################### */
-        /**
-         (Computed Property) Returns a string we can use for UI. This must be unique (`Hashable`).
-         */
-        var description: String { _userType.description }
-        
-        /* ######################################### */
-        /**
-         (Computed Property) Returns a color to use for The bar element. If selected, then we return red.
-         */
-        var color: Color { isSelected ? Self.selectedColor : _userType.color }
-        
-        /* ######################################### */
-        /**
-         (Computed Property) Returns the associated value.
-         */
-        var value: Int { _userType.value }
-    }
-    
     // MARK: Private Property
     
     /* ################################################# */
     /**
      (Stored Property) The untyped `DataFrame.Row` instance assigned to this struct instance.
      */
-    private var _dataRow: DataFrame.Row
-
-    /* ################################################# */
-    /**
-     (Computed Property) The total number of users (private, to simplify).
-     */
-    private var _totalUsers: Int { _dataRow["total_users"] as? Int ?? 0 }
-    
-    /* ################################################# */
-    /**
-     (Computed Property) The total number of "new" users (users that have never logged in).
-     */
-    private var _newUsers: Int { _dataRow["new_users"] as? Int ?? 0 }
-    
-    /* ################################################# */
-    /**
-     (Computed Property) The total number of "active" users (users that have logged in, at least once).
-     */
-    private var _activeUsers: Int { _totalUsers - _newUsers }
-    
-    /* ################################################# */
-    /**
-     (Computed Property) The total number of users (both types).
-     */
-    var _rowTotalUsers: Int { _totalUsers }
-
-    /* ################################################# */
-    /**
-     initializer
-     
-     - parameter dataRow: The `DataFrame.Row` for the line we're saving.
-     */
-    init(dataRow inDataRow: DataFrame.Row) {
-        _dataRow = inDataRow
-    }
+    var dataRow: DataFrame.Row
 
     // MARK: Public API
     
@@ -206,21 +136,23 @@ public class RCVST_Row: Identifiable, Equatable {
     /**
      (Computed Property) The date the sample was taken. `.distantFuture` is returned, if there is an error.
      */
-    public var sampleDate: Date { _dataRow["sample_date"] as? Date ?? .distantFuture }
+    public var sampleDate: Date { dataRow["sample_date"] as? Date ?? .distantFuture }
 
     /* ################################################# */
     /**
-     (Computed Property) This returns the row data in one set of plottable data points.
+     initializer
      
-     Active users are in the first element, and new users in the second.
+     - parameter dataRow: The `DataFrame.Row` for the line we're saving.
      */
-    public var userTypes: [PlottableUserTypes] {
-        [
-            PlottableUserTypes(_userType: .activeUsers(isSelected: isSelected, numberOfActiveUsers: _activeUsers)),
-            PlottableUserTypes(_userType: .newUsers(isSelected: isSelected, numberOfNewUsers: _newUsers))
-        ]
+    init(dataRow inDataRow: DataFrame.Row) {
+        dataRow = inDataRow
     }
-    
+
+    /* ################################################# */
+    /**
+     */
+    public var plottableData: [RCVS_PlottableData] = []
+
     /* ################################################# */
     /**
      Equatable Conformance. We base this on the sample date.
@@ -241,8 +173,14 @@ protocol DataProviderProtocol {
     /**
      This provides the data frame rows as an array of our own ``Row`` struct.
      */
-    var rows: [RCVST_Row] { get }
+    var rows: [RCVST_Row] { get set }
     
+    /* ################################################# */
+    /**
+     This contains an explicit sub-range of the entire data X-axis range. If in error, an empty range is returned. Default means use ``totalDateRange``.
+     */
+    var dataWindowRange: ClosedRange<Date> { get set }
+
     /* ##################################################### */
     /**
      The date range of our complete list of values.
@@ -250,12 +188,6 @@ protocol DataProviderProtocol {
      If not able to compute, an empty (distant past) range is returned.
      */
     var totalDateRange: ClosedRange<Date> { get }
-    
-    /* ################################################# */
-    /**
-     This contains an explicit sub-range of the entire data X-axis range. If in error, an empty range is returned. Default means use ``totalDateRange``.
-     */
-    var dataWindowRange: ClosedRange<Date> { get set }
     
     /* ################################################# */
     /**
@@ -279,10 +211,9 @@ protocol DataProviderProtocol {
     
     /* ##################################################### */
     /**
-     This is the maximum of users.
      */
-    var maxUsers: Int { get }
-
+    var maxYValue: Int { get }
+    
     /* ##################################################### */
     /**
      This is a utility function, for extracting discrete user count steps from a user maximum value range. It will "pad" the gridlines to round numbers, depending on the level of the maximum value.
@@ -399,21 +330,12 @@ extension DataProviderProtocol {
      
      The order of elements is first -> left (active users), last -> right (new users).
      */
-    var legend: KeyValuePairs<String, Color> {
-        KeyValuePairs<String, Color>(dictionaryLiteral: (description: RCVST_Row.PlottableUserTypes.UserTypes.activeUsers(isSelected: false, numberOfActiveUsers: 0).description,
-                                                         color: RCVST_Row.PlottableUserTypes.UserTypes.activeUsers(isSelected: false, numberOfActiveUsers: 0).color),
-                                                        (description: RCVST_Row.PlottableUserTypes.UserTypes.newUsers(isSelected: false, numberOfNewUsers: 0).description,
-                                                         color: RCVST_Row.PlottableUserTypes.UserTypes.newUsers(isSelected: false, numberOfNewUsers: 0).color),
-                                                        (description: RCVST_Row.PlottableUserTypes.selectedDescription,
-                                                         color: RCVST_Row.PlottableUserTypes.selectedColor)
-        )
-    }
+    var legend: KeyValuePairs<String, Color> { [:] }
     
     /* ##################################################### */
     /**
-     (Computed Property) This is the maximum of users.
      */
-    var maxUsers: Int { 0 }
+    var maxYValue: Int { 0 }
 }
 
 /* ##################################################### */
@@ -425,15 +347,15 @@ extension DataProviderProtocol {
      */
     func yAxisCountValues(numberOfValues inNumberOfValues: Int = 4) -> [Int] {
         guard 1 < inNumberOfValues,
-              0 < maxUsers
+              0 < maxYValue
         else { return [] }
 
         // This will be used for the "round up" operation. Crude, but sufficient for our needs.
         let divisors = [4, 8, 20, 100, 200, 400]
-        let topDivisorIndex = divisors.last(where: { $0 < maxUsers }) ?? 0
+        let topDivisorIndex = divisors.last(where: { $0 < maxYValue }) ?? 0
         let divisor = topDivisorIndex / 4
         
-        let stepSizeStart = Int(ceil(Double(maxUsers) / Double(inNumberOfValues - 1)))  // We start, by getting the maximum step size necessary to reach the maximum users.
+        let stepSizeStart = Int(ceil(Double(maxYValue) / Double(inNumberOfValues - 1)))  // We start, by getting the maximum step size necessary to reach the maximum users.
         
         let stepSize = ((stepSizeStart / divisor) + 1) * divisor    // We then, pad that, so we get nice, even numbers.
         
@@ -527,6 +449,29 @@ extension DataProviderProtocol {
      */
     mutating func deselectAllRows() {
         for row in rows.enumerated() { rows[row.offset].isSelected = false }
+    }
+}
+
+struct RCV_UserTypesDataProvider: DataProviderProtocol {
+    /* ##################################################### */
+    /**
+     */
+    var rows: [RCVST_Row] = []
+    
+    /* ##################################################### */
+    /**
+     */
+    var dataWindowRange: ClosedRange<Date> = .distantPast ... .distantPast
+    
+    /* ##################################################### */
+    /**
+     */
+    init(rows inRows: [RCVST_Row]) {
+        rows = inRows
+        if let lowerBound = rows.first?.sampleDate,
+           let upperBound = rows.last?.sampleDate {
+            dataWindowRange = Calendar.current.startOfDay(for: lowerBound) ... Calendar.current.startOfDay(for: upperBound)
+        }
     }
 }
 
