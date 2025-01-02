@@ -20,6 +20,7 @@
 		D4ADD82F2CF5F13E0030B789 /* RCVST_InitialContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ADD8232CF5F13E0030B789 /* RCVST_InitialContentView.swift */; };
 		D4ADD8302CF5F13E0030B789 /* Localizable.strings in Sources */ = {isa = PBXBuildFile; fileRef = D4ADD81C2CF5F13E0030B789 /* Localizable.strings */; };
 		D4ADD8362CF610280030B789 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4ADD8352CF610280030B789 /* LaunchScreen.storyboard */; };
+		D4EBAC792D26B7900076E72E /* RCVST_DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4EBAC782D26B7900076E72E /* RCVST_DataModel.swift */; };
 		D4FDE7F92D2590E2007C74A4 /* RCVST_ChartDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FDE7F82D2590E2007C74A4 /* RCVST_ChartDisplay.swift */; };
 /* End PBXBuildFile section */
 
@@ -39,6 +40,7 @@
 		D4ADD8222CF5F13E0030B789 /* RCVST_DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_DataProvider.swift; sourceTree = "<group>"; };
 		D4ADD8232CF5F13E0030B789 /* RCVST_InitialContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_InitialContentView.swift; sourceTree = "<group>"; };
 		D4ADD8352CF610280030B789 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D4EBAC782D26B7900076E72E /* RCVST_DataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_DataModel.swift; sourceTree = "<group>"; };
 		D4F14D862CBEA585000C482E /* Recovrr Stats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Recovrr Stats.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4FDE7F82D2590E2007C74A4 /* RCVST_ChartDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_ChartDisplay.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -110,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				D4ADD8222CF5F13E0030B789 /* RCVST_DataProvider.swift */,
+				D4EBAC782D26B7900076E72E /* RCVST_DataModel.swift */,
 			);
 			path = "Data Model";
 			sourceTree = "<group>";
@@ -242,6 +245,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4EBAC792D26B7900076E72E /* RCVST_DataModel.swift in Sources */,
 				D4ADD8292CF5F13E0030B789 /* RCVST_App.swift in Sources */,
 				D4ADD82A2CF5F13E0030B789 /* RCVST_Chart1View.swift in Sources */,
 				D4ADD82B2CF5F13E0030B789 /* RCVST_Chart2View.swift in Sources */,
