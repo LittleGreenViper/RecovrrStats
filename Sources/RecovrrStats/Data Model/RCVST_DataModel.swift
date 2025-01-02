@@ -575,7 +575,7 @@ public class RCVST_Row: RCVST_RowProtocol {
 /**
  Specialize this class, for each of the charts.
  */
-class RCV_UserTypesDataProvider: DataProviderProtocol {
+class RCV_BaseDataProvider: DataProviderProtocol {
     /* ##################################################### */
     /**
      The name to be used to describe the chart.

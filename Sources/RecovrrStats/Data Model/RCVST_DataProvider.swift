@@ -6,6 +6,16 @@ import SwiftUI
 import TabularData
 import RVS_Generic_Swift_Toolbox
 
+class RCVST_UserDataProvider: RCV_BaseDataProvider {
+    class _RCVST_UserDataRow: RCVST_Row {
+        
+    }
+    
+    init(_ inDataSource: RCVST_DataProvider) {
+        super.init(rows: inDataSource.statusDataFrame?.rows.map { _RCVST_UserDataRow(dataRow: $0) } ?? [], chartName: "User Types")
+    }
+}
+
 /* ##################################################### */
 // MARK: - Main Data Model Struct -
 /* ##################################################### */
