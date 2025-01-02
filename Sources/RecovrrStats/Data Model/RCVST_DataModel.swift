@@ -150,7 +150,7 @@ public extension RCVST_RowProtocol {
 /* ##################################################### */
 // MARK: - Array Extension For Arrays of Rows -
 /* ##################################################### */
-extension Array where Element: RCVST_RowProtocol {
+extension Array where Element == any RCVST_RowProtocol {
     /* ################################################################## */
     /**
      This returns the sample closest to the given date.
@@ -511,7 +511,7 @@ extension DataProviderProtocol {
 // MARK: - IMPLEMENTATION -
 
 /* ##################################################### */
-// MARK: - One Row Of Data -
+// MARK: - One Element Of Data From A Row -
 /* ##################################################### */
 /**
  */

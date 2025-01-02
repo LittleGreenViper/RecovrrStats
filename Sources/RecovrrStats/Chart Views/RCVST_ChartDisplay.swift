@@ -55,7 +55,7 @@ struct RCVST_ChartDisplay: View {
      
      Setting this, changes the text that is displayed in the text item at the top, and also selects/deselects the row, in the model.
      */
-    @State private var _selectedValue: (any RCVST_RowProtocol)? {
+    @State private var _selectedValue: RCVST_Row? {
         didSet {
             if let selectedValue = _selectedValue,
                1 < selectedValue.plottableData.count {
@@ -127,54 +127,55 @@ struct RCVST_ChartDisplay: View {
             }
             .chartXAxisLabel("Date", alignment: .center)            // This displays the axis title, under the labels, which are under the center of the X-axis.
             
-//            // This implements tap/swipe to select.
-//            // We start, by covering the chart with an overlay.
-//            .chartOverlay { inChart in              // The chart instance is passed in.
-//                GeometryReader { inGeom in          // We need to know the dimensions of the overlay.
-//                    Rectangle()                     // The overlay will be a rectangle
-//                        .fill(Color.clear)          // It is filled with clear, so we can see the chart through it.
-//                        .contentShape(Rectangle())  // We need to explicitly give it a shape.
-//                        // This is the gesture context that is attached to the overlay.
-//                        .gesture(
-//                            // This is the actual gesture that tracks our tap/drag. We will only be paying attention to horizontal dragging (X-axis).
-//                            DragGesture(minimumDistance: 0)             // It's a drag gesture, but specifying a `minimumDistance` of 0, makes it a tap/drag gesture.
-//                                // This is where the magic happens. This closure is called, whenever the gesture moves.
-//                                .onChanged { inValue in                 // `inValue` contains the current gesture state.
-//                                    if let frame = inChart.plotFrame {  // We need the chart's frame, as we'll be figuring out our X-axis value, based on that.
-//                                        // We query the chart for the X-axis value, corresponding to the local position, given by the gesture value. We clip the gesture, to within the chart dimensions.
-//                                        guard let date = inChart.value(atX: max(0, min(inChart.plotSize.width, inValue.location.x - inGeom[frame].origin.x)), as: Date.self) else { return }
-//                                        // Setting this property updates the selection
-//                                        _selectedValue = data.windowedRows.nearestTo(date)
-//                                    }
-//                                }
-//                                .onEnded { _ in _selectedValue = nil }
-//                        )
-//                    
-//                        // This is the gesture context that is attached to the overlay (for the pinch-to-zoom).
-//                        .gesture(
-//                            // This is the actual gesture that handles magnification.
-//                            MagnifyGesture()
-//                                // This is where the magic happens. This closure is called, whenever the gesture changes.
-//                                .onChanged { inValue in
-//                                    _firstRange = _firstRange ?? data.dataWindowRange   // We take a snapshot of the initial range, when we start, so we aren't changing the goalposts as we go.
-//
-//                                    if let firstRange = _firstRange {
-//                                        // What we are doing here, is applying our initial range, to figure out where the center of the zoom will be, and we'll be setting the new range, to either side of that.
-//                                        let rangeInSeconds = (firstRange.upperBound.timeIntervalSinceReferenceDate - firstRange.lowerBound.timeIntervalSinceReferenceDate) / 2
-//                                        let centerDateInSeconds = (TimeInterval(inValue.startAnchor.x) * (rangeInSeconds * 2)) + firstRange.lowerBound.timeIntervalSinceReferenceDate
-//                                        let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
-//                                        
-//                                        // No less than 2 days (by setting to 1 day for halfsies). The 1.2 is to "slow down" the magnification a bit, so it's not too intense.
-//                                        let newRange = max(86400, (rangeInSeconds * 1.2) / inValue.magnification)
-//                                        
-//                                        // By changing this, we force a redraw of the chart, with the new limits.
-//                                        data.dataWindowRange = (centerDate.addingTimeInterval(-newRange)...centerDate.addingTimeInterval(newRange)).clamped(to: data.totalDateRange)
-//                                    }
-//                                }
-//                                .onEnded { _ in _firstRange = nil } // We reset the initial range, when we're done.
-//                        )
-//                }
-//            }
+            // This implements tap/swipe to select.
+            // We start, by covering the chart with an overlay.
+            .chartOverlay { inChart in              // The chart instance is passed in.
+                GeometryReader { inGeom in          // We need to know the dimensions of the overlay.
+                    Rectangle()                     // The overlay will be a rectangle
+                        .fill(Color.clear)          // It is filled with clear, so we can see the chart through it.
+                        .contentShape(Rectangle())  // We need to explicitly give it a shape.
+                        // This is the gesture context that is attached to the overlay.
+                        .gesture(
+                            // This is the actual gesture that tracks our tap/drag. We will only be paying attention to horizontal dragging (X-axis).
+                            DragGesture(minimumDistance: 0)             // It's a drag gesture, but specifying a `minimumDistance` of 0, makes it a tap/drag gesture.
+                                // This is where the magic happens. This closure is called, whenever the gesture moves.
+                                .onChanged { inValue in                 // `inValue` contains the current gesture state.
+                                    if let frame = inChart.plotFrame {  // We need the chart's frame, as we'll be figuring out our X-axis value, based on that.
+                                        // We query the chart for the X-axis value, corresponding to the local position, given by the gesture value. We clip the gesture, to within the chart dimensions.
+                                        guard let date = inChart.value(atX: max(0, min(inChart.plotSize.width, inValue.location.x - inGeom[frame].origin.x)), as: Date.self) else { return }
+                                        print(date)
+                                        // Setting this property updates the selection
+                                        _selectedValue = data.windowedRows.nearestTo(date) as? RCVST_Row
+                                    }
+                                }
+                                .onEnded { _ in _selectedValue = nil }
+                        )
+                    
+                        // This is the gesture context that is attached to the overlay (for the pinch-to-zoom).
+                        .gesture(
+                            // This is the actual gesture that handles magnification.
+                            MagnifyGesture()
+                                // This is where the magic happens. This closure is called, whenever the gesture changes.
+                                .onChanged { inValue in
+                                    _firstRange = _firstRange ?? data.dataWindowRange   // We take a snapshot of the initial range, when we start, so we aren't changing the goalposts as we go.
+
+                                    if let firstRange = _firstRange {
+                                        // What we are doing here, is applying our initial range, to figure out where the center of the zoom will be, and we'll be setting the new range, to either side of that.
+                                        let rangeInSeconds = (firstRange.upperBound.timeIntervalSinceReferenceDate - firstRange.lowerBound.timeIntervalSinceReferenceDate) / 2
+                                        let centerDateInSeconds = (TimeInterval(inValue.startAnchor.x) * (rangeInSeconds * 2)) + firstRange.lowerBound.timeIntervalSinceReferenceDate
+                                        let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
+                                        
+                                        // No less than 2 days (by setting to 1 day for halfsies). The 1.2 is to "slow down" the magnification a bit, so it's not too intense.
+                                        let newRange = max(86400, (rangeInSeconds * 1.2) / inValue.magnification)
+                                        
+                                        // By changing this, we force a redraw of the chart, with the new limits.
+                                        data.dataWindowRange = (centerDate.addingTimeInterval(-newRange)...centerDate.addingTimeInterval(newRange)).clamped(to: data.totalDateRange)
+                                    }
+                                }
+                                .onEnded { _ in _firstRange = nil } // We reset the initial range, when we're done.
+                        )
+                }
+            }
         }
     }
 }
