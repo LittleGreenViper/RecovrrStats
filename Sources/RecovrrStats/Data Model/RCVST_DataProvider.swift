@@ -16,7 +16,18 @@ public struct RCVST_DataProvider_Instance: DataProviderProtocol {
     /* ##################################################### */
     /**
      */
-    var rows: [RCVST_Row]
+    var chartName: String
+    
+    /* ##################################################### */
+    /**
+     This is a string that is to be displayed, to describe the selected row.
+     */
+    var selectionString: String = ""
+
+    /* ##################################################### */
+    /**
+     */
+    var rows: [any RCVST_RowProtocol]
     
     /* ##################################################### */
     /**
@@ -29,7 +40,7 @@ public struct RCVST_DataProvider_Instance: DataProviderProtocol {
      
      It just loads the DataFrame with the dummy data.
      */
-    init(with inCSVData: String) {
+    init(with inCSVData: String, chartName inName: String) {
         /* ################################################# */
         /**
          Converts the dummy CSV data to a `DataFrame`. Nil, if there was an error.
@@ -46,6 +57,7 @@ public struct RCVST_DataProvider_Instance: DataProviderProtocol {
         }
         
         rows = convertCSVData()?.rows.map { RCVST_Row(dataRow: $0) } ?? []
+        chartName = inName
         
         if let lowerBound = rows.first?.sampleDate,
            let upperBound = rows.last?.sampleDate {

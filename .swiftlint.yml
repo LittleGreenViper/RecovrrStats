@@ -9,6 +9,7 @@ disabled_rules:
 - syntactic_sugar
 - implicit_getter
 - non_optional_string_data_conversion
+- private_over_fileprivate
 
 opt_in_rules:
 - control_statement

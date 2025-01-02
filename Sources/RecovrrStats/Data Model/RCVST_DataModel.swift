@@ -7,55 +7,216 @@ import TabularData
 import RVS_Generic_Swift_Toolbox
 
 /* ############################################# */
+/**
+ This is the color to use, when a row is selected.
+ */
+public let RCVS_LegendSelectionColor = Color.red
+
+/* ############################################# */
+// MARK: - Legend Element Data Class -
+/* ############################################# */
+/**
+ This is used to generate the legend.
+ */
+fileprivate class _RCVS_LegendElement: Identifiable {
+    /* ############################################# */
+    /**
+     Make me identifiable.
+     */
+    let id = UUID()
+
+    /* ############################################# */
+    /**
+     The name should be hashable.
+     */
+    let name: String
+
+    /* ############################################# */
+    /**
+     We can change the color of a named item
+     */
+    var color: Color
+
+    /* ############################################# */
+    /**
+     Default initializer. If you don't specify any arguments, the selection item is created.
+     
+     - parameter name: The name of the legend item.
+     - parameter color: The color to associate with the name.
+     */
+    init(name inName: String = "SLUG-SELECTED-LEGEND-LABEL".localizedVariant, color inColor: Color = RCVS_LegendSelectionColor) {
+        name = inName
+        color = inColor
+    }
+}
+
+/* ############################################# */
 // MARK: - Data Source Protocol -
 /* ############################################# */
 /**
- This protocol defines the interface for data rows in the chart.
+ This protocol defines the interface for sections of each row.
  */
-public protocol RCVS_DataSource: Identifiable {
+public protocol RCVS_DataSourceProtocol: AnyObject, Identifiable {
     /* ######################################### */
     /**
-     (Computed Property) Returns a string we can use for UI. This must be unique (`Hashable`).
+     Returns a string we can use for UI. This must be unique (`Hashable`).
      */
     var description: String { get }
     
     /* ######################################### */
     /**
-     (Computed Property) Returns a color to use for The bar element.
+     Returns a color to use for The bar element.
      */
     var color: Color { get }
     
     /* ######################################### */
     /**
-     (Computed Property) Returns the associated value.
+     Returns the associated value.
      */
     var value: Int { get }
     
     /* ######################################### */
     /**
-     (Computed Property) Returns true, if the row is currently selected.
+     Returns true, if the row is currently selected.
      */
     var isSelected: Bool { get set }
+}
+
+/* ##################################################### */
+// MARK: - One Row Of Data Protocol -
+/* ##################################################### */
+/**
+ This interprets the untyped DataFrame Row data into data that we find useful.
+ 
+ > NOTE: Rows should be classes.
+ */
+public protocol RCVST_RowProtocol: AnyObject, Identifiable {
+    /* ############################################# */
+    /**
+     True, if this row is selected.
+     */
+    var isSelected: Bool { get set }
+
+    /* ################################################# */
+    /**
+     The date the sample was taken. `.distantFuture` is returned, if there is an error.
+     */
+    var sampleDate: Date { get }
+    
+    /* ##################################################### */
+    /**
+     This is the highest integer value for the Y-axis.
+     */
+    var maxYValue: Int { get }
+
+    /* ################################################# */
+    /**
+     The untyped `DataFrame.Row` instance assigned to this instance.
+     */
+    var dataRow: DataFrame.Row { get set }
+    
+    /* ################################################# */
+    /**
+     This is the important part. The implementation should populate this with relevant data for display.
+     
+     > NOTE: The population should occur at call time, or, if cached, the cache should be refreshed, when ``dataRow`` is changed.
+     */
+    var plottableData: [any RCVS_DataSourceProtocol] { get }
+}
+
+/* ##################################################### */
+// MARK: Protocol Defaults
+/* ##################################################### */
+public extension RCVST_RowProtocol {
+    /* ############################################# */
+    /**
+     We simply use the date as an ID.
+     */
+    var id: any Hashable { sampleDate }
+
+    /* ################################################# */
+    /**
+     Default simply gets it from the attached row.
+     */
+    var sampleDate: Date { dataRow["sample_date"] as? Date ?? .distantFuture }
+    
+    /* ##################################################### */
+    /**
+     Default simply goes through the values, and stacks them all together.
+     */
+    var maxYValue: Int { plottableData.reduce(0) { $0 + $1.value } }
+}
+
+/* ##################################################### */
+// MARK: - Array Extension For Arrays of Rows -
+/* ##################################################### */
+extension Array where Element: RCVST_RowProtocol {
+    /* ################################################################## */
+    /**
+     This returns the sample closest to the given date.
+     
+     - parameter inDate: The date we want to compare against.
+     
+     - returns: The sample that is closest to (above or below) the given date.
+     */
+    func nearestTo(_ inDate: Date) -> Element? {
+        var ret: Element?
+        
+        forEach {
+            if let compDate = ret?.sampleDate {
+                ret = abs($0.sampleDate.timeIntervalSince(inDate)) < abs(compDate.timeIntervalSince(inDate)) ? $0 : ret
+            } else {
+                ret = $0
+            }
+        }
+        
+        return ret
+    }
 }
 
 /* ##################################################### */
 // MARK: - Protocol For Sending Data to the Charts -
 /* ##################################################### */
 /**
+ This protocol describes a chart dataset, which is sent to each chart.
  */
 protocol DataProviderProtocol {
+    // MARK: Required
+    
     /* ##################################################### */
     /**
-     This provides the data frame rows as an array of our own ``Row`` struct.
+     This provides the data frame rows as an array of our own ``RCVST_RowProtocol`` struct.
      */
-    var rows: [RCVST_Row] { get set }
-    
+    var rows: [any RCVST_RowProtocol] { get }
+
+    /* ##################################################### */
+    /**
+     (Computed Property) This provides a legend for the chart.
+     
+     The order of elements is first -> left (active users), last -> right (new users).
+     */
+    var legend: any View { get }
+
+    /* ##################################################### */
+    /**
+     This is a string to be displayed at the top of the chart.
+     */
+    var chartName: String { get }
+
+    /* ##################################################### */
+    /**
+     This is a string that is to be displayed, to describe the selected row.
+     */
+    var selectionString: String { get }
+
     /* ################################################# */
     /**
      This contains an explicit sub-range of the entire data X-axis range. If in error, an empty range is returned. Default means use ``totalDateRange``.
      */
     var dataWindowRange: ClosedRange<Date> { get set }
 
+    // MARK: Has Default Implementation
+    
     /* ##################################################### */
     /**
      The date range of our complete list of values.
@@ -72,20 +233,21 @@ protocol DataProviderProtocol {
 
     /* ##################################################### */
     /**
-     (Computed Property) This provides a legend for the chart.
-     
-     The order of elements is first -> left (active users), last -> right (new users).
+     This provides the data frame rows as an array of our own ``Row`` struct, but filtered for the window date range.
      */
-    var legend: KeyValuePairs<String, Color> { get }
+    var windowedRows: [any RCVST_RowProtocol] { get }
 
     /* ##################################################### */
     /**
-     This provides the data frame rows as an array of our own ``Row`` struct, but filtered for the window date range.
+     (Computed Property) This provides a row that is currently selected. Nil, if no row selected.
+     
+     > NOTE: This may return rows not in the window.
      */
-    var windowedRows: [RCVST_Row] { get }
-    
+    var selectedRow: (any RCVST_RowProtocol)? { get }
+
     /* ##################################################### */
     /**
+     This is the highest integer value for the Y-axis.
      */
     var maxYValue: Int { get }
     
@@ -135,7 +297,7 @@ protocol DataProviderProtocol {
      - returns: The previous state of the row.
      */
     @discardableResult
-    mutating func selectRow(_: RCVST_Row, isSelected: Bool) -> Bool
+    mutating func selectRow(_: any RCVST_RowProtocol, isSelected: Bool) -> Bool
     
     /* ##################################################### */
     /**
@@ -148,20 +310,6 @@ protocol DataProviderProtocol {
 // MARK: Defaults For Properties
 /* ##################################################### */
 extension DataProviderProtocol {
-    /* ##################################################### */
-    /**
-     (Computed Property) This provides the data frame rows as an array of our own ``Row`` struct, but filtered for the window date range.
-     */
-    var windowedRows: [RCVST_Row] { rows.filter { dataWindowRange.contains(Calendar.current.startOfDay(for: $0.sampleDate)) } }
-    
-    /* ##################################################### */
-    /**
-     (Computed Property) This provides a row that is currently selected. Nil, if no row selected.
-     
-     > NOTE: This may return rows not in the window.
-     */
-    var selectedRow: RCVST_Row? { rows.first(where: { $0.isSelected }) }
-
     /* ##################################################### */
     /**
      (Computed Property) The date range of our complete list of values.
@@ -201,16 +349,47 @@ extension DataProviderProtocol {
 
     /* ##################################################### */
     /**
-     (Computed Property) This provides a legend for the chart.
-     
-     The order of elements is first -> left (active users), last -> right (new users).
+     Returns a chart legend KeyValuePairs instance.
      */
-    var legend: KeyValuePairs<String, Color> { [:] }
+    var legend: any View {
+        var dictionaryLiterals = [_RCVS_LegendElement]()
+        rows.forEach {
+            $0.plottableData.forEach {
+                let key = $0.description
+                if let index = dictionaryLiterals.firstIndex(where: { $0.name == key }) {
+                    dictionaryLiterals[index].color = $0.color
+                } else {
+                    dictionaryLiterals.append(_RCVS_LegendElement(name: key, color: $0.color))
+                }
+            }
+        }
+        dictionaryLiterals.append(_RCVS_LegendElement())
+        return VStack {
+            ForEach(dictionaryLiterals) { inElement in
+                Text(inElement.name).foregroundColor(inElement.color)
+            }
+        }
+    }
     
     /* ##################################################### */
     /**
+     (Computed Property) This provides the data frame rows as an array of our own ``Row`` struct, but filtered for the window date range.
      */
-    var maxYValue: Int { 0 }
+    var windowedRows: [any RCVST_RowProtocol] { rows.filter { dataWindowRange.contains(Calendar.current.startOfDay(for: $0.sampleDate)) } }
+    
+    /* ##################################################### */
+    /**
+     (Computed Property) This provides a row that is currently selected. Nil, if no row selected.
+     
+     > NOTE: This may return rows not in the window.
+     */
+    var selectedRow: (any RCVST_RowProtocol)? { rows.first(where: { $0.isSelected }) }
+    
+    /* ##################################################### */
+    /**
+     This returns the max Y value, for the whole dataset.
+     */
+    var maxYValue: Int { rows.reduce(0) { max($0, $1.maxYValue) } }
 }
 
 /* ##################################################### */
@@ -219,6 +398,7 @@ extension DataProviderProtocol {
 extension DataProviderProtocol {
     /* ##################################################### */
     /**
+     This returns an array of Integers, that are to be used as the Y-axis values for the chart. This has 4 as the default value for the maximum number of elements.
      */
     func yAxisCountValues(numberOfValues inNumberOfValues: Int = 4) -> [Int] {
         guard 1 < inNumberOfValues,
@@ -245,6 +425,7 @@ extension DataProviderProtocol {
     
     /* ##################################################### */
     /**
+     This returns an array of Dates, that are to be used as the X-axis values for the chart. This has 4 as the default value for the maximum number of elements.
      */
     func xAxisDateValues(numberOfValues inNumberOfValues: Int = 4) -> [Date] {
         guard 1 < inNumberOfValues,
@@ -297,7 +478,7 @@ extension DataProviderProtocol {
     /**
      */
     @discardableResult
-    mutating func selectRow(_ inIndex: Int, isSelected inIsSelected: Bool = true) -> Bool {
+    func selectRow(_ inIndex: Int, isSelected inIsSelected: Bool = true) -> Bool {
         precondition((0..<rows.count).contains(inIndex), "Index out of bounds")
         
         let ret = rows[inIndex].isSelected
@@ -309,20 +490,20 @@ extension DataProviderProtocol {
         
         return ret
     }
-    
+
     /* ##################################################### */
     /**
      */
     @discardableResult
-    mutating func selectRow(_ inRow: RCVST_Row, isSelected inIsSelected: Bool = true) -> Bool {
-        guard let index = rows.firstIndex(where: { $0 == inRow }) else { return false }
+    func selectRow(_ inRow: any RCVST_RowProtocol, isSelected inIsSelected: Bool = true) -> Bool {
+        guard let index = rows.firstIndex(where: { $0.sampleDate == inRow.sampleDate }) else { return false }
         return selectRow(index, isSelected: inIsSelected)
     }
-    
+
     /* ##################################################### */
     /**
      */
-    mutating func deselectAllRows() {
+    func deselectAllRows() {
         for row in rows.enumerated() { rows[row.offset].isSelected = false }
     }
 }
@@ -333,13 +514,26 @@ extension DataProviderProtocol {
 // MARK: - One Row Of Data -
 /* ##################################################### */
 /**
+ */
+class RCVS_DataSource: RCVS_DataSourceProtocol {
+    var description: String = "ERROR"
+    
+    var color: Color = .clear
+    
+    var value: Int = 0
+    
+    var isSelected: Bool = false
+}
+
+/* ##################################################### */
+// MARK: - One Row Of Data -
+/* ##################################################### */
+/**
  This interprets the untyped DataFrame Row data into data that we find useful.
  
  This is meant to be a base class. Subclasses should provide specific data.
- 
- > NOTE: This is a class, as opposed to a struct, so it will be referenced, and can be subclassed.
  */
-public class RCVST_Row {
+public class RCVST_Row: RCVST_RowProtocol {
     /* ################################################# */
     /**
      (Stored Property) The untyped `DataFrame.Row` instance assigned to this instance.
@@ -362,7 +556,7 @@ public class RCVST_Row {
     /**
      This is the important part. This should be overridden, and the subclass should populate this with relevant data for display.
      */
-    public var plottableData: [any RCVS_DataSource] = []
+    public var plottableData: [any RCVS_DataSourceProtocol] = []
 
     /* ################################################# */
     /**
@@ -376,54 +570,31 @@ public class RCVST_Row {
 }
 
 /* ##################################################### */
-// MARK: Equatable Conformance
+// MARK: A - Data Provider Wrapper Base Class -
 /* ##################################################### */
-extension RCVST_Row: Equatable {
-    /* ################################################# */
-    /**
-     We base this on the sample date.
-     
-     - parameter lhs: The left-hand side of the comparison.
-     - parameter rhs: The right-hand side of the comparison.
-     */
-    public static func == (lhs: RCVST_Row, rhs: RCVST_Row) -> Bool { lhs.sampleDate == rhs.sampleDate }
-}
-
-/* ##################################################### */
-// MARK: - Array Extension For Arrays of Rows -
-/* ##################################################### */
-extension Array where Element == RCVST_Row {
-    /* ################################################################## */
-    /**
-     This returns the sample closest to the given date.
-     
-     - parameter inDate: The date we want to compare against.
-     
-     - returns: The sample that is closest to (above or below) the given date.
-     */
-    func nearestTo(_ inDate: Date) -> Element? {
-        var ret: Element?
-        
-        forEach {
-            if let compDate = ret?.sampleDate {
-                ret = abs($0.sampleDate.timeIntervalSince(inDate)) < abs(compDate.timeIntervalSince(inDate)) ? $0 : ret
-            } else {
-                ret = $0
-            }
-        }
-        
-        return ret
-    }
-}
-
-/* ##################################################### */
-// MARK: A - Data Provider Wrapper -
-/* ##################################################### */
-struct RCV_UserTypesDataProvider: DataProviderProtocol {
+/**
+ Specialize this class, for each of the charts.
+ */
+class RCV_UserTypesDataProvider: DataProviderProtocol {
     /* ##################################################### */
     /**
+     The name to be used to describe the chart.
      */
-    var rows: [RCVST_Row] = []
+    var chartName: String = ""
+    
+    /* ##################################################### */
+    /**
+     This is a string that is to be displayed, to describe the selected row.
+     
+     > NOTE: This is meant to be provided by the subclass. The base class is empty.
+     */
+    var selectionString: String = ""
+
+    /* ##################################################### */
+    /**
+     This contains the rows assigned to this instance.
+     */
+    var rows: [any RCVST_RowProtocol] = []
     
     /* ##################################################### */
     /**
@@ -432,9 +603,11 @@ struct RCV_UserTypesDataProvider: DataProviderProtocol {
     
     /* ##################################################### */
     /**
+     Default initializer. We need to supply the rows, and the chart name.
      */
-    init(rows inRows: [RCVST_Row]) {
+    init(rows inRows: [RCVST_Row], chartName inChartName: String) {
         rows = inRows
+        chartName = inChartName
         if let lowerBound = rows.first?.sampleDate,
            let upperBound = rows.last?.sampleDate {
             dataWindowRange = Calendar.current.startOfDay(for: lowerBound) ... Calendar.current.startOfDay(for: upperBound)
