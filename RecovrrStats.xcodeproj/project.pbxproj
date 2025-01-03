@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D4183B802D287F0600862A80 /* RCVST_DeletionsDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4183B7F2D287F0600862A80 /* RCVST_DeletionsDataProvider.swift */; };
 		D433ED262CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox in Frameworks */ = {isa = PBXBuildFile; productRef = D433ED252CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox */; };
 		D47856282D286664006517C3 /* RCVST_SignupsDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47856272D286664006517C3 /* RCVST_SignupsDataProvider.swift */; };
 		D4ADD8262CF5F13E0030B789 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4ADD81A2CF5F13E0030B789 /* Assets.xcassets */; };
@@ -22,6 +23,7 @@
 
 /* Begin PBXFileReference section */
 		D40D8F8F2CFBCCAA000F1FB4 /* RCVST_ZoomControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_ZoomControl.swift; sourceTree = "<group>"; };
+		D4183B7F2D287F0600862A80 /* RCVST_DeletionsDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_DeletionsDataProvider.swift; sourceTree = "<group>"; };
 		D4484A452CBEA80B0019BC0E /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Warnings.xcconfig; sourceTree = "<group>"; };
 		D47856272D286664006517C3 /* RCVST_SignupsDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_SignupsDataProvider.swift; sourceTree = "<group>"; };
 		D4A62DD52CC9372D001DD8A9 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 				D4ADD8222CF5F13E0030B789 /* RCVST_DataProvider.swift */,
 				D4D199542D2836B5004110BC /* RCVST_UserTypesDataProvider.swift */,
 				D47856272D286664006517C3 /* RCVST_SignupsDataProvider.swift */,
+				D4183B7F2D287F0600862A80 /* RCVST_DeletionsDataProvider.swift */,
 			);
 			path = "Data Model";
 			sourceTree = "<group>";
@@ -243,6 +246,7 @@
 				D4FDE7F92D2590E2007C74A4 /* RCVST_ChartDisplay.swift in Sources */,
 				D4ADD82E2CF5F13E0030B789 /* RCVST_DataProvider.swift in Sources */,
 				D4ADD82F2CF5F13E0030B789 /* RCVST_InitialContentView.swift in Sources */,
+				D4183B802D287F0600862A80 /* RCVST_DeletionsDataProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

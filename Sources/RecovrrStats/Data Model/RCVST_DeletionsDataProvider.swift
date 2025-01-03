@@ -7,12 +7,12 @@ import TabularData
 import RVS_Generic_Swift_Toolbox
 
 /* ###################################################################################################################################### */
-// MARK: - Signup Activity Specialized Stats Data Provider -
+// MARK: - Account Deletions Specialized Stats Data Provider -
 /* ###################################################################################################################################### */
 /**
- This implementation specializes for the signup resolution user display.
+ This implementation specializes for the account deletion activity user display.
  */
-struct RCVST_SignupsDataProvider: DataProviderProtocol {
+struct RCVST_DeletionsDataProvider: DataProviderProtocol {
     /* ################################################################################################################################## */
     // MARK: Specialized Row Type
     /* ################################################################################################################################## */
