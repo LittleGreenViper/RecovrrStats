@@ -388,10 +388,12 @@ extension Array where Element == any RCVST_RowProtocol {
      */
     func nearestTo(_ inDate: Date) -> Element? {
         var ret: Element?
-        
+        let testDate = Calendar.current.startOfDay(for: inDate).addingTimeInterval(43200)
         forEach {
-            if let compDate = ret?.sampleDate {
-                ret = abs($0.sampleDate.timeIntervalSince(inDate)) < abs(compDate.timeIntervalSince(inDate)) ? $0 : ret
+            if let compDateTemp = ret?.sampleDate {
+                let compDate = Calendar.current.startOfDay(for: compDateTemp).addingTimeInterval(43200)
+                let thisDate = Calendar.current.startOfDay(for: $0.sampleDate).addingTimeInterval(43200)
+                ret = abs(thisDate.timeIntervalSince(testDate)) < abs(compDate.timeIntervalSince(testDate)) ? $0 : ret
             } else {
                 ret = $0
             }
