@@ -12,7 +12,7 @@ import RVS_Generic_Swift_Toolbox
 /**
  This implementation specializes for the "active/new" user display.
  */
-class RCVST_UserTypesDataProvider: RCV_BaseDataProvider {
+struct RCVST_UserTypesDataProvider: DataProviderProtocol {
     /* ################################################################################################################################## */
     // MARK: Specialized Row Type
     /* ################################################################################################################################## */
@@ -42,15 +42,26 @@ class RCVST_UserTypesDataProvider: RCV_BaseDataProvider {
     
     /* ##################################################### */
     /**
-     This is the dataframe that supplies our data.
      */
-    var dataFrame: DataFrame?
+    var dataWindowRange: ClosedRange<Date> = .distantPast ... .distantPast
+    
+    /* ##################################################### */
+    /**
+     This contains the rows assigned to this instance.
+     */
+    var rows: [any RCVST_RowProtocol] = []
+    
+    /* ##################################################### */
+    /**
+     The name to be used to describe the chart.
+     */
+    var chartName: String = ""
     
     /* ##################################################### */
     /**
      This is a string that is to be displayed, to describe the selected row.
      */
-    override var selectionString: String {
+    var selectionString: String {
         get {
             if let selectedValue = selectedRow as? _RCVST_UserTypesDataRow {
                 let dateFormatter = DateFormatter()
@@ -74,7 +85,7 @@ class RCVST_UserTypesDataProvider: RCV_BaseDataProvider {
     /* ##################################################### */
     /**
      */
-    init(with inDataFrame: DataFrame) {
+    init(with inDataFrame: DataFrame, chartName inChartName: String) {
         var rowTypes = [_RCVST_UserTypesDataRow]()
     
         // We do every other one, because we have two samples per day. We only need the last one.
@@ -83,9 +94,13 @@ class RCVST_UserTypesDataProvider: RCV_BaseDataProvider {
             let previousRow = 0 < index ? inDataFrame.rows[index - 1] : nil
             rowTypes.append(_RCVST_UserTypesDataRow(dataRow: row, previousDataRow: previousRow))
         }
-
-        super.init(rows: rowTypes, chartName: "User Types")
-        dataFrame = inDataFrame
+        
+        rows = rowTypes
+        chartName = inChartName
+        if let lowerBound = rowTypes.first?.sampleDate,
+           let upperBound = rowTypes.last?.sampleDate {
+            dataWindowRange = Calendar.current.startOfDay(for: lowerBound) ... Calendar.current.startOfDay(for: upperBound)
+        }
     }
 }
 
@@ -342,6 +357,6 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
      */
     init(statusDataFrame inDataFrame: DataFrame) {
         statusDataFrame = inDataFrame
-        userDataProvider = RCVST_UserTypesDataProvider(with: inDataFrame)
+        userDataProvider = RCVST_UserTypesDataProvider(with: inDataFrame, chartName: "User Types")
     }
 }
