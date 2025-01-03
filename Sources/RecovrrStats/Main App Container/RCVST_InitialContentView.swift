@@ -191,8 +191,8 @@ struct RootStackView: View {
             Text(String(format: "SLUG-MAIN-CURRENT-INACTIVE".localizedVariant, latestInactiveTotal))
                 .foregroundColor(.blue)
             List {
-                NavigationLink("User Types") {
-                    if let data = _data?.userDataProvider {
+                if let data = _data?.userDataProvider {
+                    NavigationLink(data.chartName) {
                         RCVST_ChartDisplay(data: data)
                     }
                 }

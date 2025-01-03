@@ -82,7 +82,7 @@ struct RCVST_ChartDisplay: View {
      */
     var body: some View {
         GeometryReader { inGeometry in
-            GroupBox {
+            GroupBox(data.chartName) {
                 // We need to add a `VStack`, so that the text item and chart play well together.
                 VStack {
                     // This displays the value of the selected bar. It is one line of red text, so we make it small enough to fit.
@@ -101,6 +101,8 @@ struct RCVST_ChartDisplay: View {
                             .foregroundStyle(inPlottableData.color)
                         }
                     }
+                    
+                    .padding(.trailing, 20)
                     
                     // The following adornments are covered in more detail in [the SwiftUI documentation](https://developer.apple.com/documentation/charts/customizing-axes-in-swift-charts).
                     
