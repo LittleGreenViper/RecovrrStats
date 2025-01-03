@@ -136,7 +136,7 @@ struct RootStackView: View {
     /**
      This is the actual dataframe wrapper for the stats. Everything from here, on, will be bound to this.
      */
-    @State private var _data: RCVST_DataProvider?
+    @State private var _data: RCVST_DataProvider? { didSet { updateTotals() } }
 
     /* ################################################################## */
     /**
@@ -183,7 +183,7 @@ struct RootStackView: View {
             .minimumScaleFactor(0.5)
             .lineLimit(1)
             .font(.subheadline)
-            .foregroundStyle(.red)
+            .foregroundStyle(RCVS_LegendSelectionColor)
         
         NavigationStack {
             Text(String(format: "SLUG-MAIN-CURRENT-ACTIVE".localizedVariant, latestActiveTotal))
