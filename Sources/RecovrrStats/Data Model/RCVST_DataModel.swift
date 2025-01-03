@@ -407,7 +407,7 @@ extension Array where Element == any RCVST_RowProtocol {
 /**
  This protocol describes a chart dataset, which is sent to each chart.
  */
-protocol DataProviderProtocol: AnyObject {
+protocol DataProviderProtocol {
     // MARK: Required
     
     /* ##################################################### */
@@ -512,7 +512,7 @@ protocol DataProviderProtocol: AnyObject {
      - returns: The previous state of the row.
      */
     @discardableResult
-    func selectRow(_: Int, isSelected: Bool) -> Bool
+    mutating func selectRow(_: Int, isSelected: Bool) -> Bool
     
     /* ##################################################### */
     /**
@@ -524,13 +524,15 @@ protocol DataProviderProtocol: AnyObject {
      - returns: The previous state of the row.
      */
     @discardableResult
-    func selectRow(_: any RCVST_RowProtocol, isSelected: Bool) -> Bool
+    mutating func selectRow(_: any RCVST_RowProtocol, isSelected: Bool) -> Bool
+    
+    mutating func setDataWindowRange(_ inDataWindowRange: ClosedRange<Date>)
     
     /* ##################################################### */
     /**
      This removes selection from all rows.
      */
-    func deselectAllRows()
+    mutating func deselectAllRows()
 }
 
 /* ##################################################### */
@@ -705,7 +707,7 @@ extension DataProviderProtocol {
     /**
      */
     @discardableResult
-    func selectRow(_ inIndex: Int, isSelected inIsSelected: Bool = true) -> Bool {
+    mutating func selectRow(_ inIndex: Int, isSelected inIsSelected: Bool = true) -> Bool {
         precondition((0..<rows.count).contains(inIndex), "Index out of bounds")
         
         let ret = rows[inIndex].isSelected
@@ -722,7 +724,7 @@ extension DataProviderProtocol {
     /**
      */
     @discardableResult
-    func selectRow(_ inRow: any RCVST_RowProtocol, isSelected inIsSelected: Bool = true) -> Bool {
+    mutating func selectRow(_ inRow: any RCVST_RowProtocol, isSelected inIsSelected: Bool = true) -> Bool {
         guard let index = rows.firstIndex(where: { $0.sampleDate == inRow.sampleDate }) else { return false }
         return selectRow(index, isSelected: inIsSelected)
     }
@@ -730,8 +732,15 @@ extension DataProviderProtocol {
     /* ##################################################### */
     /**
      */
-    func deselectAllRows() {
+    mutating func deselectAllRows() {
         for row in rows.enumerated() { rows[row.offset].isSelected = false }
+    }
+    
+    /* ##################################################### */
+    /**
+     */
+    mutating func setDataWindowRange(_ inDataWindowRange: ClosedRange<Date>) {
+        dataWindowRange = inDataWindowRange
     }
 }
 

@@ -170,9 +170,9 @@ struct RCVST_ChartDisplay: View {
                                                 
                                                 // No less than 2 days (by setting to 1 day for halfsies). The 1.2 is to "slow down" the magnification a bit, so it's not too intense.
                                                 let newRange = max(86400, (rangeInSeconds * 1.2) / inValue.magnification)
-                                                
+
                                                 // By changing this, we force a redraw of the chart, with the new limits.
-                                                data.dataWindowRange = (centerDate.addingTimeInterval(-newRange)...centerDate.addingTimeInterval(newRange)).clamped(to: data.totalDateRange)
+                                                data.setDataWindowRange((centerDate.addingTimeInterval(-newRange)...centerDate.addingTimeInterval(newRange)).clamped(to: data.totalDateRange))
                                             }
                                         }
                                         .onEnded { _ in _firstRange = nil } // We reset the initial range, when we're done.
