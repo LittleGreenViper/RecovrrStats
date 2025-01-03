@@ -166,8 +166,8 @@ struct RootStackView: View {
     /**
      */
     func updateTotals() {
-        guard let latestAct = _data?.allRows.last?.activeUsers,
-              let latestInact = _data?.allRows.last?.newUsers
+        guard let latestAct = _data?.userDataProvider?.rows.last?.activeUsers,
+              let latestInact = _data?.userDataProvider?.rows.last?.newUsers
         else { return }
         latestActiveTotal = latestAct
         latestInactiveTotal = latestInact
@@ -192,21 +192,31 @@ struct RootStackView: View {
                 .foregroundColor(.blue)
             List {
                 NavigationLink("User Types") {
-                    if let data = _data {
-                        RCVST_ChartDisplay(data: _data)
+                    if let data = _data?.userDataProvider {
+                        RCVST_ChartDisplay(data: data)
                     }
                 }
             }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
             // Reacts to "pull to refresh," to reload the file.
-            .refreshable { _data = RCVST_DataProvider(useMockData: false, completion: updateTotals) }
+            .refreshable {
+                RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
+                    _data = inDataProvider
+                }
+            }
         }
-        .onAppear { _data = RCVST_DataProvider(useMockData: false, completion: updateTotals) }
+        .onAppear {
+            RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
+                _data = inDataProvider
+            }
+        }
         // Forces updates, whenever we become active.
         .onChange(of: _scenePhase, initial: true) {
             if .active == _scenePhase,
                nil == _data {
-                _data = RCVST_DataProvider(useMockData: false, completion: updateTotals)
+                RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
+                    _data = inDataProvider
+                }
             } else if .background == _scenePhase {
                 _data = nil
             }

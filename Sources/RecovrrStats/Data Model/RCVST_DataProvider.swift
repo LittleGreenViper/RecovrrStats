@@ -6,21 +6,26 @@ import SwiftUI
 import TabularData
 import RVS_Generic_Swift_Toolbox
 
-class RCVST_UserDataProvider: RCV_BaseDataProvider {
-    /* ##################################################### */
+/* ###################################################################################################################################### */
+// MARK: - User Type Specialized Stats Data Provider -
+/* ###################################################################################################################################### */
+/**
+ */
+class RCVST_UserTypesDataProvider: RCV_BaseDataProvider {
+    /* ################################################################################################################################## */
+    // MARK: Specialized Row Type
+    /* ################################################################################################################################## */
     /**
      */
-    var dataFrame: DataFrame?
-    
-    class _RCVST_UserDataRow: RCVST_Row {
-        /* ############################################# */
+    class _RCVST_UserTypesDataRow: RCVST_Row {
+        /* ################################################# */
         /**
          */
-        override var plottableData: [any RCVS_DataSourceProtocol] {
+        override var plottableData: [RCVST_BasePlottableData] {
             get {
                 [
-                    RCVST_Row._RCVST_UserDataPlottableData(description: "Active Users", color: .green, value: activeUsers, isSelected: isSelected),
-                    RCVST_Row._RCVST_UserDataPlottableData(description: "New Users", color: .blue, value: newUsers, isSelected: isSelected)
+                    RCVST_Row.RCVST_BasePlottableData(description: "Active Users", color: .green, value: activeUsers, isSelected: isSelected),
+                    RCVST_Row.RCVST_BasePlottableData(description: "New Users", color: .blue, value: newUsers, isSelected: isSelected)
                 ]
             }
             
@@ -28,13 +33,22 @@ class RCVST_UserDataProvider: RCV_BaseDataProvider {
         }
     }
     
-    init(with inDataFrame: DataFrame) {
-        var rowTypes = [_RCVST_UserDataRow]()
+    /* ##################################################### */
+    /**
+     */
+    var dataFrame: DataFrame?
     
-        for index in 0..<inDataFrame.rows.count {
+    /* ##################################################### */
+    /**
+     */
+    init(with inDataFrame: DataFrame) {
+        var rowTypes = [_RCVST_UserTypesDataRow]()
+    
+        // We do every other one, because we have two samples per day. We only need the last one.
+        for index in stride(from: 0, to: inDataFrame.rows.count, by: 2) {
             let row = inDataFrame.rows[index]
             let previousRow = 0 < index ? inDataFrame.rows[index - 1] : nil
-            rowTypes.append(_RCVST_UserDataRow(dataRow: row, previousDataRow: previousRow))
+            rowTypes.append(_RCVST_UserTypesDataRow(dataRow: row, previousDataRow: previousRow))
         }
 
         super.init(rows: rowTypes, chartName: "User Types")
@@ -284,11 +298,17 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
      This stores the dataframe info.
      */
     var statusDataFrame: DataFrame
+    
+    /* ################################################################## */
+    /**
+     */
+    var userDataProvider: RCVST_UserTypesDataProvider?
 
     /* ################################################################## */
     /**
      */
     init(statusDataFrame inDataFrame: DataFrame) {
         statusDataFrame = inDataFrame
+        userDataProvider = RCVST_UserTypesDataProvider(with: inDataFrame)
     }
 }

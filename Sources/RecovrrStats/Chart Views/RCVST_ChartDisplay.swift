@@ -89,7 +89,7 @@ struct RCVST_ChartDisplay: View {
             
             // This builds bars. The date determines the X-axis, and the Y-axis has the number of each type of user, stacked.
             Chart(data.windowedRows as? [RCVST_Row] ?? []) { inRow in // Note that we use the `windowedRows` computed property. This comes into play, when we implement pinch-to-zoom.
-                ForEach(inRow.plottableData as? [RCVS_DataSource] ?? []) { inPlottableData in
+                ForEach(inRow.plottableData) { inPlottableData in
                     BarMark(
                         x: .value("Date", inRow.sampleDate, unit: .day),    // The date is the same, for each component. Each bar represents one day.
                         y: .value(inPlottableData.description, inPlottableData.value) // The components "stack," with subsequent ones being placed above previous ones.

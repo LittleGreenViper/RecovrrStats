@@ -127,7 +127,7 @@ public protocol RCVST_RowProtocol: AnyObject, Identifiable {
      
      > NOTE: The population should occur at call time, or, if cached, the cache should be refreshed, when ``dataRow`` is changed.
      */
-    var plottableData: [any RCVS_DataSourceProtocol] { get }
+    var plottableData: [RCVST_Row.RCVST_BasePlottableData] { get }
 }
 
 /* ##################################################### */
@@ -767,30 +767,30 @@ public class RCVST_Row: RCVST_RowProtocol {
     /**
      Each row can have multiple segments. This general-purpose class is used to communicate these segments.
      */
-    class _RCVST_UserDataPlottableData: RCVS_DataSourceProtocol {
+    public class RCVST_BasePlottableData: RCVS_DataSourceProtocol {
         /* ############################################# */
         /**
          (Stored Property) The row segment description
          */
-        var description: String
+        public var description: String
         
         /* ############################################# */
         /**
          (Stored Property) The row segment color
          */
-        var color: Color
+        public var color: Color
         
         /* ############################################# */
         /**
          (Stored Property) The row segment value
          */
-        var value: Int
+        public var value: Int
         
         /* ############################################# */
         /**
          (Stored Property) True, if the row segment is selected.
          */
-        var isSelected: Bool
+        public var isSelected: Bool
         
         /* ############################################# */
         /**
@@ -802,7 +802,7 @@ public class RCVST_Row: RCVST_RowProtocol {
             - value: The row segment value
             - isSelected: True, if the row segment is selected.
          */
-        init(description inDescription: String, color inColor: Color, value inValue: Int, isSelected inIsSelected: Bool) {
+        public init(description inDescription: String, color inColor: Color, value inValue: Int, isSelected inIsSelected: Bool) {
             description = inDescription
             color = inColor
             value = inValue
@@ -838,7 +838,7 @@ public class RCVST_Row: RCVST_RowProtocol {
     /**
      This is the important part. This should be overridden, and the subclass should populate this with relevant data for display.
      */
-    public var plottableData: [any RCVS_DataSourceProtocol] = []
+    public var plottableData: [RCVST_BasePlottableData] = []
 
     /* ################################################# */
     /**
