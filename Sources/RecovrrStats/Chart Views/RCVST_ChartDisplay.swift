@@ -37,7 +37,7 @@ struct RCVST_ChartDisplay: View {
      
      It's somewhat mutable (we can set observational state, like marking rows as selected, or setting a "window" of dates to examine).
      */
-    @Binding var data: DataProviderProtocol
+    @State var data: DataProviderProtocol
     
     // MARK: Private Properties
 

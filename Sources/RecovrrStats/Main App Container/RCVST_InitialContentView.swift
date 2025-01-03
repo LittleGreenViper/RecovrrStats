@@ -191,11 +191,11 @@ struct RootStackView: View {
             Text(String(format: "SLUG-MAIN-CURRENT-INACTIVE".localizedVariant, latestInactiveTotal))
                 .foregroundColor(.blue)
             List {
-                NavigationLink(Self._navigationNames[0]) { RCVST_Chart1View(title: Self._navigationNames[0], data: $_data, dataWindow: $_dataWindow, selectedValuesString: $_selectedValuesString) }
-                NavigationLink(Self._navigationNames[1]) { RCVST_Chart2View(title: Self._navigationNames[1], data: $_data, dataWindow: $_dataWindow, selectedValuesString: $_selectedValuesString) }
-                NavigationLink(Self._navigationNames[2]) { RCVST_Chart3View(title: Self._navigationNames[2], data: $_data, dataWindow: $_dataWindow, selectedValuesString: $_selectedValuesString) }
-                NavigationLink(Self._navigationNames[3]) { RCVST_Chart4View(title: Self._navigationNames[3], data: $_data, dataWindow: $_dataWindow, selectedValuesString: $_selectedValuesString) }
-                NavigationLink(Self._navigationNames[4]) { RCVST_Chart5View(title: Self._navigationNames[4], data: $_data, dataWindow: $_dataWindow, selectedValuesString: $_selectedValuesString) }
+                NavigationLink("User Types") {
+                    if let data = _data {
+                        RCVST_ChartDisplay(data: _data)
+                    }
+                }
             }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
             // Reacts to "pull to refresh," to reload the file.
