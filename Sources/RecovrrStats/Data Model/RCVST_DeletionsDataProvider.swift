@@ -19,12 +19,12 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
     /**
      This adds the plottable data to the row.
      */
-    class _RCVST_SignupsDataRow: RCVST_Row {
+    class _RCVST_DeletionsDataRow: RCVST_Row {
         /* ################################################# */
         /**
          This has an instance of the previous row, as we aggregate two at a time.
          */
-        var previousRowInstance: _RCVST_SignupsDataRow?
+        var previousRowInstance: _RCVST_DeletionsDataRow?
         
         /* ################################################# */
         /**
@@ -32,15 +32,19 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
          */
         override var plottableData: [RCVST_BasePlottableData] {
             get {
-                let signupsAccepted = newAcceptedRequests + (previousRowInstance?.newAcceptedRequests ?? 0)
-                let signupsRejected = newRejectedRequests + (previousRowInstance?.newRejectedRequests ?? 0)
+                let deletedActive = newDeletedActive + (previousRowInstance?.newDeletedActive ?? 0)
+                let deletedInactive = newDeletedInactive + (previousRowInstance?.newDeletedInactive ?? 0)
+                let deletedSelf = newSelfDeleted + (previousRowInstance?.newSelfDeleted ?? 0)
                 return [
-                    RCVST_Row.RCVST_BasePlottableData(description: "SLUG-SIGNUP-COLUMN-NAME-acceptedSignups".localizedVariant,
+                    RCVST_Row.RCVST_BasePlottableData(description: "SLUG-DELETION-COLUMN-NAME-deletedActive".localizedVariant,
                                                       color: isSelected ? RCVS_LegendSelectionColor : .green,
-                                                      value: signupsAccepted, isSelected: isSelected),
-                    RCVST_Row.RCVST_BasePlottableData(description: "SLUG-SIGNUP-COLUMN-NAME-rejectedSignups".localizedVariant,
+                                                      value: deletedActive, isSelected: isSelected),
+                    RCVST_Row.RCVST_BasePlottableData(description: "SLUG-DELETION-COLUMN-NAME-deletedInactive".localizedVariant,
+                                                      color:  isSelected ? RCVS_LegendSelectionColor : .blue,
+                                                      value: deletedInactive, isSelected: isSelected),
+                    RCVST_Row.RCVST_BasePlottableData(description: "SLUG-DELETION-COLUMN-NAME-selfDeleted".localizedVariant,
                                                       color:  isSelected ? RCVS_LegendSelectionColor : .orange,
-                                                      value: signupsRejected, isSelected: isSelected)
+                                                      value: deletedSelf, isSelected: isSelected)
                 ]
             }
             
@@ -56,7 +60,7 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
          - parameter rowIndex: The 0-based index (in the dataframe rows) of this row (it will also be the index of this row).
          - parameter previousRowInstance: The resolved instance of the row prior to this one (may be nil, for row 0).
          */
-        public init(dataRow inDataRow: DataFrame.Row, previousDataRow inPreviousDataRow: DataFrame.Row?, rowIndex inIndex: Int, previousRowInstance inPreviousRowInstance: _RCVST_SignupsDataRow?) {
+        public init(dataRow inDataRow: DataFrame.Row, previousDataRow inPreviousDataRow: DataFrame.Row?, rowIndex inIndex: Int, previousRowInstance inPreviousRowInstance: _RCVST_DeletionsDataRow?) {
             super.init(dataRow: inDataRow, previousDataRow: inPreviousDataRow, rowIndex: inIndex)
             previousRowInstance = inPreviousRowInstance
         }
@@ -83,14 +87,14 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
     /**
      */
     init(with inDataFrame: DataFrame, chartName inChartName: String) {
-        var rowTypes = [_RCVST_SignupsDataRow]()
+        var rowTypes = [_RCVST_DeletionsDataRow]()
     
         // We do every other one, because we have two samples per day. We will be adding them together.
         for index in stride(from: 1, to: inDataFrame.rows.count, by: 2) {
             let row = inDataFrame.rows[index]
             let previousRow = 0 < index ? inDataFrame.rows[index - 1] : nil
-            let previousRowInstance = nil != previousRow ? _RCVST_SignupsDataRow(dataRow: previousRow!, previousDataRow: rowTypes.last?.dataRow, rowIndex: index, previousRowInstance: rowTypes.last) : nil
-            rowTypes.append(_RCVST_SignupsDataRow(dataRow: row, previousDataRow: previousRow, rowIndex: index, previousRowInstance: previousRowInstance))
+            let previousRowInstance = nil != previousRow ? _RCVST_DeletionsDataRow(dataRow: previousRow!, previousDataRow: rowTypes.last?.dataRow, rowIndex: index, previousRowInstance: rowTypes.last) : nil
+            rowTypes.append(_RCVST_DeletionsDataRow(dataRow: row, previousDataRow: previousRow, rowIndex: index, previousRowInstance: previousRowInstance))
         }
         
         rows = rowTypes
@@ -107,17 +111,19 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
      */
     var selectionString: String {
         get {
-            if let selectedValue = selectedRow as? _RCVST_SignupsDataRow {
+            if let selectedValue = selectedRow as? _RCVST_DeletionsDataRow {
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateStyle = .short
                 dateFormatter.timeStyle = .none
-                let signupsAccepted = selectedValue.newAcceptedRequests + (selectedValue.previousRowInstance?.newAcceptedRequests ?? 0)
-                let signupsRejected = selectedValue.newRejectedRequests + (selectedValue.previousRowInstance?.newRejectedRequests ?? 0)
-                let ret = String(format: "SLUG-SIGNUP-TYPES-DESC-STRING-FORMAT".localizedVariant,
+                let deletedActive = selectedValue.newDeletedActive + (selectedValue.previousRowInstance?.newDeletedActive ?? 0)
+                let deletedInactive = selectedValue.newDeletedInactive + (selectedValue.previousRowInstance?.newDeletedInactive ?? 0)
+                let deletedSelf = selectedValue.newSelfDeleted + (selectedValue.previousRowInstance?.newSelfDeleted ?? 0)
+                let ret = String(format: "SLUG-DELETED-TYPES-DESC-STRING-FORMAT".localizedVariant,
                                  dateFormatter.string(from: selectedValue.sampleDate),
-                                 signupsAccepted,
-                                 signupsRejected,
-                                 signupsAccepted + signupsRejected
+                                 deletedActive,
+                                 deletedInactive,
+                                 deletedSelf,
+                                 deletedActive + deletedInactive + deletedSelf
                 )
                 return ret
             } else {
