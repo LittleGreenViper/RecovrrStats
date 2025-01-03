@@ -643,9 +643,9 @@ extension DataProviderProtocol {
         else { return [] }
 
         // This will be used for the "round up" operation. Crude, but sufficient for our needs.
-        let divisors = [4, 8, 20, 100, 200, 400]
-        let topDivisorIndex = divisors.last(where: { $0 < maxYValue }) ?? 0
-        let divisor = topDivisorIndex / 4
+        let divisors = [4, 8, 20, 40, 100, 200, 400, 1000]
+        let topDivisorIndex = divisors.last(where: { $0 <= maxYValue }) ?? 0
+        let divisor = max(1, topDivisorIndex / 4)
         
         let stepSizeStart = Int(ceil(Double(maxYValue) / Double(inNumberOfValues - 1)))  // We start, by getting the maximum step size necessary to reach the maximum users.
         
