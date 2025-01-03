@@ -120,7 +120,13 @@ public protocol RCVST_RowProtocol: AnyObject, Identifiable {
      The untyped `DataFrame.Row` instance assigned to this instance.
      */
     var dataRow: DataFrame.Row { get set }
-    
+
+    /* ################################################# */
+    /**
+     The 0-based index (in the dataframe rows) of this row (it will also be the index of this row).
+     */
+    var rowIndex: Int { get set }
+
     /* ################################################# */
     /**
      This is the important part. The implementation should populate this with relevant data for display.
@@ -140,55 +146,55 @@ public extension RCVST_RowProtocol {
     /**
      The total number of users (both active and inactive), for the previous sample.
      */
-    private var _previousTotalUsers: Int { previousDataRow?[RCVST_DataProvider.Columns.total_users.rawValue] as? Int ?? 0 }
+    var previousTotalUsers: Int { previousDataRow?[RCVST_DataProvider.Columns.total_users.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The total number of new (inactive) users, for the previous sample.
      */
-    private var _previousNewUsers: Int { previousDataRow?[RCVST_DataProvider.Columns.new_users.rawValue] as? Int ?? 0 }
+    var previousNewUsers: Int { previousDataRow?[RCVST_DataProvider.Columns.new_users.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The current number of users (both active and new), for the previous sample.
      */
-    private var _previousNeverSetLocation: Int { previousDataRow?[RCVST_DataProvider.Columns.never_set_location.rawValue] as? Int ?? 0 }
+    var previousNeverSetLocation: Int { previousDataRow?[RCVST_DataProvider.Columns.never_set_location.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative total number of signup requests, for the previous sample.
      */
-    private var _previousTotalRequests: Int { previousDataRow?[RCVST_DataProvider.Columns.total_requests.rawValue] as? Int ?? 0 }
+    var previousTotalRequests: Int { previousDataRow?[RCVST_DataProvider.Columns.total_requests.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative total number of signup requests approved by the administrators, for the previous sample.
      */
-    private var _previousAcceptedRequests: Int { previousDataRow?[RCVST_DataProvider.Columns.accepted_requests.rawValue] as? Int ?? 0 }
+    var previousAcceptedRequests: Int { previousDataRow?[RCVST_DataProvider.Columns.accepted_requests.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative total number of signup requests rejected by the administrators, for the previous sample.
      */
-    private var _previousRejectedRequests: Int { previousDataRow?[RCVST_DataProvider.Columns.rejected_requests.rawValue] as? Int ?? 0 }
+    var previousRejectedRequests: Int { previousDataRow?[RCVST_DataProvider.Columns.rejected_requests.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative number of active users that have been deleted by the administrators, for the previous sample.
      */
-    private var _previousDeletedActive: Int { previousDataRow?[RCVST_DataProvider.Columns.deleted_active.rawValue] as? Int ?? 0 }
+    var previousDeletedActive: Int { previousDataRow?[RCVST_DataProvider.Columns.deleted_active.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative number of new users that have been deleted by the administrators, for the previous sample.
      */
-    private var _previousDeletedInactive: Int { previousDataRow?[RCVST_DataProvider.Columns.deleted_inactive.rawValue] as? Int ?? 0 }
+    var previousDeletedInactive: Int { previousDataRow?[RCVST_DataProvider.Columns.deleted_inactive.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The total number of active users, for the previous sample.
      */
-    private var _previousActiveUsers: Int { _previousTotalUsers - _previousNewUsers }
+    var previousActiveUsers: Int { previousTotalUsers - previousNewUsers }
     
     // MARK: Public Data
     
@@ -308,25 +314,25 @@ public extension RCVST_RowProtocol {
     /**
      The change in the total number of users. Positive is users added, negative is users removed.
      */
-    var changeInTotalUsers: Int { 0 == _previousTotalUsers ? 0 : totalUsers - _previousTotalUsers }
+    var changeInTotalUsers: Int { 0 == previousTotalUsers ? 0 : totalUsers - previousTotalUsers }
 
     /* ############################################################## */
     /**
      The change in the total number of inactive users. Positive is users added, negative is users removed.
      */
-    var changeInNewUsers: Int { 0 == _previousNewUsers ? 0 : newUsers - _previousNewUsers }
+    var changeInNewUsers: Int { 0 == previousNewUsers ? 0 : newUsers - previousNewUsers }
 
     /* ############################################################## */
     /**
      The change in the total number of inactive users. Positive is users added, negative is users removed.
      */
-    var changeInActiveUsers: Int { 0 == _previousActiveUsers ? 0 : activeUsers - _previousActiveUsers }
+    var changeInActiveUsers: Int { 0 == previousActiveUsers ? 0 : activeUsers - previousActiveUsers }
 
     /* ############################################################## */
     /**
      The change in the number of users (both active and new), that have a nil location.
      */
-    var changeInNeverSetLocation: Int { 0 == _previousNeverSetLocation ? 0 : neverSetLocation - _previousNeverSetLocation }
+    var changeInNeverSetLocation: Int { 0 == previousNeverSetLocation ? 0 : neverSetLocation - previousNeverSetLocation }
 
     /* ############################################################## */
     /**
@@ -338,31 +344,31 @@ public extension RCVST_RowProtocol {
     /**
      The number of signup requests since the last sample.
      */
-    var newRequests: Int { totalRequests - _previousTotalRequests }
+    var newRequests: Int { totalRequests - previousTotalRequests }
 
     /* ############################################################## */
     /**
      The number of signup requests approved by the administrators since the last sample.
      */
-    var newAcceptedRequests: Int { acceptedRequests - _previousAcceptedRequests }
+    var newAcceptedRequests: Int { acceptedRequests - previousAcceptedRequests }
 
     /* ############################################################## */
     /**
      The number of signup requests rejected by the administrators since the last sample.
      */
-    var newRejectedRequests: Int { rejectedRequests - _previousRejectedRequests }
+    var newRejectedRequests: Int { rejectedRequests - previousRejectedRequests }
 
     /* ############################################################## */
     /**
      The number of active users deleted by the administrators since the last sample.
      */
-    var newDeletedActive: Int { deletedActive - _previousDeletedActive }
+    var newDeletedActive: Int { deletedActive - previousDeletedActive }
 
     /* ############################################################## */
     /**
      The number of inactive users deleted by the administrators since the last sample.
      */
-    var newDeletedInactive: Int { deletedInactive - _previousDeletedInactive }
+    var newDeletedInactive: Int { deletedInactive - previousDeletedInactive }
 
     /* ############################################################## */
     /**
@@ -823,6 +829,12 @@ public class RCVST_Row: RCVST_RowProtocol {
 
     /* ################################################# */
     /**
+     The 0-based index (in the dataframe rows) of this row (it will also be the index of this row).
+     */
+    public var rowIndex: Int
+
+    /* ################################################# */
+    /**
      (Stored Property) The untyped `DataFrame.Row` instance assigned to this instance.
      */
     public var previousDataRow: DataFrame.Row?
@@ -856,9 +868,12 @@ public class RCVST_Row: RCVST_RowProtocol {
      initializer
      
      - parameter dataRow: The `DataFrame.Row` for the line we're saving.
+     - parameter previousDataRow: The `DataFrame.Row` for the line prior to the one we're saving (may be nil, for the first row).
+     - parameter rowIndex: The 0-based index (in the dataframe rows) of this row (it will also be the index of this row).
      */
-    public init(dataRow inDataRow: DataFrame.Row, previousDataRow inPreviousDataRow: DataFrame.Row?) {
+    public init(dataRow inDataRow: DataFrame.Row, previousDataRow inPreviousDataRow: DataFrame.Row?, rowIndex inIndex: Int) {
         dataRow = inDataRow
+        rowIndex = inIndex
         previousDataRow = inPreviousDataRow
     }
 }

@@ -253,6 +253,11 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
     /**
      */
     var userDataProvider: RCVST_UserTypesDataProvider?
+    
+    /* ################################################################## */
+    /**
+     */
+    var signupsDataProvider: RCVST_SignupsDataProvider?
 
     /* ################################################################## */
     /**
@@ -260,5 +265,6 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
     init(statusDataFrame inDataFrame: DataFrame) {
         statusDataFrame = inDataFrame
         userDataProvider = RCVST_UserTypesDataProvider(with: inDataFrame, chartName: "SLUG-USER-TOTALS-CHART-TITLE".localizedVariant)
+        signupsDataProvider = RCVST_SignupsDataProvider(with: inDataFrame, chartName: "SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant)
     }
 }

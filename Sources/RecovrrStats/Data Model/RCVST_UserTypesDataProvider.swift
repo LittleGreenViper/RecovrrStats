@@ -64,10 +64,10 @@ struct RCVST_UserTypesDataProvider: DataProviderProtocol {
         var rowTypes = [_RCVST_UserTypesDataRow]()
     
         // We do every other one, because we have two samples per day. We only need the last one.
-        for index in stride(from: 0, to: inDataFrame.rows.count, by: 2) {
+        for index in stride(from: 1, to: inDataFrame.rows.count, by: 2) {
             let row = inDataFrame.rows[index]
             let previousRow = 0 < index ? inDataFrame.rows[index - 1] : nil
-            rowTypes.append(_RCVST_UserTypesDataRow(dataRow: row, previousDataRow: previousRow))
+            rowTypes.append(_RCVST_UserTypesDataRow(dataRow: row, previousDataRow: previousRow, rowIndex: index))
         }
         
         rows = rowTypes
@@ -88,7 +88,7 @@ struct RCVST_UserTypesDataProvider: DataProviderProtocol {
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateStyle = .short
                 dateFormatter.timeStyle = .none
-                let ret = String(format: "%@: Active: %d, New: %d, Total: %d",
+                let ret = String(format: "SLUG-USER-TYPES-DESC-STRING-FORMAT".localizedVariant,
                                  dateFormatter.string(from: selectedValue.sampleDate),
                                  selectedValue.activeUsers,
                                  selectedValue.newUsers,
