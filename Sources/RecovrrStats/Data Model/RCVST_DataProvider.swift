@@ -10,22 +10,29 @@ import RVS_Generic_Swift_Toolbox
 // MARK: - User Type Specialized Stats Data Provider -
 /* ###################################################################################################################################### */
 /**
+ This implementation specializes for the "active/new" user display.
  */
 class RCVST_UserTypesDataProvider: RCV_BaseDataProvider {
     /* ################################################################################################################################## */
     // MARK: Specialized Row Type
     /* ################################################################################################################################## */
     /**
+     This adds the plottable data to the row.
      */
     class _RCVST_UserTypesDataRow: RCVST_Row {
         /* ################################################# */
         /**
+         We generate plottable data on demand.
          */
         override var plottableData: [RCVST_BasePlottableData] {
             get {
                 [
-                    RCVST_Row.RCVST_BasePlottableData(description: "Active Users", color: .green, value: activeUsers, isSelected: isSelected),
-                    RCVST_Row.RCVST_BasePlottableData(description: "New Users", color: .blue, value: newUsers, isSelected: isSelected)
+                    RCVST_Row.RCVST_BasePlottableData(description: "SLUG-USER-COLUMN-NAME-active".localizedVariant,
+                                                      color: isSelected ? RCVS_LegendSelectionColor : .green,
+                                                      value: activeUsers, isSelected: isSelected),
+                    RCVST_Row.RCVST_BasePlottableData(description: "SLUG-USER-COLUMN-NAME-new".localizedVariant,
+                                                      color:  isSelected ? RCVS_LegendSelectionColor : .blue,
+                                                      value: newUsers, isSelected: isSelected)
                 ]
             }
             
@@ -35,9 +42,35 @@ class RCVST_UserTypesDataProvider: RCV_BaseDataProvider {
     
     /* ##################################################### */
     /**
+     This is the dataframe that supplies our data.
      */
     var dataFrame: DataFrame?
     
+    /* ##################################################### */
+    /**
+     This is a string that is to be displayed, to describe the selected row.
+     */
+    override var selectionString: String {
+        get {
+            if let selectedValue = selectedRow as? _RCVST_UserTypesDataRow {
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateStyle = .short
+                dateFormatter.timeStyle = .none
+                let ret = String(format: "%@: Active: %d, New: %d, Total: %d",
+                                 dateFormatter.string(from: selectedValue.sampleDate),
+                                 selectedValue.activeUsers,
+                                 selectedValue.newUsers,
+                                 selectedValue.totalUsers
+                )
+                return ret
+            } else {
+                return " "
+            }
+        }
+        
+        set { _ = newValue }
+    }
+
     /* ##################################################### */
     /**
      */

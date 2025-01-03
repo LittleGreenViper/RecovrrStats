@@ -407,7 +407,7 @@ extension Array where Element == any RCVST_RowProtocol {
 /**
  This protocol describes a chart dataset, which is sent to each chart.
  */
-protocol DataProviderProtocol {
+protocol DataProviderProtocol: AnyObject {
     // MARK: Required
     
     /* ##################################################### */
@@ -512,7 +512,7 @@ protocol DataProviderProtocol {
      - returns: The previous state of the row.
      */
     @discardableResult
-    mutating func selectRow(_: Int, isSelected: Bool) -> Bool
+    func selectRow(_: Int, isSelected: Bool) -> Bool
     
     /* ##################################################### */
     /**
@@ -524,13 +524,13 @@ protocol DataProviderProtocol {
      - returns: The previous state of the row.
      */
     @discardableResult
-    mutating func selectRow(_: any RCVST_RowProtocol, isSelected: Bool) -> Bool
+    func selectRow(_: any RCVST_RowProtocol, isSelected: Bool) -> Bool
     
     /* ##################################################### */
     /**
      This removes selection from all rows.
      */
-    mutating func deselectAllRows()
+    func deselectAllRows()
 }
 
 /* ##################################################### */
