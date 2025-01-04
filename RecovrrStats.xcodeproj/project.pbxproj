@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		D4183B802D287F0600862A80 /* RCVST_DeletionsDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4183B7F2D287F0600862A80 /* RCVST_DeletionsDataProvider.swift */; };
 		D433ED262CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox in Frameworks */ = {isa = PBXBuildFile; productRef = D433ED252CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox */; };
+		D47403882D28D09700F08C0A /* RCVST_UserActivityDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47403872D28D09700F08C0A /* RCVST_UserActivityDataProvider.swift */; };
 		D47856282D286664006517C3 /* RCVST_SignupsDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47856272D286664006517C3 /* RCVST_SignupsDataProvider.swift */; };
 		D4ADD8262CF5F13E0030B789 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4ADD81A2CF5F13E0030B789 /* Assets.xcassets */; };
 		D4ADD8292CF5F13E0030B789 /* RCVST_App.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ADD81D2CF5F13E0030B789 /* RCVST_App.swift */; };
@@ -25,6 +26,7 @@
 		D40D8F8F2CFBCCAA000F1FB4 /* RCVST_ZoomControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_ZoomControl.swift; sourceTree = "<group>"; };
 		D4183B7F2D287F0600862A80 /* RCVST_DeletionsDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_DeletionsDataProvider.swift; sourceTree = "<group>"; };
 		D4484A452CBEA80B0019BC0E /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Warnings.xcconfig; sourceTree = "<group>"; };
+		D47403872D28D09700F08C0A /* RCVST_UserActivityDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_UserActivityDataProvider.swift; sourceTree = "<group>"; };
 		D47856272D286664006517C3 /* RCVST_SignupsDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_SignupsDataProvider.swift; sourceTree = "<group>"; };
 		D4A62DD52CC9372D001DD8A9 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		D4ADD81A2CF5F13E0030B789 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 				D4D199542D2836B5004110BC /* RCVST_UserTypesDataProvider.swift */,
 				D47856272D286664006517C3 /* RCVST_SignupsDataProvider.swift */,
 				D4183B7F2D287F0600862A80 /* RCVST_DeletionsDataProvider.swift */,
+				D47403872D28D09700F08C0A /* RCVST_UserActivityDataProvider.swift */,
 			);
 			path = "Data Model";
 			sourceTree = "<group>";
@@ -241,6 +244,7 @@
 				D4D199552D2836B5004110BC /* RCVST_UserTypesDataProvider.swift in Sources */,
 				D47856282D286664006517C3 /* RCVST_SignupsDataProvider.swift in Sources */,
 				D4EBAC792D26B7900076E72E /* RCVST_DataModel.swift in Sources */,
+				D47403882D28D09700F08C0A /* RCVST_UserActivityDataProvider.swift in Sources */,
 				D4ADD8292CF5F13E0030B789 /* RCVST_App.swift in Sources */,
 				D4ADD8302CF5F13E0030B789 /* Localizable.strings in Sources */,
 				D4FDE7F92D2590E2007C74A4 /* RCVST_ChartDisplay.swift in Sources */,

@@ -58,7 +58,7 @@ struct RCVST_ChartDisplay: View {
     @State private var _selectedValue: RCVST_Row? {
         didSet {
             if let selectedValue = _selectedValue,
-               1 < selectedValue.plottableData.count {
+               !selectedValue.plottableData.isEmpty {
                 data.selectRow(selectedValue)
                 _selectedValuesString = data.selectionString
             } else {
@@ -88,7 +88,7 @@ struct RCVST_ChartDisplay: View {
                     VStack {
                         // This displays the value of the selected bar. It is one line of red text, so we make it small enough to fit.
                         Text(_selectedValuesString)
-                            .font(.caption)
+                            .font(.system(size: 11))
                             .foregroundStyle(RCVS_LegendSelectionColor)
                         
                         // This builds bars. The date determines the X-axis, and the Y-axis has the number of each type of user, stacked.

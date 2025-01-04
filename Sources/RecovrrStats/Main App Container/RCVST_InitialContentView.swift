@@ -206,6 +206,26 @@ struct RootStackView: View {
                         RCVST_ChartDisplay(data: data)
                     }
                 }
+                if let data = _data?.active1DataProvider {
+                    NavigationLink(data.chartName) {
+                        RCVST_ChartDisplay(data: data)
+                    }
+                }
+                if let data = _data?.active7DataProvider {
+                    NavigationLink(data.chartName) {
+                        RCVST_ChartDisplay(data: data)
+                    }
+                }
+                if let data = _data?.active30DataProvider {
+                    NavigationLink(data.chartName) {
+                        RCVST_ChartDisplay(data: data)
+                    }
+                }
+                if let data = _data?.active90DataProvider {
+                    NavigationLink(data.chartName) {
+                        RCVST_ChartDisplay(data: data)
+                    }
+                }
             }
             .navigationTitle("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
             // Reacts to "pull to refresh," to reload the file.

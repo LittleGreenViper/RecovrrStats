@@ -263,6 +263,26 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
     /**
      */
     var deletionsDataProvider: RCVST_DeletionsDataProvider?
+    
+    /* ################################################################## */
+    /**
+     */
+    var active1DataProvider: RCVST_UserActivityDataProvider?
+    
+    /* ################################################################## */
+    /**
+     */
+    var active7DataProvider: RCVST_UserActivityDataProvider?
+    
+    /* ################################################################## */
+    /**
+     */
+    var active30DataProvider: RCVST_UserActivityDataProvider?
+    
+    /* ################################################################## */
+    /**
+     */
+    var active90DataProvider: RCVST_UserActivityDataProvider?
 
     /* ################################################################## */
     /**
@@ -272,5 +292,9 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
         userDataProvider = RCVST_UserTypesDataProvider(with: inDataFrame, chartName: "SLUG-USER-TOTALS-CHART-TITLE".localizedVariant)
         signupsDataProvider = RCVST_SignupsDataProvider(with: inDataFrame, chartName: "SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant)
         deletionsDataProvider = RCVST_DeletionsDataProvider(with: inDataFrame, chartName: "SLUG-CHART-4-TITLE".localizedVariant)
+        active1DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 1)
+        active7DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 7)
+        active30DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 30)
+        active90DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 90)
     }
 }
