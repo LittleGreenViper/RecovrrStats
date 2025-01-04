@@ -431,6 +431,18 @@ protocol DataProviderProtocol {
      The order of elements is first -> left (active users), last -> right (new users).
      */
     var legend: [RCVS_LegendElement] { get }
+    
+    /* ##################################################### */
+    /**
+     (Computed Property) The string to use for the Y-axis.
+     */
+    var yAxisLabel: String { get }
+    
+    /* ##################################################### */
+    /**
+     (Computed Property) The string to use for the X-axis.
+     */
+    var xAxisLabel: String { get }
 
     /* ##################################################### */
     /**
@@ -624,6 +636,18 @@ extension DataProviderProtocol {
      This returns the max Y value, for the whole dataset.
      */
     var maxYValue: Int { rows.reduce(0) { max($0, $1.maxYValue) } }
+    
+    /* ##################################################### */
+    /**
+     (Computed Property) The string to use for the Y-axis.
+     */
+    var yAxisLabel: String { "SLUG-BAR-CHART-Y-AXIS-LABEL".localizedVariant }
+    
+    /* ##################################################### */
+    /**
+     (Computed Property) The string to use for the X-axis.
+     */
+    var xAxisLabel: String { "SLUG-BAR-CHART-X-AXIS-LABEL".localizedVariant }
 }
 
 /* ##################################################### */

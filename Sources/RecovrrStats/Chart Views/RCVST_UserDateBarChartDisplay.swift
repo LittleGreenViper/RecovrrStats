@@ -231,7 +231,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                 AxisValueLabel(anchor: .trailing)               // This draws the value for this Y-axis level, as a label. It is set to anchor its trailing edge to the axis tick.
                             }
                         }
-                        .chartYAxisLabel("SLUG-BAR-CHART-Y-AXIS-LABEL".localizedVariant)                               // This displays the axis title, above the upper, left corner of the chart, over the Y-axis labels.
+                        .chartYAxisLabel(data.yAxisLabel)                               // This displays the axis title, above the upper, left corner of the chart, over the Y-axis labels.
                         
                         // This moves the X-axis labels down, and centers them on the tick marks. It also sets up a range of values to display, and aligns them with the start of the data range.
                         // Default, is for the X-axis to display to the right of the tickmark, and the gridlines seem to radiate from the middle.
@@ -244,7 +244,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                 }
                             }
                         }
-                        .chartXAxisLabel("SLUG-BAR-CHART-X-AXIS-LABEL".localizedVariant, alignment: .center)            // This displays the axis title, under the labels, which are under the center of the X-axis.
+                        .chartXAxisLabel(data.xAxisLabel, alignment: .center)            // This displays the axis title, under the labels, which are under the center of the X-axis.
                         
                         // This implements tap/swipe to select.
                         // We start, by covering the chart with an overlay.

@@ -81,6 +81,12 @@ struct RCVST_SignupsDataProvider: DataProviderProtocol {
 
     /* ##################################################### */
     /**
+     (Computed Property) The string to use for the Y-axis.
+     */
+    var yAxisLabel: String { "SLUG-BAR-CHART-Y-AXIS-SIGNUP-LABEL".localizedVariant }
+
+    /* ##################################################### */
+    /**
      */
     init(with inDataFrame: DataFrame, chartName inChartName: String) {
         var rowTypes = [_RCVST_SignupsDataRow]()
