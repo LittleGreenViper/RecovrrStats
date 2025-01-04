@@ -18,7 +18,7 @@ public let RCVS_LegendSelectionColor = Color.red
 /**
  This is used to generate the legend.
  */
-fileprivate class _RCVS_LegendElement: Identifiable {
+class RCVS_LegendElement: Identifiable {
     /* ############################################# */
     /**
      Make me identifiable.
@@ -430,7 +430,7 @@ protocol DataProviderProtocol {
      
      The order of elements is first -> left (active users), last -> right (new users).
      */
-    var legend: any View { get }
+    var legend: [RCVS_LegendElement] { get }
 
     /* ##################################################### */
     /**
@@ -588,24 +588,21 @@ extension DataProviderProtocol {
     /**
      Returns a chart legend KeyValuePairs instance.
      */
-    var legend: any View {
-        var dictionaryLiterals = [_RCVS_LegendElement]()
+    var legend: [RCVS_LegendElement] {
+        var dictionaryLiterals = [RCVS_LegendElement]()
         rows.forEach {
             $0.plottableData.forEach {
                 let key = $0.description
                 if let index = dictionaryLiterals.firstIndex(where: { $0.name == key }) {
                     dictionaryLiterals[index].color = $0.color
                 } else {
-                    dictionaryLiterals.append(_RCVS_LegendElement(name: key, color: $0.color))
+                    dictionaryLiterals.append(RCVS_LegendElement(name: key, color: $0.color))
                 }
             }
         }
-        dictionaryLiterals.append(_RCVS_LegendElement())
-        return VStack {
-            ForEach(dictionaryLiterals) { inElement in
-                Text(inElement.name).foregroundColor(inElement.color)
-            }
-        }
+        dictionaryLiterals.append(RCVS_LegendElement())
+        
+        return dictionaryLiterals
     }
     
     /* ##################################################### */

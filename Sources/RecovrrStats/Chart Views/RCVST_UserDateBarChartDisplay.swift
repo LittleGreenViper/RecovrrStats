@@ -19,6 +19,61 @@
 
 import SwiftUI
 import Charts
+import CoreHaptics
+
+/* ###################################################################################################################################### */
+// MARK: - Helps With Haptics -
+/* ###################################################################################################################################### */
+/**
+ We declare this, to provide a default haptic implementation.
+ */
+protocol RCVST_HapticHopper: View {
+    /* ################################################################## */
+    /**
+     This is used to give us haptic feedback for dragging. REQUIRED
+     */
+    var hapticEngine: CHHapticEngine? { get }
+
+    /* ################################################################## */
+    /**
+     This prepares our haptic engine. REQUIRED
+     */
+    func prepareHaptics()
+    
+    /* ################################################################## */
+    /**
+     This triggers the haptic. OPTIONAL
+     
+     - parameter intensity: The 0 -> 1 intensity, with 0, being off, and 1 being max. Optional for protocol default. Default is 0.25 (gentle selection).
+     - parameter sharpness: The 0 -> 1 sharpness, with 0, being soft, and 1 being hard. Optional for protocol default. Default is 0 (soft).
+     */
+    func triggerHaptic(intensity: Float, sharpness: Float)
+}
+
+/* ###################################################################################################################################### */
+// MARK: Defaults
+/* ###################################################################################################################################### */
+extension RCVST_HapticHopper {
+    /* ################################################################## */
+    /**
+     This provides a basic haptic trigger function. Probably all we need.
+     */
+    func triggerHaptic(intensity inIntensity: Float = 0.3, sharpness inSharpness: Float = 0) {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+        var events = [CHHapticEvent]()
+
+        let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: inIntensity)
+        let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: inSharpness)
+        let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: 0)
+        events.append(event)
+
+        guard let pattern = try? CHHapticPattern(events: events, parameters: []),
+              let player = try? hapticEngine?.makePlayer(with: pattern)
+        else { return }
+        
+        try? player.start(atTime: 0)
+    }
+}
 
 /* ######################################################### */
 // MARK: - The Actual Chart View -
@@ -30,7 +85,7 @@ import Charts
  
  X-axis is date, and Y-axis is a simple, linear, number of users of the system.
  */
-struct RCVST_UserDateBarChartDisplay: View {
+struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
     /* ##################################################### */
     /**
      (Stored Property) This is the actual data that we'll be providing to the chart.
@@ -73,6 +128,26 @@ struct RCVST_UserDateBarChartDisplay: View {
      This contains the data window, at the start of the gesture. We use this to calculate the magnification, and center of the pinch.
      */
     @State private var _firstRange: ClosedRange<Date>? { didSet { if oldValue != _firstRange { _selectedValue = nil } } }    // Make sure to nuke any selection.
+    
+    /* ################################################################## */
+    /**
+     This is used to give us haptic feedback for dragging.
+     */
+    @State var hapticEngine: CHHapticEngine?
+
+    /* ################################################################## */
+    /**
+     This prepares our haptic engine.
+     */
+    func prepareHaptics() {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics,
+              let hapticEngineTemp = try? CHHapticEngine()
+        else { return }
+        
+        hapticEngine = hapticEngineTemp
+        
+        try? hapticEngine?.start()
+    }
 
     // MARK: Computed Properties
 
@@ -151,9 +226,12 @@ struct RCVST_UserDateBarChartDisplay: View {
                                                     print(date)
                                                     // Setting this property updates the selection
                                                     _selectedValue = data.windowedRows.nearestTo(date) as? RCVST_Row
+                                                    triggerHaptic()
                                                 }
                                             }
-                                            .onEnded { _ in _selectedValue = nil }
+                                            .onEnded { _ in
+                                                _selectedValue = nil
+                                            }
                                     )
                                 
                                     // This is the gesture context that is attached to the overlay (for the pinch-to-zoom).
@@ -181,6 +259,8 @@ struct RCVST_UserDateBarChartDisplay: View {
                                     )
                             }
                         }
+                        
+                        RCVST_ChartLegend(legendElements: data.legend)
                     }
                 }
                 // We want our box to be square, based on the width of the screen.
@@ -192,6 +272,9 @@ struct RCVST_UserDateBarChartDisplay: View {
                     alignment: .top
                 )
                 .padding([.leading, .trailing], 20)
+            }
+            .onAppear {
+                prepareHaptics()
             }
         }
     }
