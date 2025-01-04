@@ -56,7 +56,7 @@
 
 "SLUG-CHART-3-TITLE-FORMAT"                 =   "User Activity (%d Days)";
 "SLUG-CHART-3-TITLE-SHORT"                  =   "User Activity (1 Day)";
-"SLUG-CHART-3-TYPES-DESC-STRING-FORMAT"     =   "%@: Users Active in the last %@: %d (%d%%)";
+"SLUG-CHART-3-TYPES-DESC-STRING-FORMAT"     =   "%@: Active in the last %@: %d (%d%%)";
 "SLUG-CHART-3-AVERAGE-DESC-STRING-FORMAT"   =   "%@: Avg. Days Last Login: %d";
 "SLUG-BAR-CHART-X-AXIS-CHART-3-LABEL"       =   "Date";
 "SLUG-BAR-CHART-Y-AXIS-CHART-3-LABEL"       =   "Users";

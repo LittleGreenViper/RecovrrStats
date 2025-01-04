@@ -30,7 +30,7 @@ import Charts
  
  X-axis is date, and Y-axis is a simple, linear, number of users of the system.
  */
-struct RCVST_ChartDisplay: View {
+struct RCVST_UserDateBarChartDisplay: View {
     /* ##################################################### */
     /**
      (Stored Property) This is the actual data that we'll be providing to the chart.
@@ -88,7 +88,7 @@ struct RCVST_ChartDisplay: View {
                     VStack {
                         // This displays the value of the selected bar. It is one line of red text, so we make it small enough to fit.
                         Text(_selectedValuesString)
-                            .font(.system(size: 11))
+                            .font(.system(size: 13))
                             .foregroundStyle(RCVS_LegendSelectionColor)
                         
                         // This builds bars. The date determines the X-axis, and the Y-axis has the number of each type of user, stacked.

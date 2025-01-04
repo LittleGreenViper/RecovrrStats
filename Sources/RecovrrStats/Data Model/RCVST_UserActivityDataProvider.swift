@@ -26,10 +26,17 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
          */
         override var plottableData: [RCVST_BasePlottableData] {
             get {
-                let activity = (0...1).contains(days) ? activeInLast24Hours
-                                : (2...7).contains(days) ? activeInLastWeek
-                                    : (8...89).contains(days) ? activeInLast30Days
-                                        : activeInLast90Days
+                var activity: Int = 0
+                switch days {
+                case 0..<2:
+                    activity = activeInLast24Hours
+                case 2..<8:
+                    activity = activeInLastWeek
+                case 8..<89:
+                    activity = activeInLast30Days
+                default:
+                    activity = activeInLast90Days
+                }
                 return [
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-BAR-CHART-ACTIVE-TYPES-Y".localizedVariant,
                                                       color: isSelected ? RCVS_LegendSelectionColor : .green,
@@ -46,6 +53,19 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
          It must be 1, 7, 30 or 90.
          */
         var days: Int = 1
+
+        /* ################################################# */
+        /**
+         initializer
+         
+         - parameter dataRow: The `DataFrame.Row` for the line we're saving.
+         - parameter previousDataRow: The `DataFrame.Row` for the line prior to the one we're saving (may be nil, for the first row).
+         - parameter rowIndex: The 0-based index (in the dataframe rows) of this row (it will also be the index of this row).
+         */
+        public init(dataRow inDataRow: DataFrame.Row, previousDataRow inPreviousDataRow: DataFrame.Row?, rowIndex inIndex: Int, days inDays: Int = 1) {
+            super.init(dataRow: inDataRow, previousDataRow: inPreviousDataRow, rowIndex: inIndex)
+            days = inDays
+        }
     }
     
     /* ##################################################### */
@@ -82,8 +102,7 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
         for index in stride(from: 1, to: inDataFrame.rows.count, by: 2) {
             let row = inDataFrame.rows[index]
             let previousRow = 0 < index ? inDataFrame.rows[index - 1] : nil
-            let value = _RCVST_UserActivityDataRow(dataRow: row, previousDataRow: previousRow, rowIndex: index)
-            value.days = days
+            let value = _RCVST_UserActivityDataRow(dataRow: row, previousDataRow: previousRow, rowIndex: index, days: inDays)
             rowTypes.append(value)
         }
         
@@ -106,14 +125,22 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateStyle = .short
                 dateFormatter.timeStyle = .none
-                let activity = (0...1).contains(days) ? selectedValue.activeInLast24Hours
-                                : (2...7).contains(days) ? selectedValue.activeInLastWeek
-                                    : (8...89).contains(days) ? selectedValue.activeInLast30Days
-                                        : selectedValue.activeInLast90Days
-                let string = ((0...1).contains(days) ? "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-1"
-                                : (2...7).contains(days) ? "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-7"
-                                    : (8...89).contains(days) ? "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-30"
-                                        : "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-90").localizedVariant
+                var activity: Int = 0
+                var string: String = ""
+                switch days {
+                case 0..<2:
+                    activity = selectedValue.activeInLast24Hours
+                    string = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-1".localizedVariant
+                case 2..<8:
+                    activity = selectedValue.activeInLastWeek
+                    string = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-7".localizedVariant
+                case 8..<89:
+                    activity = selectedValue.activeInLast30Days
+                    string = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-30".localizedVariant
+                default:
+                    activity = selectedValue.activeInLast90Days
+                    string = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-90".localizedVariant
+                }
                 let percentage = Int((activity * 100) / selectedValue.activeUsers)
                 return String(format: "SLUG-CHART-3-TYPES-DESC-STRING-FORMAT".localizedVariant, dateFormatter.string(from: selectedValue.sampleDate), string, activity, percentage)
             } else {

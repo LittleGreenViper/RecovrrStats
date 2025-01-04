@@ -19,7 +19,7 @@
 		D4ADD8362CF610280030B789 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4ADD8352CF610280030B789 /* LaunchScreen.storyboard */; };
 		D4D199552D2836B5004110BC /* RCVST_UserTypesDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4D199542D2836B5004110BC /* RCVST_UserTypesDataProvider.swift */; };
 		D4EBAC792D26B7900076E72E /* RCVST_DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4EBAC782D26B7900076E72E /* RCVST_DataModel.swift */; };
-		D4FDE7F92D2590E2007C74A4 /* RCVST_ChartDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FDE7F82D2590E2007C74A4 /* RCVST_ChartDisplay.swift */; };
+		D4FDE7F92D2590E2007C74A4 /* RCVST_UserDateBarChartDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FDE7F82D2590E2007C74A4 /* RCVST_UserDateBarChartDisplay.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,7 +39,7 @@
 		D4D199542D2836B5004110BC /* RCVST_UserTypesDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_UserTypesDataProvider.swift; sourceTree = "<group>"; };
 		D4EBAC782D26B7900076E72E /* RCVST_DataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_DataModel.swift; sourceTree = "<group>"; };
 		D4F14D862CBEA585000C482E /* Recovrr Stats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Recovrr Stats.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D4FDE7F82D2590E2007C74A4 /* RCVST_ChartDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_ChartDisplay.swift; sourceTree = "<group>"; };
+		D4FDE7F82D2590E2007C74A4 /* RCVST_UserDateBarChartDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_UserDateBarChartDisplay.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,7 +77,7 @@
 		D4E360372CF7598B00232A1A /* Chart Views */ = {
 			isa = PBXGroup;
 			children = (
-				D4FDE7F82D2590E2007C74A4 /* RCVST_ChartDisplay.swift */,
+				D4FDE7F82D2590E2007C74A4 /* RCVST_UserDateBarChartDisplay.swift */,
 			);
 			path = "Chart Views";
 			sourceTree = "<group>";
@@ -247,7 +247,7 @@
 				D47403882D28D09700F08C0A /* RCVST_UserActivityDataProvider.swift in Sources */,
 				D4ADD8292CF5F13E0030B789 /* RCVST_App.swift in Sources */,
 				D4ADD8302CF5F13E0030B789 /* Localizable.strings in Sources */,
-				D4FDE7F92D2590E2007C74A4 /* RCVST_ChartDisplay.swift in Sources */,
+				D4FDE7F92D2590E2007C74A4 /* RCVST_UserDateBarChartDisplay.swift in Sources */,
 				D4ADD82E2CF5F13E0030B789 /* RCVST_DataProvider.swift in Sources */,
 				D4ADD82F2CF5F13E0030B789 /* RCVST_InitialContentView.swift in Sources */,
 				D4183B802D287F0600862A80 /* RCVST_DeletionsDataProvider.swift in Sources */,

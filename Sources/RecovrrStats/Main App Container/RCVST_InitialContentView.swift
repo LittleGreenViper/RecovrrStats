@@ -193,37 +193,37 @@ struct RootStackView: View {
             List {
                 if let data = _data?.userDataProvider {
                     NavigationLink(data.chartName) {
-                        RCVST_ChartDisplay(data: data)
+                        RCVST_UserDateBarChartDisplay(data: data)
                     }
                 }
                 if let data = _data?.signupsDataProvider {
                     NavigationLink(data.chartName) {
-                        RCVST_ChartDisplay(data: data)
+                        RCVST_UserDateBarChartDisplay(data: data)
                     }
                 }
                 if let data = _data?.deletionsDataProvider {
                     NavigationLink(data.chartName) {
-                        RCVST_ChartDisplay(data: data)
+                        RCVST_UserDateBarChartDisplay(data: data)
                     }
                 }
                 if let data = _data?.active1DataProvider {
                     NavigationLink(data.chartName) {
-                        RCVST_ChartDisplay(data: data)
+                        RCVST_UserDateBarChartDisplay(data: data)
                     }
                 }
                 if let data = _data?.active7DataProvider {
                     NavigationLink(data.chartName) {
-                        RCVST_ChartDisplay(data: data)
+                        RCVST_UserDateBarChartDisplay(data: data)
                     }
                 }
                 if let data = _data?.active30DataProvider {
                     NavigationLink(data.chartName) {
-                        RCVST_ChartDisplay(data: data)
+                        RCVST_UserDateBarChartDisplay(data: data)
                     }
                 }
                 if let data = _data?.active90DataProvider {
                     NavigationLink(data.chartName) {
-                        RCVST_ChartDisplay(data: data)
+                        RCVST_UserDateBarChartDisplay(data: data)
                     }
                 }
             }
