@@ -22,6 +22,45 @@ import Charts
 import CoreHaptics
 
 /* ###################################################################################################################################### */
+// MARK: - Chart Legend View -
+/* ###################################################################################################################################### */
+/**
+ */
+struct RCVST_ChartLegend: View {
+    /* ############################################# */
+    /**
+     */
+    @State private var _legendElements: [RCVS_LegendElement]
+
+    /* ############################################# */
+    /**
+     */
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(_legendElements) { inLegendElement in
+                HStack(spacing: 2) {
+                    Circle()
+                        .fill(inLegendElement.color)
+                        .frame(width: 8)
+
+                    Text(inLegendElement.name)
+                        .font(.system(size: 10))
+                        .italic()
+                        .foregroundStyle(inLegendElement.color)
+                }
+            }
+        }
+    }
+    
+    /* ############################################# */
+    /**
+     */
+    init(legendElements inLegendElements: [RCVS_LegendElement]) {
+        _legendElements = inLegendElements
+    }
+}
+
+/* ###################################################################################################################################### */
 // MARK: - Helps With Haptics -
 /* ###################################################################################################################################### */
 /**

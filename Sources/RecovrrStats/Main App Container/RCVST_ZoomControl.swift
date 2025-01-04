@@ -46,13 +46,7 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
     /**
      This is the actual dataframe wrapper for the stats.
      */
-    @Binding var data: RCVST_DataProvider?
-
-    /* ################################################################## */
-    /**
-     This has the data range we will be looking at.
-     */
-    @Binding var dataWindow: ClosedRange<Date>
+    @Binding var data: DataProviderProtocol?
 
     /* ################################################################## */
     /**
@@ -73,8 +67,9 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
                         .background(Color(red: 1, green: 1, blue: 0))
                         .frame(width: inGeometry.size.width * magnification, alignment: .leading)
                         .onChange(of: magnification) {
-                            guard let minDateTemp = data?.allRows.first?.date,
-                                  let maxDateTemp = data?.allRows.last?.date
+                            guard let minDateTemp = data?.rows.first?.sampleDate,
+                                  let maxDateTemp = data?.rows.last?.sampleDate,
+                                  let dataWindow = data?.dataWindowRange
                             else { return }
                             
                             let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
@@ -105,8 +100,9 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
                         }
                         // If the user rotates the device, or adjusts the split, we revert to total.
                         .onChange(of: inGeometry.frame(in: .global)) {
-                            guard let minDateTemp = data?.allRows.first?.date,
-                                  let maxDateTemp = data?.allRows.last?.date
+                            guard let minDateTemp = data?.rows.first?.sampleDate,
+                                  let maxDateTemp = data?.rows.last?.sampleDate,
+                                  let dataWindow = data?.dataWindowRange
                             else { return }
                             
                             let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
@@ -122,8 +118,9 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
                         .gesture(
                                 TapGesture(count: 2).onEnded {
                                     magnification = 1
-                                    guard let minDateTemp = data?.allRows.first?.date,
-                                          let maxDateTemp = data?.allRows.last?.date
+                                    guard let minDateTemp = data?.rows.first?.sampleDate,
+                                          let maxDateTemp = data?.rows.last?.sampleDate,
+                                          let dataWindow = data?.dataWindowRange
                                     else { return }
                                     
                                     let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
@@ -136,7 +133,8 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
                                     guard let minDateTemp = data?.allRows.first?.date,
-                                          let maxDateTemp = data?.allRows.last?.date
+                                          let maxDateTemp = data?.allRows.last?.date,
+                                          let dataWindow = data?.dataWindowRange
                                     else { return }
                                     
                                     let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
@@ -164,7 +162,7 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
                                         let newMinDate = Date(timeIntervalSinceReferenceDate: newStartingDateInSeconds)
                                         let newMaxDate = newMinDate.addingTimeInterval(dateRangeInSeconds)
                                         
-                                        dataWindow = newMinDate...newMaxDate
+                                        data?.setDataWindowRange(newMinDate...newMaxDate)
                                     }
                                 }
                         )
@@ -179,20 +177,25 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
                 }
            }
         }
-            .onChange(of: dataWindow) {
+            .onChange(of: data?.dataWindowRange) {
+                guard let minDateTemp = data?.rows.first?.sampleDate,
+                      let maxDateTemp = data?.rows.last?.sampleDate,
+                      let dataWindow = data?.dataWindowRange
+                else { return }
                 _days = Int((dataWindow.upperBound.timeIntervalSinceReferenceDate - dataWindow.lowerBound.timeIntervalSinceReferenceDate) / 86400)
                 triggerHaptic(intensity: 0.25, sharpness: 0.5)
             }
             .padding([.top, .bottom], 12)
             .background(Color(red: 0.4, green: 0.7, blue: 1))
             .onAppear {
-                guard let minDateTemp = data?.allRows.first?.date,
-                      let maxDateTemp = data?.allRows.last?.date
+                guard let minDateTemp = data?.rows.first?.sampleDate,
+                      let maxDateTemp = data?.rows.last?.sampleDate,
+                      let dataWindow = data?.dataWindowRange
                 else { return }
                 
                 let minDate = max(Date.distantPast, minDateTemp.addingTimeInterval(-43200))
                 let maxDate = min(Date.distantFuture, maxDateTemp.addingTimeInterval(43200))
-                dataWindow = minDate...maxDate
+                data?.setDataWindowRange(minDate...maxDate)
                 _days = Int((maxDate.timeIntervalSinceReferenceDate - minDate.timeIntervalSinceReferenceDate) / 86400)
                 prepareHaptics()
                 magnification = 1

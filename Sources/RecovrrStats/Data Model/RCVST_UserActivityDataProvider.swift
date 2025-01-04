@@ -38,7 +38,7 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
                     activity = activeInLast90Days
                 }
                 return [
-                    RCVST_Row.RCVST_BasePlottableData(description: "SLUG-BAR-CHART-ACTIVE-TYPES-Y".localizedVariant,
+                    RCVST_Row.RCVST_BasePlottableData(description: "SLUG-USER-COLUMN-NAME-active".localizedVariant,
                                                       color: isSelected ? RCVS_LegendSelectionColor : .green,
                                                       value: activity, isSelected: isSelected)
                 ]
