@@ -281,7 +281,6 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                                     .onEnded { _ in _selectedValue = nil }
                                             )
                                         )
-                                
                                     
                                     .gesture(                   // This is the gesture context that is attached to the overlay (for the pinch-to-zoom).
                                         // This is the actual gesture that handles magnification.
