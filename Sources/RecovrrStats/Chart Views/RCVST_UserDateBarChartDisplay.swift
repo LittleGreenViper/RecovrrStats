@@ -231,7 +231,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                 AxisValueLabel(anchor: .trailing)               // This draws the value for this Y-axis level, as a label. It is set to anchor its trailing edge to the axis tick.
                             }
                         }
-                        .chartYAxisLabel(data.yAxisLabel)                               // This displays the axis title, above the upper, left corner of the chart, over the Y-axis labels.
+                        .chartYAxisLabel(data.yAxisLabel)                       // This displays the axis title, above the upper, left corner of the chart, over the Y-axis labels.
                         
                         // This moves the X-axis labels down, and centers them on the tick marks. It also sets up a range of values to display, and aligns them with the start of the data range.
                         // Default, is for the X-axis to display to the right of the tickmark, and the gridlines seem to radiate from the middle.
@@ -244,7 +244,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                 }
                             }
                         }
-                        .chartXAxisLabel(data.xAxisLabel, alignment: .center)            // This displays the axis title, under the labels, which are under the center of the X-axis.
+                        .chartXAxisLabel(data.xAxisLabel, alignment: .center)   // This displays the axis title, under the labels, which are under the center of the X-axis.
                         
                         // This implements tap/swipe to select.
                         // We start, by covering the chart with an overlay.
@@ -253,36 +253,37 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                 Rectangle()                     // The overlay will be a rectangle
                                     .fill(Color.clear)          // It is filled with clear, so we can see the chart through it.
                                     .contentShape(Rectangle())  // We need to explicitly give it a shape.
-                                                                // This is the gesture context that is attached to the overlay.
-                                    .gesture(
+                                
+                                    .gesture(                   // This is the gesture context that is attached to the overlay(For both double-tap, and selection).
+                                        // This gesture will set the data window to full spread, if double-tapped.
                                         TapGesture(count: 2)
                                             .onEnded {
-                                                triggerHaptic(intensity: 0.5, sharpness: 0.5)
-                                                data.setDataWindowRange(data.totalDateRange)
-                                            }
-                                        )
-
-                                    .gesture(
-                                        // This is the actual gesture that tracks our tap/drag. We will only be paying attention to horizontal dragging (X-axis).
-                                        DragGesture(minimumDistance: 0)             // It's a drag gesture, but specifying a `minimumDistance` of 0, makes it a tap/drag gesture.
-                                        // This is where the magic happens. This closure is called, whenever the gesture moves.
-                                            .onChanged { inValue in                 // `inValue` contains the current gesture state.
-                                                if let frame = inChart.plotFrame {  // We need the chart's frame, as we'll be figuring out our X-axis value, based on that.
-                                                                                    // We query the chart for the X-axis value, corresponding to the local position, given by the gesture value. We clip the gesture, to within the chart dimensions.
-                                                    guard let date = inChart.value(atX: max(0, min(inChart.plotSize.width, inValue.location.x - inGeom[frame].origin.x)), as: Date.self) else { return }
-                                                    print(date)
-                                                    // Setting this property updates the selection
-                                                    _selectedValue = data.windowedRows.nearestTo(date) as? RCVST_Row
-                                                    triggerHaptic()
+                                                if data.dataWindowRange != data.totalDateRange {
+                                                    _selectedValue = nil
+                                                    triggerHaptic(intensity: 0.5, sharpness: 0.5)
+                                                    data.setDataWindowRange(data.totalDateRange)
                                                 }
                                             }
-                                            .onEnded { _ in
-                                                _selectedValue = nil
-                                            }
-                                    )
+                                            .simultaneously(with:   // We combine it with the drag, so we don't get hesitation.
+                                                // This is the actual gesture that tracks our tap/drag. We will only be paying attention to horizontal dragging (X-axis).
+                                                DragGesture(minimumDistance: 0)             // It's a drag gesture, but specifying a `minimumDistance` of 0, makes it a tap/drag gesture.
+                                                // This is where the magic happens. This closure is called, whenever the gesture moves.
+                                                    .onChanged { inValue in                 // `inValue` contains the current gesture state.
+                                                        if let frame = inChart.plotFrame {  // We need the chart's frame, as we'll be figuring out our X-axis value, based on that.
+                                                                                            // We query the chart for the X-axis value, corresponding to the local position, given by the gesture value. We clip the gesture, to within the chart dimensions.
+                                                            guard let date = inChart.value(atX: max(0, min(inChart.plotSize.width, inValue.location.x - inGeom[frame].origin.x)), as: Date.self) else { return }
+                                                            print(date)
+                                                            // Setting this property updates the selection
+                                                            _selectedValue = data.windowedRows.nearestTo(date) as? RCVST_Row
+                                                            triggerHaptic()
+                                                        }
+                                                    }
+                                                    .onEnded { _ in _selectedValue = nil }
+                                            )
+                                        )
                                 
-                                    // This is the gesture context that is attached to the overlay (for the pinch-to-zoom).
-                                    .gesture(
+                                    
+                                    .gesture(                   // This is the gesture context that is attached to the overlay (for the pinch-to-zoom).
                                         // This is the actual gesture that handles magnification.
                                         MagnifyGesture()
                                             // This is where the magic happens. This closure is called, whenever the gesture changes.
@@ -307,11 +308,11 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                             }
                         }
                         
-                        RCVST_ChartLegend(legendElements: data.legend)
-                        RCVST_ZoomControl(data: $data)
+                        RCVST_ChartLegend(legendElements: data.legend)          // The chart legend.
+                        RCVST_ZoomControl(data: $data)                          // This shows a scrubber, if we are zoomed in.
                     }
                 }
-                // We want our box to be square, based on the width of the screen.
+                // We want our box to be basically square, based on the width of the screen.
                 .frame(
                     minWidth: inGeometry.size.width * 0.8,
                     maxWidth: .infinity,
@@ -321,9 +322,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                 )
                 .padding([.leading, .trailing], 20)
             }
-            .onAppear {
-                prepareHaptics()
-            }
+            .onAppear { prepareHaptics() }
         }
     }
 }
