@@ -14,13 +14,14 @@ import CoreHaptics
 struct RCVST_ZoomControl: View, RCVST_HapticHopper {
     /* ################################################################## */
     /**
+     */
+    @State private var _startLocation: Double?
+    
+    /* ################################################################## */
+    /**
      This is our haptic engine, used to provide feedback.
      */
     @State var hapticEngine: CHHapticEngine?
-
-    @State private var _startingPosition: CGFloat?
-
-    @State private var _leftPosition: CGFloat = 0
 
     /* ################################################################## */
     /**
@@ -34,33 +35,52 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
      */
     var body: some View {
         ViewThatFits(in: .horizontal) {
-            ZStack {
-                GeometryReader { inGeometry in
+                ZStack {
                     Rectangle()
                         .fill(Color.clear)
                         .contentShape(Rectangle())
-                   if !data.isMaxed {
-                        let width = abs(data.dataWindowRange.upperBound.distance(to: data.dataWindowRange.lowerBound) / data.totalDateRange.upperBound.distance(to: data.totalDateRange.lowerBound) * inGeometry.size.width)
+                    if data.dataWindowRange != data.totalDateRange {
+                        GeometryReader { inGeometry in
+                            let frame = inGeometry.frame(in: .local)
+                            let geoWidth = frame.size.width
+                            let globalMagnificationFactor = Double(geoWidth) / data.totalDateRange.lowerBound.distance(to: data.totalDateRange.upperBound)
+                            let timeRange = data.dataWindowRange.lowerBound.distance(to: data.dataWindowRange.upperBound)
+                            let width = CGFloat(max(16, timeRange * globalMagnificationFactor))
+                            let leftSide = data.totalDateRange.lowerBound.distance(to: data.dataWindowRange.lowerBound) * globalMagnificationFactor
                         Rectangle()
-                            .fill(Color.yellow)
+                            .fill(Color.accentColor)
+                            .cornerRadius(9)
                             .contentShape(Rectangle())
-                            .frame(width: max(16, width), height: 16, alignment: .leading)
-                            .cornerRadius(8)
-                            .padding(.leading, _leftPosition)
+                            .frame(width: width, height: 15)
+                            .position(x: leftSide + (width / 2), y: 9)
                             .gesture(
-                                DragGesture()
+                                DragGesture(minimumDistance: 0)
                                     .onChanged { inValue in
-                                        _startingPosition = _startingPosition ?? inValue.location.x - _leftPosition
-                                        if let startingPosition = _startingPosition {
-                                            _leftPosition = inValue.location.x - startingPosition
+                                        if 0 != inValue.translation.width {
+                                            _startLocation = _startLocation ?? data.dataWindowRange.lowerBound.timeIntervalSinceReferenceDate
+                                            if let startLocation = _startLocation {
+                                                let dateChangeInSeconds = Int((Double(inValue.location.x - inValue.startLocation.x) / globalMagnificationFactor) / 86400) * 86400
+                                                print("Translation: \(inValue.location.x)")
+                                                let newLowerBound = startLocation + Double(dateChangeInSeconds)
+                                                let finalLowerBound = max(data.totalDateRange.lowerBound.timeIntervalSinceReferenceDate,
+                                                                          min(data.totalDateRange.upperBound.timeIntervalSinceReferenceDate - timeRange,
+                                                                              newLowerBound
+                                                                             )
+                                                )
+                                                let finalUpperBound = finalLowerBound + timeRange
+                                                triggerHaptic()
+                                                data.setDataWindowRange(Date(timeIntervalSinceReferenceDate: finalLowerBound)...Date(timeIntervalSinceReferenceDate: finalUpperBound))
+                                            }
                                         }
                                     }
+                                    .onEnded { _ in _startLocation = nil }
                             )
                     }
                 }
             }
         }
         .frame(height: 18)
+        .onAppear { prepareHaptics() }
     }
     
     /* ################################################################## */

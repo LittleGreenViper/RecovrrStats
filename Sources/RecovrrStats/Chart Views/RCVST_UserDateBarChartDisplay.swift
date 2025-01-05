@@ -255,6 +255,14 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                     .contentShape(Rectangle())  // We need to explicitly give it a shape.
                                                                 // This is the gesture context that is attached to the overlay.
                                     .gesture(
+                                        TapGesture(count: 2)
+                                            .onEnded {
+                                                triggerHaptic(intensity: 0.5, sharpness: 0.5)
+                                                data.setDataWindowRange(data.totalDateRange)
+                                            }
+                                        )
+
+                                    .gesture(
                                         // This is the actual gesture that tracks our tap/drag. We will only be paying attention to horizontal dragging (X-axis).
                                         DragGesture(minimumDistance: 0)             // It's a drag gesture, but specifying a `minimumDistance` of 0, makes it a tap/drag gesture.
                                         // This is where the magic happens. This closure is called, whenever the gesture moves.
@@ -289,7 +297,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                                     
                                                     // No less than 2 days (by setting to 1 day for halfsies). The 1.2 is to "slow down" the magnification a bit, so it's not too intense.
                                                     let newRange = max(86400, (rangeInSeconds * 1.2) / inValue.magnification)
-                                                    
+                                                    triggerHaptic()
                                                     // By changing this, we force a redraw of the chart, with the new limits.
                                                     data.setDataWindowRange((centerDate.addingTimeInterval(-newRange)...centerDate.addingTimeInterval(newRange)).clamped(to: data.totalDateRange))
                                                 }
