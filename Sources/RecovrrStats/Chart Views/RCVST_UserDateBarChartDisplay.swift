@@ -202,7 +202,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                     VStack {
                         // This displays the value of the selected bar. It is one line of red text, so we make it small enough to fit.
                         Text(_selectedValuesString)
-                            .font(.system(size: 13))
+                            .font(.system(size: 400 > inGeometry.frame(in: .local).width ? 13 : 17))
                             .foregroundStyle(RCVS_LegendSelectionColor)
                         
                         // This builds bars. The date determines the X-axis, and the Y-axis has the number of each type of user, stacked.
