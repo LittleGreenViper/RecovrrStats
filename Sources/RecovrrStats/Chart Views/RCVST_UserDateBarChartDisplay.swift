@@ -300,6 +300,8 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                         }
                         
                         RCVST_ChartLegend(legendElements: data.legend)
+                        
+                        RCVST_ZoomControl(data: $data)
                     }
                 }
                 // We want our box to be square, based on the width of the screen.

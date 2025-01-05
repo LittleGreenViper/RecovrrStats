@@ -11,6 +11,7 @@
 		D433ED262CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox in Frameworks */ = {isa = PBXBuildFile; productRef = D433ED252CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox */; };
 		D47403882D28D09700F08C0A /* RCVST_UserActivityDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47403872D28D09700F08C0A /* RCVST_UserActivityDataProvider.swift */; };
 		D47856282D286664006517C3 /* RCVST_SignupsDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47856272D286664006517C3 /* RCVST_SignupsDataProvider.swift */; };
+		D495CF872D2A1CC90041ECB9 /* RCVST_ZoomControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40D8F8F2CFBCCAA000F1FB4 /* RCVST_ZoomControl.swift */; };
 		D4ADD8262CF5F13E0030B789 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4ADD81A2CF5F13E0030B789 /* Assets.xcassets */; };
 		D4ADD8292CF5F13E0030B789 /* RCVST_App.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ADD81D2CF5F13E0030B789 /* RCVST_App.swift */; };
 		D4ADD82E2CF5F13E0030B789 /* RCVST_DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ADD8222CF5F13E0030B789 /* RCVST_DataProvider.swift */; };
@@ -66,9 +67,9 @@
 			isa = PBXGroup;
 			children = (
 				D4ADD81B2CF5F13E0030B789 /* Info.plist */,
-				D4E3603A2CF75A3400232A1A /* Data Model */,
 				D4E3603B2CF75A4500232A1A /* Main App Container */,
 				D4E360372CF7598B00232A1A /* Chart Views */,
+				D4E3603A2CF75A3400232A1A /* Data Model */,
 				D4E360392CF75A1E00232A1A /* Resources */,
 			);
 			path = RecovrrStats;
@@ -251,6 +252,7 @@
 				D4ADD82E2CF5F13E0030B789 /* RCVST_DataProvider.swift in Sources */,
 				D4ADD82F2CF5F13E0030B789 /* RCVST_InitialContentView.swift in Sources */,
 				D4183B802D287F0600862A80 /* RCVST_DeletionsDataProvider.swift in Sources */,
+				D495CF872D2A1CC90041ECB9 /* RCVST_ZoomControl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

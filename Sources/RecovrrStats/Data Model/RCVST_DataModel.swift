@@ -575,6 +575,12 @@ extension DataProviderProtocol {
     
     /* ################################################# */
     /**
+     (Computed Property) Returns true, if the data window stretches across the entire range.
+     */
+    var isMaxed: Bool { currentDataWindowRange == totalDateRange }
+    
+    /* ################################################# */
+    /**
      (Computed Property) This contains an explicit sub-range of the entire data X-axis range. If in error, an empty range is returned. Default means use ``totalDateRange``.
      */
     var currentDataWindowRange: ClosedRange<Date> {
