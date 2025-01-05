@@ -37,6 +37,9 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
                 default:
                     activity = activeInLast90Days
                 }
+                
+                activity = activity * 100 / activeUsers
+                
                 return [
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-USER-COLUMN-NAME-active".localizedVariant,
                                                       color: isSelected ? RCVS_LegendSelectionColor : .green,
@@ -84,7 +87,13 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
      The name to be used to describe the chart.
      */
     var chartName: String = ""
-    
+
+    /* ##################################################### */
+    /**
+     (Computed Property) The string to use for the Y-axis.
+     */
+    var yAxisLabel: String { "SLUG-BAR-CHART-Y-AXIS-PERCENTAGE-LABEL".localizedVariant }
+
     /* ##################################################### */
     /**
      The number of days in the range we are examining.
