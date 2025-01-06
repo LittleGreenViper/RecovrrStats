@@ -318,7 +318,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                         }
                         
                         RCVST_ChartLegend(legendElements: data.legend)          // The chart legend.
-                        RCVST_ZoomControl(data: $data)                          // This shows a scrubber, if we are zoomed in.
+                        RCVST_ZoomControl(data: $data, dayCount: $dayCount)     // This shows a scrubber, if we are zoomed in.
                     }
                 }
                 // We want our box to be basically square, based on the width of the screen.
