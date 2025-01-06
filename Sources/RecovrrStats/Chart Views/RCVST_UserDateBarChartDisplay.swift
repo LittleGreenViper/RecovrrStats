@@ -121,7 +121,7 @@ extension RCVST_HapticHopper {
 }
 
 /* ######################################################### */
-// MARK: - The Actual Chart View -
+// MARK: - The Chart View -
 /* ######################################################### */
 /**
  This is a simple bar chart that displays a set of bars, across a number of days, and the Y-axis will represent whatever data is passed in.

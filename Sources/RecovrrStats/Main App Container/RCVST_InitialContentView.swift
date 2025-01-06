@@ -78,44 +78,44 @@ struct RootStackView: View {
      */
     var body: some View {
         VStack {
+            Text(String(format: "SLUG-MAIN-SCREEN-TITLE".localizedVariant, _data?.numberOfDays ?? 0))
+                .font(.headline)
+            Text(String(format: "SLUG-MAIN-CURRENT-ACTIVE".localizedVariant, latestActiveTotal))
+                .foregroundColor(.green)
+            Text(String(format: "SLUG-MAIN-CURRENT-INACTIVE".localizedVariant, latestInactiveTotal))
+                .foregroundColor(.blue)
             NavigationStack {
                 VStack(spacing: 8) {
-                    Text(String(format: "SLUG-MAIN-SCREEN-TITLE".localizedVariant, _data?.numberOfDays ?? 0))
-                        .font(.headline)
-                    Text(String(format: "SLUG-MAIN-CURRENT-ACTIVE".localizedVariant, latestActiveTotal))
-                        .foregroundColor(.green)
-                    Text(String(format: "SLUG-MAIN-CURRENT-INACTIVE".localizedVariant, latestInactiveTotal))
-                        .foregroundColor(.blue)
                     List(_dataItems, id: \.chartName) { data in
-                            NavigationLink {
-                                view(for: data)
-                            } label: {
-                                Text(data.chartName)
-                            }
+                        NavigationLink {
+                            view(for: data)
+                        } label: {
+                            Text(data.chartName)
                         }
-                        // Reacts to "pull to refresh," to reload the file.
-                        .refreshable {
-                            RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
-                                _data = inDataProvider
-                            }
+                    }
+                    // Reacts to "pull to refresh," to reload the file.
+                    .refreshable {
+                        RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
+                            _data = inDataProvider
+                        }
                     }
                 }
             }
-            .onAppear {
+        }
+        .onAppear {
+            RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
+                _data = inDataProvider
+            }
+        }
+        // Forces updates, whenever we become active.
+        .onChange(of: _scenePhase, initial: true) {
+            if .active == _scenePhase,
+               nil == _data {
                 RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
                     _data = inDataProvider
                 }
-            }
-            // Forces updates, whenever we become active.
-            .onChange(of: _scenePhase, initial: true) {
-                if .active == _scenePhase,
-                   nil == _data {
-                    RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
-                        _data = inDataProvider
-                    }
-                } else if .background == _scenePhase {
-                    _data = nil
-                }
+            } else if .background == _scenePhase {
+                _data = nil
             }
         }
     }
@@ -154,7 +154,7 @@ struct RootStackView: View {
     /**
      This was inspired by [this SO answer](https://stackoverflow.com/a/71192821/879365).
      
-     It acts a a "lazy loader" for the chart view.
+     It acts a a "loader" for the chart view.
      
      - parameter for: The data we want displayed.
      - returns: A View, with the chart display.
