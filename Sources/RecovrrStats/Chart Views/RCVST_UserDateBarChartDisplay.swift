@@ -25,6 +25,7 @@ import CoreHaptics
 // MARK: - Chart Legend View -
 /* ###################################################################################################################################### */
 /**
+ This displays a horizontal row of legend elements for a chart.
  */
 struct RCVST_ChartLegend: View {
     /* ############################################# */
