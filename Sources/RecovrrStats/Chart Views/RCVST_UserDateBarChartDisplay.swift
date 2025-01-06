@@ -135,7 +135,11 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
      
      It's somewhat mutable (we can set observational state, like marking rows as selected, or setting a "window" of dates to examine).
      */
-    @State var data: any DataProviderProtocol
+    @State var data: any DataProviderProtocol {
+        didSet {
+            dayCount = data.numberOfDays
+        }
+    }
     
     // MARK: Private Properties
 
@@ -172,6 +176,12 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
      */
     @State private var _firstRange: ClosedRange<Date>? { didSet { if oldValue != _firstRange { _selectedValue = nil } } }    // Make sure to nuke any selection.
     
+    /* ################################################################## */
+    /**
+     The number of days, covered by the data window.
+     */
+    @Binding var dayCount: Int
+
     /* ################################################################## */
     /**
      This is used to give us haptic feedback for dragging.

@@ -416,6 +416,12 @@ extension Array where Element == any RCVST_RowProtocol {
  This protocol describes a chart dataset, which is sent to each chart.
  */
 protocol DataProviderProtocol: Identifiable {
+    /* ##################################################### */
+    /**
+     This satisfies our ID requirements.
+     */
+    var id: String { get }
+    
     // MARK: Required
     
     /* ##################################################### */
@@ -497,7 +503,13 @@ protocol DataProviderProtocol: Identifiable {
      This is the highest integer value for the Y-axis.
      */
     var maxYValue: Int { get }
-    
+
+    /* ################################################################## */
+    /**
+     This reports the number of days in the current data window.
+     */
+    var numberOfDays: Int { get }
+
     /* ##################################################### */
     /**
      This is a utility function, for extracting discrete user count steps from a user maximum value range. It will "pad" the gridlines to round numbers, depending on the level of the maximum value.
@@ -569,7 +581,7 @@ extension DataProviderProtocol {
     /**
      This satisfies our ID requirements.
      */
-    var id: String { dataWindowRange.description }
+    var id: String { chartName }
     
     /* ##################################################### */
     /**
@@ -651,7 +663,7 @@ extension DataProviderProtocol {
     
     /* ##################################################### */
     /**
-     This returns the max Y value, for the whole dataset.
+     (Computed Property) This returns the max Y value, for the whole dataset.
      */
     var maxYValue: Int { rows.reduce(0) { max($0, $1.maxYValue) } }
     
@@ -666,6 +678,12 @@ extension DataProviderProtocol {
      (Computed Property) The string to use for the X-axis.
      */
     var xAxisLabel: String { "SLUG-BAR-CHART-X-AXIS-LABEL".localizedVariant }
+
+    /* ################################################################## */
+    /**
+     (Computed Property) This reports the number of days in the current data window.
+     */
+    var numberOfDays: Int { Int(dataWindowRange.lowerBound.distance(to: dataWindowRange.upperBound) / 86400) }
 }
 
 /* ##################################################### */

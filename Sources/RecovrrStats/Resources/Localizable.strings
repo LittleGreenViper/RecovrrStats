@@ -27,6 +27,7 @@
 "SLUG-MAIN-SCREEN-TITLE"                    =   "Recovrr Stats (%d days)";
 "SLUG-MAIN-CURRENT-ACTIVE"                  =   "Current Active Users: %d";
 "SLUG-MAIN-CURRENT-INACTIVE"                =   "Current Inactive Users: %d";
+"SLUG-CHARTS-TITLE"                         =   "Charts:";
 
 "SLUG-SELECTED-LEGEND-LABEL"                =   "Selected";
 

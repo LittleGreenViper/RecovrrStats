@@ -36,12 +36,7 @@ struct RootStackView: View {
     /**
      This is the actual dataframe wrapper for the stats. Everything from here, on, will be bound to this.
      */
-    @State private var _data: RCVST_DataProvider? {
-        didSet {
-            updateTotals()
-            buildNavList()
-        }
-    }
+    @State private var _data: RCVST_DataProvider? { didSet { _updateTotals() } }
     
     /* ################################################################## */
     /**
@@ -53,79 +48,33 @@ struct RootStackView: View {
     /**
      The current (last sample) number of active users.
      */
-    @State var latestActiveTotal: Int = 0
+    @State private var _latestActiveTotal: Int = 0
     
     /* ################################################################## */
     /**
      The current (last sample) number of inactive (new) users.
      */
-    @State var latestInactiveTotal: Int = 0
-    
-    /* ################################################################## */
-    /**
-     */
-    func updateTotals() {
-        guard let latestAct = _data?.userDataProvider?.rows.last?.activeUsers,
-              let latestInact = _data?.userDataProvider?.rows.last?.newUsers
-        else { return }
-        latestActiveTotal = latestAct
-        latestInactiveTotal = latestInact
-    }
+    @State private var _latestInactiveTotal: Int = 0
 
     /* ################################################################## */
     /**
-     The main navigation stack screen.
      */
-    var body: some View {
-        VStack {
-            Text(String(format: "SLUG-MAIN-SCREEN-TITLE".localizedVariant, _data?.numberOfDays ?? 0))
-                .font(.headline)
-            Text(String(format: "SLUG-MAIN-CURRENT-ACTIVE".localizedVariant, latestActiveTotal))
-                .foregroundColor(.green)
-            Text(String(format: "SLUG-MAIN-CURRENT-INACTIVE".localizedVariant, latestInactiveTotal))
-                .foregroundColor(.blue)
-            NavigationStack {
-                VStack(spacing: 8) {
-                    List(_dataItems, id: \.chartName) { data in
-                        NavigationLink {
-                            view(for: data)
-                        } label: {
-                            Text(data.chartName)
-                        }
-                    }
-                    // Reacts to "pull to refresh," to reload the file.
-                    .refreshable {
-                        RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
-                            _data = inDataProvider
-                        }
-                    }
-                }
-            }
-        }
-        .onAppear {
-            RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
-                _data = inDataProvider
-            }
-        }
-        // Forces updates, whenever we become active.
-        .onChange(of: _scenePhase, initial: true) {
-            if .active == _scenePhase,
-               nil == _data {
-                RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
-                    _data = inDataProvider
-                }
-            } else if .background == _scenePhase {
-                _data = nil
-            }
-        }
+    private func _updateTotals() {
+        guard let latestAct = _data?.userDataProvider?.rows.last?.activeUsers,
+              let latestInact = _data?.userDataProvider?.rows.last?.newUsers
+        else { return }
+        _latestActiveTotal = latestAct
+        _latestInactiveTotal = latestInact
+        _buildNavList()
+        dayCount = _data?.numberOfDays ?? 0
     }
-    
+
     /* ################################################################## */
     /**
      This was inspired by [this SO answer](https://stackoverflow.com/a/71192821/879365).
      It builds a list of items for the nav
      */
-    func buildNavList() {
+    private func _buildNavList() {
         _dataItems = [any DataProviderProtocol]()
         if let data = _data?.userDataProvider {
             _dataItems.append(data)
@@ -149,7 +98,7 @@ struct RootStackView: View {
             _dataItems.append(data)
         }
     }
-        
+    
     /* ################################################################## */
     /**
      This was inspired by [this SO answer](https://stackoverflow.com/a/71192821/879365).
@@ -160,11 +109,50 @@ struct RootStackView: View {
      - returns: A View, with the chart display.
      */
     @ViewBuilder
-    func view(for inData: (any DataProviderProtocol)?) -> some View {
+    private func _loadView(for inData: (any DataProviderProtocol)?) -> some View {
         if let data = inData {
-            RCVST_UserDateBarChartDisplay(data: data)
+            RCVST_UserDateBarChartDisplay(data: data, dayCount: $dayCount)
         } else {
             Text("ERROR")
         }
+    }
+    
+    /* ################################################################## */
+    /**
+     The number of days, covered by the data window.
+     */
+    @State var dayCount: Int = 0
+
+    /* ################################################################## */
+    /**
+     The main navigation stack screen.
+     */
+    var body: some View {
+        VStack {
+            Text(String(format: "SLUG-MAIN-SCREEN-TITLE".localizedVariant, dayCount))
+                .font(.headline)
+            Text(String(format: "SLUG-MAIN-CURRENT-ACTIVE".localizedVariant, _latestActiveTotal))
+                .foregroundColor(.green)
+                .font(.caption)
+            Text(String(format: "SLUG-MAIN-CURRENT-INACTIVE".localizedVariant, _latestInactiveTotal))
+                .foregroundColor(.blue)
+                .font(.caption)
+            NavigationStack {
+                List(_dataItems, id: \.chartName) { inData in NavigationLink(inData.chartName) { _loadView(for: inData) } }
+                    // Reacts to "pull to refresh," to reload the file.
+                    .refreshable { RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in _data = inDataProvider } }
+            }
+        }
+            // Makes sure that we load up, immediately.
+            .onAppear { RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in _data = inDataProvider } }
+            // Forces updates, whenever we become active.
+            .onChange(of: _scenePhase, initial: true) {
+                if .active == _scenePhase,
+                   nil == _data {
+                    RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in _data = inDataProvider }
+                } else if .background == _scenePhase {
+                    _data = nil
+                }
+            }
     }
 }
