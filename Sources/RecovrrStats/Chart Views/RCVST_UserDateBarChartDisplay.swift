@@ -29,11 +29,13 @@ import CoreHaptics
 struct RCVST_ChartLegend: View {
     /* ############################################# */
     /**
+     This contains the built legend elements from which we'll build our display.
      */
     @State private var _legendElements: [RCVS_LegendElement]
 
     /* ############################################# */
     /**
+     This returns a horizontal row of titles, preceded by dots. All will be the color they represent.
      */
     var body: some View {
         HStack(spacing: 8) {
@@ -54,6 +56,9 @@ struct RCVST_ChartLegend: View {
     
     /* ############################################# */
     /**
+     Initializer
+
+     - parameter legendElements: an array of legend elements that will be used to build the view.
      */
     init(legendElements inLegendElements: [RCVS_LegendElement]) {
         _legendElements = inLegendElements
@@ -118,11 +123,9 @@ extension RCVST_HapticHopper {
 // MARK: - The Actual Chart View -
 /* ######################################################### */
 /**
- This is the meat of the demonstration.
+ This is a simple bar chart that displays a set of bars, across a number of days, and the Y-axis will represent whatever data is passed in.
  
- It's a simple bar chart that displays a set of bars, across 71 days, that represent the total number of users of an app, with "active" ones, and "new" ones, separated by color.
- 
- X-axis is date, and Y-axis is a simple, linear, number of users of the system.
+ X-axis is date, and Y-axis is arbitrary (but probably usually users).
  */
 struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
     /* ##################################################### */
@@ -192,13 +195,13 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
 
     /* ##################################################### */
     /**
-     (Computed Property) The main chart view. It is a simple bar chart, with each bar, segregated vertically, by user type.
+     (Computed Property) The main chart view. It is a simple bar chart, with each bar, segregated vertically, in some cases.
      */
     var body: some View {
         GeometryReader { inGeometry in
             ScrollView {
                 GroupBox(data.chartName) {
-                    // We need to add a `VStack`, so that the text item and chart play well together.
+                    // We need to add a `VStack`, so that the text item, the legend, the scrubber, and chart play well together.
                     VStack {
                         // This displays the value of the selected bar. It is one line of red text, so we make it small enough to fit.
                         Text(_selectedValuesString)
