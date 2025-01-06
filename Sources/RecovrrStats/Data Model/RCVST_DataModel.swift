@@ -415,7 +415,7 @@ extension Array where Element == any RCVST_RowProtocol {
 /**
  This protocol describes a chart dataset, which is sent to each chart.
  */
-protocol DataProviderProtocol {
+protocol DataProviderProtocol: Identifiable {
     // MARK: Required
     
     /* ##################################################### */
@@ -546,6 +546,12 @@ protocol DataProviderProtocol {
     @discardableResult
     mutating func selectRow(_: any RCVST_RowProtocol, isSelected: Bool) -> Bool
     
+    /* ##################################################### */
+    /**
+     This sets our data range.
+     
+     - parameter inDataWindowRange: A closed Date range, equal to, or a subset of, totalDateRange
+     */
     mutating func setDataWindowRange(_ inDataWindowRange: ClosedRange<Date>)
     
     /* ##################################################### */
@@ -559,6 +565,12 @@ protocol DataProviderProtocol {
 // MARK: Defaults For Properties
 /* ##################################################### */
 extension DataProviderProtocol {
+    /* ##################################################### */
+    /**
+     This satisfies our ID requirements.
+     */
+    var id: String { dataWindowRange.description }
+    
     /* ##################################################### */
     /**
      (Computed Property) The date range of our complete list of values.

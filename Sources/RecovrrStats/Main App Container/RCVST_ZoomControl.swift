@@ -27,7 +27,7 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
     /**
      This is the actual dataframe wrapper for the stats.
      */
-    @Binding var data: DataProviderProtocol
+    @Binding var data: any DataProviderProtocol
 
     /* ################################################################## */
     /**

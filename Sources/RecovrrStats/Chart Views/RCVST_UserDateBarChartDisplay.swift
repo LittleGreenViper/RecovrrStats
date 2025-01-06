@@ -135,7 +135,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
      
      It's somewhat mutable (we can set observational state, like marking rows as selected, or setting a "window" of dates to examine).
      */
-    @State var data: DataProviderProtocol
+    @State var data: any DataProviderProtocol
     
     // MARK: Private Properties
 

@@ -42,6 +42,7 @@ struct RCVST_UserTypesDataProvider: DataProviderProtocol {
     
     /* ##################################################### */
     /**
+     This is the displayed range of data.
      */
     var dataWindowRange: ClosedRange<Date> = .distantPast ... .distantPast
     
