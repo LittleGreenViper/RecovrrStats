@@ -75,38 +75,52 @@ struct RootStackView: View {
                         .foregroundColor(.blue)
                     List {
                         if let data = _data?.userDataProvider {
-                            NavigationLink(data.chartName) {
+                            NavigationLink {
                                 RCVST_UserDateBarChartDisplay(data: data)
+                            } label: {
+                                Text(data.chartName)
                             }
                         }
                         if let data = _data?.signupsDataProvider {
-                            NavigationLink(data.chartName) {
+                            NavigationLink {
                                 RCVST_UserDateBarChartDisplay(data: data)
+                            } label: {
+                                Text(data.chartName)
                             }
                         }
                         if let data = _data?.deletionsDataProvider {
-                            NavigationLink(data.chartName) {
+                            NavigationLink {
                                 RCVST_UserDateBarChartDisplay(data: data)
+                            } label: {
+                                Text(data.chartName)
                             }
                         }
                         if let data = _data?.active1DataProvider {
-                            NavigationLink(data.chartName) {
+                            NavigationLink {
                                 RCVST_UserDateBarChartDisplay(data: data)
+                            } label: {
+                                Text(data.chartName)
                             }
                         }
                         if let data = _data?.active7DataProvider {
-                            NavigationLink(data.chartName) {
+                            NavigationLink {
                                 RCVST_UserDateBarChartDisplay(data: data)
+                            } label: {
+                                Text(data.chartName)
                             }
                         }
                         if let data = _data?.active30DataProvider {
-                            NavigationLink(data.chartName) {
+                            NavigationLink {
                                 RCVST_UserDateBarChartDisplay(data: data)
+                            } label: {
+                                Text(data.chartName)
                             }
                         }
                         if let data = _data?.active90DataProvider {
-                            NavigationLink(data.chartName) {
+                            NavigationLink {
                                 RCVST_UserDateBarChartDisplay(data: data)
+                            } label: {
+                                Text(data.chartName)
                             }
                         }
                     }
