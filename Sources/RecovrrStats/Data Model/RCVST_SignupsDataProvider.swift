@@ -36,7 +36,7 @@ struct RCVST_SignupsDataProvider: DataProviderProtocol {
                 let signupsRejected = newRejectedRequests + (previousRowInstance?.newRejectedRequests ?? 0)
                 return [
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-SIGNUP-COLUMN-NAME-acceptedSignups".localizedVariant,
-                                                      color: isSelected ? RCVS_LegendSelectionColor : .green,
+                                                      color: isSelected ? RCVS_LegendSelectionColor : .blue,
                                                       value: signupsAccepted, isSelected: isSelected),
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-SIGNUP-COLUMN-NAME-rejectedSignups".localizedVariant,
                                                       color:  isSelected ? RCVS_LegendSelectionColor : .orange,

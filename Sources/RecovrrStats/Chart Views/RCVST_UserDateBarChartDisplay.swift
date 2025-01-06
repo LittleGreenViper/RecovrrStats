@@ -202,7 +202,8 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                     VStack {
                         // This displays the value of the selected bar. It is one line of red text, so we make it small enough to fit.
                         Text(_selectedValuesString)
-                            .font(.system(size: 400 > inGeometry.frame(in: .local).width ? 13 : 17))
+                            .font(.system(size: 400 > inGeometry.frame(in: .local).width ? 13 : 20))
+                            .minimumScaleFactor(0.5)
                             .foregroundStyle(RCVS_LegendSelectionColor)
                         
                         // This builds bars. The date determines the X-axis, and the Y-axis has the number of each type of user, stacked.
@@ -270,9 +271,8 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                                 // This is where the magic happens. This closure is called, whenever the gesture moves.
                                                     .onChanged { inValue in                 // `inValue` contains the current gesture state.
                                                         if let frame = inChart.plotFrame {  // We need the chart's frame, as we'll be figuring out our X-axis value, based on that.
-                                                                                            // We query the chart for the X-axis value, corresponding to the local position, given by the gesture value. We clip the gesture, to within the chart dimensions.
+                                                            // We query the chart for the X-axis value, corresponding to the local position, given by the gesture value. We clip the gesture, to within the chart dimensions.
                                                             guard let date = inChart.value(atX: max(0, min(inChart.plotSize.width, inValue.location.x - inGeom[frame].origin.x)), as: Date.self) else { return }
-                                                            print(date)
                                                             // Setting this property updates the selection
                                                             _selectedValue = data.windowedRows.nearestTo(date) as? RCVST_Row
                                                             triggerHaptic()
