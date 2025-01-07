@@ -122,7 +122,7 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
         
         days = inDays
         rows = rowTypes
-        chartName = 1 < inDays ? String(format: "SLUG-CHART-3-TITLE-FORMAT".localizedVariant, inDays) : "SLUG-CHART-3-TITLE-SHORT".localizedVariant
+        chartName = 1 < inDays ? String(format: "SLUG-BAR-CHART-ACTIVE-TITLE-FORMAT".localizedVariant, inDays) : "SLUG-BAR-CHART-ACTIVE-TITLE-SHORT".localizedVariant
         if let lowerBound = rowTypes.first?.sampleDate,
            let upperBound = rowTypes.last?.sampleDate {
             dataWindowRange = Calendar.current.startOfDay(for: lowerBound) ... Calendar.current.startOfDay(for: upperBound)
@@ -156,7 +156,7 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
                     string = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-90".localizedVariant
                 }
                 let percentage = Int((activity * 100) / selectedValue.activeUsers)
-                return String(format: "SLUG-CHART-3-TYPES-DESC-STRING-FORMAT".localizedVariant, dateFormatter.string(from: selectedValue.sampleDate), string, activity, percentage)
+                return String(format: "SLUG-BAR-CHART-ACTIVE-DESC-STRING-FORMAT".localizedVariant, dateFormatter.string(from: selectedValue.sampleDate), string, activity, percentage)
             } else {
                 return " "
             }
