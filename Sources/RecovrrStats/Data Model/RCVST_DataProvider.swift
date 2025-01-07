@@ -251,7 +251,7 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
     /**
      This stores the dataframe info.
      */
-    var numberOfDays: Int { return statusDataFrame.rows.count / 2 }
+    var numberOfDays: Int { return (statusDataFrame.rows.count + 1) / 2 }
 
     /* ################################################################## */
     /**

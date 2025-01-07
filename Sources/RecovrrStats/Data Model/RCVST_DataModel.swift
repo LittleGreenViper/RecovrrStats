@@ -683,7 +683,7 @@ extension DataProviderProtocol {
     /**
      (Computed Property) This reports the number of days in the current data window.
      */
-    var numberOfDays: Int { Int(dataWindowRange.lowerBound.distance(to: dataWindowRange.upperBound) / 86400) }
+    var numberOfDays: Int { (Int(dataWindowRange.lowerBound.distance(to: dataWindowRange.upperBound) + 86399) / 86400) }
 }
 
 /* ##################################################### */
