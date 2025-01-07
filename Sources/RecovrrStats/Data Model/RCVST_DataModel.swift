@@ -628,7 +628,7 @@ extension DataProviderProtocol {
 
     /* ##################################################### */
     /**
-     Returns a chart legend KeyValuePairs instance.
+     Returns a chart legend data instance.
      */
     var legend: [RCVS_LegendElement] {
         var dictionaryLiterals = [RCVS_LegendElement]()
