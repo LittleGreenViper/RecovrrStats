@@ -37,14 +37,17 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
                 let deletedSelf = newSelfDeleted + (previousRowInstance?.newSelfDeleted ?? 0)
                 return [
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-DELETION-COLUMN-NAME-deletedInactive".localizedVariant,
-                                                      color:  isSelected ? RCVS_LegendSelectionColor : .blue,
-                                                      value: deletedInactive, isSelected: isSelected),
+                                                      color: (isSelected ? RCVS_LegendSelectionColor : .blue),
+                                                      value: deletedInactive,
+                                                      isSelected: isSelected),
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-DELETION-COLUMN-NAME-deletedActive".localizedVariant,
-                                                      color: isSelected ? RCVS_LegendSelectionColor : .green,
-                                                      value: deletedActive, isSelected: isSelected),
+                                                      color: (isSelected ? RCVS_LegendSelectionColor : .green),
+                                                      value: deletedActive,
+                                                      isSelected: isSelected),
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-DELETION-COLUMN-NAME-selfDeleted".localizedVariant,
-                                                      color:  isSelected ? RCVS_LegendSelectionColor : .orange,
-                                                      value: deletedSelf, isSelected: isSelected)
+                                                      color: (isSelected ? RCVS_LegendSelectionColor : .orange),
+                                                      value: deletedSelf,
+                                                      isSelected: isSelected)
                 ]
             }
             

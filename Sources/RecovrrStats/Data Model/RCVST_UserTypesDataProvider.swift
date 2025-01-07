@@ -28,11 +28,13 @@ struct RCVST_UserTypesDataProvider: DataProviderProtocol {
             get {
                 [
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-USER-COLUMN-NAME-active".localizedVariant,
-                                                      color: isSelected ? RCVS_LegendSelectionColor : .green,
-                                                      value: activeUsers, isSelected: isSelected),
+                                                      color: (isSelected ? RCVS_LegendSelectionColor : .green),
+                                                      value: activeUsers,
+                                                      isSelected: isSelected),
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-USER-COLUMN-NAME-new".localizedVariant,
-                                                      color:  isSelected ? RCVS_LegendSelectionColor : .blue,
-                                                      value: newUsers, isSelected: isSelected)
+                                                      color: (isSelected ? RCVS_LegendSelectionColor : .blue),
+                                                      value: newUsers,
+                                                      isSelected: isSelected)
                 ]
             }
             

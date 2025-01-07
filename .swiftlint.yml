@@ -10,7 +10,6 @@ disabled_rules:
 - implicit_getter
 - non_optional_string_data_conversion
 - private_over_fileprivate
-- colon
 
 opt_in_rules:
 - control_statement
