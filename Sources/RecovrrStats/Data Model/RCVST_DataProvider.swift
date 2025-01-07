@@ -119,7 +119,7 @@ public class RCVST_DataProvider {
 
     /* ##################################################### */
     /**
-     This factory funcion will generate new model instances, and call a compltion closure, after fetching the necessary data.
+     This factory function will generate new model instances, and call a compltion closure, after fetching the necessary data.
 
      - parameter useDummyData: An optional (default is false) Bool. If true, then we don't fetch any data. Instead, we use a small sample of built-in CSV data.
      - parameter completion: A tail completion block, that receives a new model instance. This may be called in any thread.
