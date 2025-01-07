@@ -550,7 +550,7 @@ protocol DataProviderProtocol: Identifiable {
     /**
      This will allow you to set the selection of a a row, given a copy of the row.
      
-     - parameter inRow: The row to be selected.
+     - parameter inRow: The row to be selected (as an instance).
      - parameter isSelected: Optional (default is true) state for the new selection (set to false, to deselect a row).
 
      - returns: The previous state of the row.
@@ -562,7 +562,7 @@ protocol DataProviderProtocol: Identifiable {
     /**
      This sets our data range.
      
-     - parameter inDataWindowRange: A closed Date range, equal to, or a subset of, totalDateRange
+     - parameter inDataWindowRange: A closed Date range, equal to, or a subset of, ``totalDateRange``
      */
     mutating func setDataWindowRange(_ inDataWindowRange: ClosedRange<Date>)
     
@@ -770,6 +770,7 @@ extension DataProviderProtocol {
 extension DataProviderProtocol {
     /* ##################################################### */
     /**
+     This simply deselects all rows, then selects the indexed one.
      */
     @discardableResult
     mutating func selectRow(_ inIndex: Int, isSelected inIsSelected: Bool = true) -> Bool {
@@ -787,6 +788,7 @@ extension DataProviderProtocol {
 
     /* ##################################################### */
     /**
+     This simply deselects all rows, then selects the referenced one.
      */
     @discardableResult
     mutating func selectRow(_ inRow: any RCVST_RowProtocol, isSelected inIsSelected: Bool = true) -> Bool {
@@ -796,6 +798,7 @@ extension DataProviderProtocol {
 
     /* ##################################################### */
     /**
+     This deselects all rows.
      */
     mutating func deselectAllRows() {
         for row in rows.enumerated() { rows[row.offset].isSelected = false }
@@ -803,6 +806,7 @@ extension DataProviderProtocol {
     
     /* ##################################################### */
     /**
+     We simply set the date range.
      */
     mutating func setDataWindowRange(_ inDataWindowRange: ClosedRange<Date>) {
         dataWindowRange = inDataWindowRange
@@ -815,14 +819,33 @@ extension DataProviderProtocol {
 // MARK: - One Element Of Data From A Row -
 /* ##################################################### */
 /**
+ This is a very simple interface for each plottable data item.
+ 
+ Note that it is a class, not a struct. We do this, so it can be subclassed and referenced.
  */
 class RCVS_DataSource: RCVS_DataSourceProtocol {
+    /* ##################################################### */
+    /**
+     The textual description of this plottable data item.
+     */
     var description: String = "ERROR"
     
+    /* ##################################################### */
+    /**
+     The color to be applied, in the chart.
+     */
     var color: Color = .clear
     
+    /* ##################################################### */
+    /**
+     The value (as an Int) for this plottable data item.
+     */
     var value: Int = 0
     
+    /* ##################################################### */
+    /**
+     True, if the row is currently selected.
+     */
     var isSelected: Bool = false
 }
 

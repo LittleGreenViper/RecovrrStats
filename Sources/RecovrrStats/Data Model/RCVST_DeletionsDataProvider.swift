@@ -68,6 +68,7 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
     
     /* ##################################################### */
     /**
+     The actual range of the currently displayed rows.
      */
     var dataWindowRange: ClosedRange<Date> = .distantPast ... .distantPast
     
@@ -91,6 +92,10 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
 
     /* ##################################################### */
     /**
+     The initializer.
+     
+     - parameter with: The data frame, with the data processed from the CSV.
+     - parameter chartName: The name to be used to describe the chart representing this data.
      */
     init(with inDataFrame: DataFrame, chartName inChartName: String) {
         var rowTypes = [_RCVST_DeletionsDataRow]()

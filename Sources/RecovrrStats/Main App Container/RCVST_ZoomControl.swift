@@ -14,6 +14,7 @@ import CoreHaptics
 struct RCVST_ZoomControl: View, RCVST_HapticHopper {
     /* ################################################################## */
     /**
+     The initial location, at the start of the drag.
      */
     @State private var _startLocation: Double?
     

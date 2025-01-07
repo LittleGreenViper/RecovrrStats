@@ -261,41 +261,51 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
 
     /* ################################################################## */
     /**
+     A data provider instance, tuned to user types.
      */
     var userDataProvider: RCVST_UserTypesDataProvider?
     
     /* ################################################################## */
     /**
+     A data provider instance, tuned to signup resolutions.
      */
     var signupsDataProvider: RCVST_SignupsDataProvider?
     
     /* ################################################################## */
     /**
+     A data provider instance, tuned to deletions.
      */
     var deletionsDataProvider: RCVST_DeletionsDataProvider?
     
     /* ################################################################## */
     /**
+     A data provider instance, tuned to users active within the last 24 hours.
      */
     var active1DataProvider: RCVST_UserActivityDataProvider?
     
     /* ################################################################## */
     /**
+     A data provider instance, tuned to users active within the last week.
      */
     var active7DataProvider: RCVST_UserActivityDataProvider?
     
     /* ################################################################## */
     /**
+     A data provider instance, tuned to users active within the last 30 days.
      */
     var active30DataProvider: RCVST_UserActivityDataProvider?
     
     /* ################################################################## */
     /**
+     A data provider instance, tuned to users active within the last 90 days.
      */
     var active90DataProvider: RCVST_UserActivityDataProvider?
 
     /* ################################################################## */
     /**
+     Default initializer. We set up our data providers, here.
+     
+     - parameter statusDataFrame: The actual data frame that was fetched and intialized, from the CSV data.
      */
     init(statusDataFrame inDataFrame: DataFrame) {
         statusDataFrame = inDataFrame
