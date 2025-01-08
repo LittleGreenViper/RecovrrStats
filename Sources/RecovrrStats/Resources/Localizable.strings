@@ -44,15 +44,15 @@
 "SLUG-BAR-CHART-Y-AXIS-SIGNUP-LABEL"        =   "Signups";
 
 "SLUG-CHART-4-TITLE"                        =   "Account Deletions";
-"SLUG-DELETED-TYPES-DESC-STRING-FORMAT"     =   "%@: Active: %d, Inactive: %d, Self: %d, Total: %d";
+"SLUG-DELETED-TYPES-DESC-STRING-FORMAT"     =   "%@: Active: %d, Inactive: %d, Other: %d, Total: %d";
 "SLUG-DELETION-COLUMN-NAME-deletedActive"   =   "Active";
 "SLUG-DELETION-COLUMN-NAME-deletedInactive" =   "Inactive";
-"SLUG-DELETION-COLUMN-NAME-selfDeleted"     =   "Self-Deleted";
+"SLUG-DELETION-COLUMN-NAME-selfDeleted"     =   "Other";
 "SLUG-BAR-CHART-Y-AXIS-DELETIONS-LABEL"     =   "Deletions";
 
 "SLUG-BAR-CHART-ACTIVE-TITLE-FORMAT"        =   "User Activity (%d Days)";
 "SLUG-BAR-CHART-ACTIVE-TITLE-SHORT"         =   "User Activity (1 Day)";
-"SLUG-BAR-CHART-ACTIVE-DESC-STRING-FORMAT"  =   "%@: Active in the last %@: %d (%d%%)";
+"SLUG-BAR-CHART-ACTIVE-DESC-STRING-FORMAT"  =   "%@: Active in the last %@: %d (%.2g%%)";
 "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-1"      =   "day";
 "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-7"      =   "week";
 "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-30"     =   "30 days";

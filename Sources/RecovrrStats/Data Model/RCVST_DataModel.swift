@@ -73,7 +73,7 @@ public protocol RCVS_DataSourceProtocol: AnyObject, Identifiable {
     /**
      Returns the associated value.
      */
-    var value: Int { get }
+    var value: Float { get }
     
     /* ######################################### */
     /**
@@ -107,7 +107,7 @@ public protocol RCVST_RowProtocol: AnyObject, Identifiable {
     /**
      This is the highest integer value for the Y-axis.
      */
-    var maxYValue: Int { get }
+    var maxYValue: Float { get }
 
     /* ################################################# */
     /**
@@ -214,7 +214,7 @@ public extension RCVST_RowProtocol {
     /**
      Default simply goes through the values, and stacks them all together.
      */
-    var maxYValue: Int { plottableData.reduce(0) { $0 + $1.value } }
+    var maxYValue: Float { plottableData.reduce(0) { $0 + $1.value } }
     
     // MARK: Raw Data
     
@@ -336,12 +336,6 @@ public extension RCVST_RowProtocol {
 
     /* ############################################################## */
     /**
-     These are the number of users that logged into their accounts for the first time, since the last sample.
-     */
-    var newFirstTimeLogins: Int { Swift.max(0, changeInActiveUsers - (newDeletedActive + newSelfDeleted)) }
-
-    /* ############################################################## */
-    /**
      The number of signup requests since the last sample.
      */
     var newRequests: Int { totalRequests - previousTotalRequests }
@@ -369,15 +363,6 @@ public extension RCVST_RowProtocol {
      The number of inactive users deleted by the administrators since the last sample.
      */
     var newDeletedInactive: Int { deletedInactive - previousDeletedInactive }
-
-    /* ############################################################## */
-    /**
-     These are the number of users that deleted their own accounts, since the last sample.
-     */
-    var newSelfDeleted: Int {
-        let newNegativeDeletedActive = -newDeletedActive
-        return abs(Swift.max(0, newNegativeDeletedActive - changeInActiveUsers))
-    }
 }
 
 /* ##################################################### */
@@ -502,7 +487,7 @@ protocol DataProviderProtocol: Identifiable {
     /**
      This is the highest integer value for the Y-axis.
      */
-    var maxYValue: Int { get }
+    var maxYValue: Float { get }
 
     /* ################################################################## */
     /**
@@ -665,7 +650,7 @@ extension DataProviderProtocol {
     /**
      (Computed Property) This returns the max Y value, for the whole dataset.
      */
-    var maxYValue: Int { rows.reduce(0) { max($0, $1.maxYValue) } }
+    var maxYValue: Float { rows.reduce(0) { max($0, $1.maxYValue) } }
     
     /* ##################################################### */
     /**
@@ -701,7 +686,7 @@ extension DataProviderProtocol {
 
         // This will be used for the "round up" operation. Crude, but sufficient for our needs.
         let divisors = [8, 16, 24, 32, 40, 80, 160, 240, 320, 400, 800, 1600]
-        let topDivisor = divisors.last(where: { $0 <= maxYValue }) ?? 0
+        let topDivisor = divisors.last(where: { $0 <= Int(ceil(maxYValue)) }) ?? 0
         let divisor = max(1, topDivisor / 8)
         
         let stepSizeStart = Int(ceil(Double(maxYValue) / Double(inNumberOfValues - 1)))  // We start, by getting the maximum step size necessary to reach the maximum users.
@@ -840,7 +825,7 @@ class RCVS_DataSource: RCVS_DataSourceProtocol {
     /**
      The value (as an Int) for this plottable data item.
      */
-    var value: Int = 0
+    var value: Float = 0
     
     /* ##################################################### */
     /**
@@ -881,7 +866,7 @@ public class RCVST_Row: RCVST_RowProtocol {
         /**
          (Stored Property) The row segment value
          */
-        public var value: Int
+        public var value: Float
         
         /* ############################################# */
         /**
@@ -899,7 +884,7 @@ public class RCVST_Row: RCVST_RowProtocol {
             - value: The row segment value
             - isSelected: True, if the row segment is selected.
          */
-        public init(description inDescription: String, color inColor: Color, value inValue: Int, isSelected inIsSelected: Bool) {
+        public init(description inDescription: String, color inColor: Color, value inValue: Float, isSelected inIsSelected: Bool) {
             description = inDescription
             color = inColor
             value = inValue

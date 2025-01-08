@@ -32,9 +32,9 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
          */
         override var plottableData: [RCVST_BasePlottableData] {
             get {
-                let deletedActive = newDeletedActive + (previousRowInstance?.newDeletedActive ?? 0)
-                let deletedInactive = newDeletedInactive + (previousRowInstance?.newDeletedInactive ?? 0)
-                let deletedSelf = newSelfDeleted + (previousRowInstance?.newSelfDeleted ?? 0)
+                let deletedActive = Float(newDeletedActive + (previousRowInstance?.newDeletedActive ?? 0))
+                let deletedInactive = Float(newDeletedInactive + (previousRowInstance?.newDeletedInactive ?? 0))
+                let deletedSelf = Float(0)
                 return [
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-DELETION-COLUMN-NAME-deletedInactive".localizedVariant,
                                                       color: (isSelected ? RCVS_LegendSelectionColor : .blue),
@@ -131,7 +131,7 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
                 dateFormatter.timeStyle = .none
                 let deletedActive = selectedValue.newDeletedActive + (selectedValue.previousRowInstance?.newDeletedActive ?? 0)
                 let deletedInactive = selectedValue.newDeletedInactive + (selectedValue.previousRowInstance?.newDeletedInactive ?? 0)
-                let deletedSelf = selectedValue.newSelfDeleted + (selectedValue.previousRowInstance?.newSelfDeleted ?? 0)
+                let deletedSelf = Int(0)
                 let ret = String(format: "SLUG-DELETED-TYPES-DESC-STRING-FORMAT".localizedVariant,
                                  dateFormatter.string(from: selectedValue.sampleDate),
                                  deletedActive,

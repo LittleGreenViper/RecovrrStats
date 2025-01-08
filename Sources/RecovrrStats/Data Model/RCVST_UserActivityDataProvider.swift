@@ -26,19 +26,19 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
          */
         override var plottableData: [RCVST_BasePlottableData] {
             get {
-                var activity: Int = 0
+                var activity: Float = 0
                 switch days {
                 case 0..<2:
-                    activity = activeInLast24Hours
+                    activity = Float(activeInLast24Hours)
                 case 2..<8:
-                    activity = activeInLastWeek
+                    activity = Float(activeInLastWeek)
                 case 8..<89:
-                    activity = activeInLast30Days
+                    activity = Float(activeInLast30Days)
                 default:
-                    activity = activeInLast90Days
+                    activity = Float(activeInLast90Days)
                 }
                 
-                activity = activity * 100 / activeUsers
+                activity = Float(Int(activity * 100)) / Float(activeUsers)
                 
                 return [
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-USER-COLUMN-NAME-active".localizedVariant,
@@ -139,23 +139,23 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateStyle = .short
                 dateFormatter.timeStyle = .none
-                var activity: Int = 0
+                var activity: Float = 0
                 var string: String = ""
                 switch days {
                 case 0..<2:
-                    activity = selectedValue.activeInLast24Hours
+                    activity = Float(selectedValue.activeInLast24Hours)
                     string = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-1".localizedVariant
                 case 2..<8:
-                    activity = selectedValue.activeInLastWeek
+                    activity = Float(selectedValue.activeInLastWeek)
                     string = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-7".localizedVariant
                 case 8..<89:
-                    activity = selectedValue.activeInLast30Days
+                    activity = Float(selectedValue.activeInLast30Days)
                     string = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-30".localizedVariant
                 default:
-                    activity = selectedValue.activeInLast90Days
+                    activity = Float(selectedValue.activeInLast90Days)
                     string = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-90".localizedVariant
                 }
-                let percentage = Int((activity * 100) / selectedValue.activeUsers)
+                let percentage = Float(Int(activity * 100)) / Float(selectedValue.activeUsers)
                 return String(format: "SLUG-BAR-CHART-ACTIVE-DESC-STRING-FORMAT".localizedVariant, dateFormatter.string(from: selectedValue.sampleDate), string, activity, percentage)
             } else {
                 return " "

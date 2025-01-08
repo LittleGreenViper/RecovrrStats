@@ -37,10 +37,10 @@ struct RCVST_SignupsDataProvider: DataProviderProtocol {
                 return [
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-SIGNUP-COLUMN-NAME-acceptedSignups".localizedVariant,
                                                       color: isSelected ? RCVS_LegendSelectionColor : .blue,
-                                                      value: signupsAccepted, isSelected: isSelected),
+                                                      value: Float(signupsAccepted), isSelected: isSelected),
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-SIGNUP-COLUMN-NAME-rejectedSignups".localizedVariant,
                                                       color: (isSelected ? RCVS_LegendSelectionColor : .orange),
-                                                      value: signupsRejected,
+                                                      value: Float(signupsRejected),
                                                       isSelected: isSelected)
                 ]
             }
