@@ -146,49 +146,49 @@ public extension RCVST_RowProtocol {
     /**
      The total number of users (both active and inactive), for the previous sample.
      */
-    var previousTotalUsers: Int { previousDataRow?[RCVST_DataProvider.Columns.total_users.rawValue] as? Int ?? 0 }
+    var previousTotalUsers: Int { previousDataRow?[RCVST_DataProvider.Columns.total_users.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.total_users.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The total number of new (inactive) users, for the previous sample.
      */
-    var previousNewUsers: Int { previousDataRow?[RCVST_DataProvider.Columns.new_users.rawValue] as? Int ?? 0 }
+    var previousNewUsers: Int { previousDataRow?[RCVST_DataProvider.Columns.new_users.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.new_users.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The current number of users (both active and new), for the previous sample.
      */
-    var previousNeverSetLocation: Int { previousDataRow?[RCVST_DataProvider.Columns.never_set_location.rawValue] as? Int ?? 0 }
+    var previousNeverSetLocation: Int { previousDataRow?[RCVST_DataProvider.Columns.never_set_location.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.never_set_location.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative total number of signup requests, for the previous sample.
      */
-    var previousTotalRequests: Int { previousDataRow?[RCVST_DataProvider.Columns.total_requests.rawValue] as? Int ?? 0 }
+    var previousTotalRequests: Int { previousDataRow?[RCVST_DataProvider.Columns.total_requests.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.total_requests.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative total number of signup requests approved by the administrators, for the previous sample.
      */
-    var previousAcceptedRequests: Int { previousDataRow?[RCVST_DataProvider.Columns.accepted_requests.rawValue] as? Int ?? 0 }
+    var previousAcceptedRequests: Int { previousDataRow?[RCVST_DataProvider.Columns.accepted_requests.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.accepted_requests.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative total number of signup requests rejected by the administrators, for the previous sample.
      */
-    var previousRejectedRequests: Int { previousDataRow?[RCVST_DataProvider.Columns.rejected_requests.rawValue] as? Int ?? 0 }
+    var previousRejectedRequests: Int { previousDataRow?[RCVST_DataProvider.Columns.rejected_requests.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.rejected_requests.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative number of active users that have been deleted by the administrators, for the previous sample.
      */
-    var previousDeletedActive: Int { previousDataRow?[RCVST_DataProvider.Columns.deleted_active.rawValue] as? Int ?? 0 }
+    var previousDeletedActive: Int { previousDataRow?[RCVST_DataProvider.Columns.deleted_active.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.deleted_active.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative number of new users that have been deleted by the administrators, for the previous sample.
      */
-    var previousDeletedInactive: Int { previousDataRow?[RCVST_DataProvider.Columns.deleted_inactive.rawValue] as? Int ?? 0 }
+    var previousDeletedInactive: Int { previousDataRow?[RCVST_DataProvider.Columns.deleted_inactive.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.deleted_inactive.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
