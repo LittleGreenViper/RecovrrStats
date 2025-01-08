@@ -156,7 +156,7 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
                     string = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-90".localizedVariant
                 }
                 let percentage = Float(Int(activity * 100)) / Float(selectedValue.activeUsers)
-                return String(format: "SLUG-BAR-CHART-ACTIVE-DESC-STRING-FORMAT".localizedVariant, dateFormatter.string(from: selectedValue.sampleDate), string, activity, percentage)
+                return String(format: "SLUG-BAR-CHART-ACTIVE-DESC-STRING-FORMAT".localizedVariant, dateFormatter.string(from: selectedValue.sampleDate), string, Int(activity), percentage)
             } else {
                 return " "
             }
