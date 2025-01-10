@@ -333,6 +333,6 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
             }
         }
         .onAppear { prepareHaptics() }
-        .onDisappear { dayCount = Int(data.totalDateRange.lowerBound.distance(to: data.totalDateRange.upperBound) / 86400) }
+        .onDisappear { dayCount = data.numberOfDays }
     }
 }
