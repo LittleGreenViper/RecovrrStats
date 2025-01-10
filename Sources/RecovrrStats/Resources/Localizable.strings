@@ -53,7 +53,7 @@
 
 "SLUG-BAR-CHART-ACTIVE-TITLE-FORMAT"        =   "User Activity (%d Days)";
 "SLUG-BAR-CHART-ACTIVE-TITLE-SHORT"         =   "User Activity (1 Day)";
-"SLUG-BAR-CHART-ACTIVE-DESC-STRING-FORMAT"  =   "%@: Active in the last %@: %d (%.2g%%)";
+"SLUG-BAR-CHART-ACTIVE-DESC-STRING-FORMAT"  =   "%@: Active in the last %@: %d (%.3g%%)";
 "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-1"      =   "day";
 "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-7"      =   "week";
 "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-30"     =   "30 days";
