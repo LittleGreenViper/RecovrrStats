@@ -176,7 +176,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
     /**
      The number of days, covered by the data window.
      */
-    @Binding var dayCount: Int
+    @Binding var dayCount: Int?
 
     /* ################################################################## */
     /**
@@ -332,7 +332,10 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                 .padding([.leading, .trailing], 20)
             }
         }
-        .onAppear { prepareHaptics() }
-        .onDisappear { dayCount = data.numberOfDays }
+        .onAppear {
+            dayCount = data.numberOfDays
+            prepareHaptics()
+        }
+        .onDisappear { dayCount = nil }
     }
 }

@@ -24,7 +24,8 @@
 "SLUG-COLUMN-NAME-deleted_active"           =   "Admin Deleted Active Users";
 "SLUG-COLUMN-NAME-deleted_inactive"         =   "Admin Deleted Inactive Users";
 
-"SLUG-MAIN-SCREEN-TITLE"                    =   "Recovrr Stats (%d days)";
+"SLUG-MAIN-SCREEN-TITLE"                    =   "Recovrr Stats";
+"SLUG-MAIN-SCREEN-TITLE-FORMAT"             =   "Recovrr Stats (%d days)";
 "SLUG-MAIN-CURRENT-ACTIVE"                  =   "Current Active Users: %d";
 "SLUG-MAIN-CURRENT-INACTIVE"                =   "Current Inactive Users: %d";
 

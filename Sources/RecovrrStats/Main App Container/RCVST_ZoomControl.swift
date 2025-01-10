@@ -34,7 +34,7 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
     /**
      The number of days, covered by the data window.
      */
-    @Binding var dayCount: Int
+    @Binding var dayCount: Int?
 
     /* ################################################################## */
     /**

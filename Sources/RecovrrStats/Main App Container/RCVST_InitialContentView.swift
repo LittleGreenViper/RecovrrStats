@@ -66,7 +66,6 @@ struct RootStackView: View {
         _latestActiveTotal = latestAct
         _latestInactiveTotal = latestInact
         _buildNavList()
-        dayCount = _data?.numberOfDays ?? 0
     }
 
     /* ################################################################## */
@@ -121,7 +120,19 @@ struct RootStackView: View {
     /**
      The number of days, covered by the data window.
      */
-    @State var dayCount: Int = 0
+    @State var dayCount: Int?
+    
+    /* ################################################################## */
+    /**
+     The number of days, covered by the data window.
+     */
+    var title: String {
+        if let dayCount = dayCount {
+            return String(format: "SLUG-MAIN-SCREEN-TITLE-FORMAT".localizedVariant, dayCount)
+        } else {
+            return "SLUG-MAIN-SCREEN-TITLE".localizedVariant
+        }
+    }
 
     /* ################################################################## */
     /**
@@ -129,7 +140,7 @@ struct RootStackView: View {
      */
     var body: some View {
         VStack {
-            Text(String(format: "SLUG-MAIN-SCREEN-TITLE".localizedVariant, dayCount))
+            Text(title)
                 .font(.headline)
             Text(String(format: "SLUG-MAIN-CURRENT-ACTIVE".localizedVariant, _latestActiveTotal))
                 .foregroundColor(.green)
@@ -144,7 +155,12 @@ struct RootStackView: View {
             }
         }
             // Makes sure that we load up, immediately.
-            .onAppear { RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in _data = inDataProvider } }
+        .onAppear {
+            dayCount = nil
+            RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
+                _data = inDataProvider
+            }
+        }
             // Forces updates, whenever we become active.
             .onChange(of: _scenePhase, initial: true) {
                 if .active == _scenePhase,
