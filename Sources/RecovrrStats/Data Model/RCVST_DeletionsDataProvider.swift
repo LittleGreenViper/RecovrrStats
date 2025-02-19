@@ -36,11 +36,11 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
                 let delI = Float(deletedInactive - (previousRowInstance?.previousDeletedInactive ?? 0))
                 
                 return [
-                    RCVST_Row.RCVST_BasePlottableData(description: "SLUG-DELETION-COLUMN-NAME-deletedActive".localizedVariant,
+                    RCVST_Row.RCVST_BasePlottableData(description: "SLUG-DELETION-COLUMN-NAME-deletedInactive".localizedVariant,
                                                       color: (isSelected ? RCVS_LegendSelectionColor : .blue),
                                                       value: delI,
                                                       isSelected: isSelected),
-                    RCVST_Row.RCVST_BasePlottableData(description: "SLUG-DELETION-COLUMN-NAME-deletedInactive".localizedVariant,
+                    RCVST_Row.RCVST_BasePlottableData(description: "SLUG-DELETION-COLUMN-NAME-deletedActive".localizedVariant,
                                                       color: (isSelected ? RCVS_LegendSelectionColor : .green),
                                                       value: delA,
                                                       isSelected: isSelected)
