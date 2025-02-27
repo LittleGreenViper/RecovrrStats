@@ -8,7 +8,7 @@ All of our statistics are anonymized and aggregated. Every 12 hours, a new row i
 
 The system has a "gatekeeper" administrator, that reviews and approves (or rejects) signup requests.
 
-Unless a signup is approved, the user cannot log in, so there are the following basic states for users (or potential users) of the system:
+Unless a signup is approved, the user cannot log in, so these are the following basic states for users (or potential users) of the system:
 
     1) Open Signup Request
     
