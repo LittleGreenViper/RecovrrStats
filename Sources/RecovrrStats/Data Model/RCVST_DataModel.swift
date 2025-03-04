@@ -363,6 +363,21 @@ public extension RCVST_RowProtocol {
      The number of inactive users deleted by the administrators since the last sample.
      */
     var newDeletedInactive: Int { deletedInactive - previousDeletedInactive }
+    
+    /* ############################################################## */
+    /**
+     The number of users that deleted their own accounts.
+     */
+    var selfDeletions: Int {
+        let adminDeletions = (deletedActive - previousDeletedActive) +
+                             (deletedInactive - previousDeletedInactive)
+
+        // Calculate expected total users if only admin deletions happened
+        let expectedTotalUsers = totalUsers - adminDeletions
+
+        // Self-deletions are the unexpected drop in totalUsers
+        return max(0, expectedTotalUsers - totalUsers)
+    }
 }
 
 /* ##################################################### */

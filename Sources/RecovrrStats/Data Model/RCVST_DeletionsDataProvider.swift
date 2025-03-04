@@ -34,7 +34,8 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
             get {
                 let delA = Float(deletedActive - (previousRowInstance?.previousDeletedActive ?? 0))
                 let delI = Float(deletedInactive - (previousRowInstance?.previousDeletedInactive ?? 0))
-                
+                let delS = Float(selfDeletions - (previousRowInstance?.selfDeletions ?? 0))
+
                 return [
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-DELETION-COLUMN-NAME-deletedInactive".localizedVariant,
                                                       color: (isSelected ? RCVS_LegendSelectionColor : .blue),
@@ -43,6 +44,10 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-DELETION-COLUMN-NAME-deletedActive".localizedVariant,
                                                       color: (isSelected ? RCVS_LegendSelectionColor : .green),
                                                       value: delA,
+                                                      isSelected: isSelected),
+                    RCVST_Row.RCVST_BasePlottableData(description: "SLUG-DELETION-COLUMN-NAME-selfDeleted".localizedVariant,
+                                                      color: (isSelected ? RCVS_LegendSelectionColor : .orange),
+                                                      value: delS,
                                                       isSelected: isSelected)
                 ]
             }
@@ -126,14 +131,16 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
                 dateFormatter.dateStyle = .short
                 dateFormatter.timeStyle = .none
                 let plottable = selectedValue.plottableData
-                guard 2 == plottable.count else { return "ERROR" }
+                guard 3 == plottable.count else { return "ERROR" }
                 let deletedInactive = Int(plottable[0].value)
                 let deletedActive = Int(plottable[1].value)
-                let deletedTotal = deletedActive + deletedInactive
+                let selfDeleted = Int(plottable[2].value)
+                let deletedTotal = deletedActive + deletedInactive + selfDeleted
                 let ret = String(format: "SLUG-DELETED-TYPES-DESC-STRING-FORMAT".localizedVariant,
                                  dateFormatter.string(from: selectedValue.sampleDate),
-                                 deletedActive,
                                  deletedInactive,
+                                 deletedActive,
+                                 selfDeleted,
                                  deletedTotal
                 )
                 return ret
