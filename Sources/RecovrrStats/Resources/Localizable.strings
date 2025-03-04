@@ -45,7 +45,7 @@
 "SLUG-BAR-CHART-Y-AXIS-SIGNUP-LABEL"        =   "Signups";
 
 "SLUG-CHART-4-TITLE"                        =   "Account Deletions";
-"SLUG-DELETED-TYPES-DESC-STRING-FORMAT"     =   "%@: Active: %d, Inactive: %d, self: %d, Total: %d";
+"SLUG-DELETED-TYPES-DESC-STRING-FORMAT"     =   "%@: Inactive: %d, Active: %d, self: %d, Total: %d";
 "SLUG-DELETION-COLUMN-NAME-deletedActive"   =   "Active";
 "SLUG-DELETION-COLUMN-NAME-deletedInactive" =   "Inactive";
 "SLUG-DELETION-COLUMN-NAME-selfDeleted"     =   "Other";
