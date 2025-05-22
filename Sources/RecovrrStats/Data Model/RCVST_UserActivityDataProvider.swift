@@ -141,18 +141,23 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
                 dateFormatter.timeStyle = .none
                 var activity: Float = 0
                 var string: String = ""
+                let day = Float(selectedValue.activeInLast24Hours)
+                let week = Float(selectedValue.activeInLastWeek) - day
+                let month = Float(selectedValue.activeInLast30Days) - (week + day)
+                let quarter = Float(selectedValue.activeInLast90Days) - (week + day + month)
+                
                 switch days {
                 case 0..<2:
-                    activity = Float(selectedValue.activeInLast24Hours)
+                    activity = day
                     string = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-1".localizedVariant
                 case 2..<8:
-                    activity = Float(selectedValue.activeInLastWeek)
+                    activity = week
                     string = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-7".localizedVariant
                 case 8..<89:
-                    activity = Float(selectedValue.activeInLast30Days)
+                    activity = month
                     string = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-30".localizedVariant
                 default:
-                    activity = Float(selectedValue.activeInLast90Days)
+                    activity = quarter
                     string = "SLUG-BAR-CHART-ACTIVE-TYPES-VALUES-90".localizedVariant
                 }
                 let percentage = Float(Int(activity * 100)) / Float(selectedValue.activeUsers)
