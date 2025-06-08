@@ -71,10 +71,11 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
                                     .simultaneously(with:   // We combine it with the drag, so we don't get hesitation.
                                         DragGesture(minimumDistance: 0)
                                             .onChanged { inValue in
-                                                if 0 != inValue.translation.width {
+                                                if 0 != inValue.translation.width || 0 != inValue.translation.height {
                                                     _startLocation = _startLocation ?? data.dataWindowRange.lowerBound.timeIntervalSinceReferenceDate
                                                     if let startLocation = _startLocation {
-                                                        let dateChangeInSeconds = Int((Double(inValue.location.x - inValue.startLocation.x) / globalMagnificationFactor) / 86400) * 86400
+                                                        let maxChange = max(Double(inValue.location.x - inValue.startLocation.x), Double(inValue.location.y - inValue.startLocation.y))
+                                                        let dateChangeInSeconds = Int((maxChange / globalMagnificationFactor) / 86400) * 86400
                                                         let newLowerBound = startLocation + Double(dateChangeInSeconds)
                                                         let finalLowerBound = max(data.totalDateRange.lowerBound.timeIntervalSinceReferenceDate,
                                                                                   min(data.totalDateRange.upperBound.timeIntervalSinceReferenceDate - timeRange,

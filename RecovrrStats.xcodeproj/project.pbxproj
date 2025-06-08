@@ -29,7 +29,6 @@
 		D4484A452CBEA80B0019BC0E /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Warnings.xcconfig; sourceTree = "<group>"; };
 		D47403872D28D09700F08C0A /* RCVST_UserActivityDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_UserActivityDataProvider.swift; sourceTree = "<group>"; };
 		D47856272D286664006517C3 /* RCVST_SignupsDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_SignupsDataProvider.swift; sourceTree = "<group>"; };
-		D4A62DD52CC9372D001DD8A9 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		D4ADD81A2CF5F13E0030B789 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D4ADD81B2CF5F13E0030B789 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D4ADD81C2CF5F13E0030B789 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
@@ -127,7 +126,6 @@
 		D4F14D7D2CBEA585000C482E = {
 			isa = PBXGroup;
 			children = (
-				D4A62DD52CC9372D001DD8A9 /* .swiftlint.yml */,
 				D4484A462CBEA80B0019BC0E /* Meta */,
 				D4E360382CF759A200232A1A /* Sources */,
 				D4F14D872CBEA585000C482E /* Products */,
@@ -388,7 +386,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0025;
+				CURRENT_PROJECT_VERSION = 0026;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -407,7 +405,7 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.littlegreenviper.RecovrrStats;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = NO;
@@ -427,7 +425,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0025;
+				CURRENT_PROJECT_VERSION = 0026;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -446,7 +444,7 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.littlegreenviper.RecovrrStats;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = NO;

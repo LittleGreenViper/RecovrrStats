@@ -11,6 +11,9 @@
       location = "group:README.md">
    </FileRef>
    <FileRef
+      location = "group:.swiftlint.yml">
+   </FileRef>
+   <FileRef
       location = "group:RecovrrStats.xcodeproj">
    </FileRef>
 </Workspace>
