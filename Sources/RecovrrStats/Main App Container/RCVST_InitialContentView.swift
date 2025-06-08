@@ -60,7 +60,7 @@ struct RootStackView: View {
     /**
      */
     private func _updateTotals() {
-        guard let latestAct = _data?.userDataProvider?.rows.last?.activeUsers,
+        guard let latestAct = _data?.totalRejections, // _data?.userDataProvider?.rows.last?.activeUsers,
               let latestInact = _data?.userDataProvider?.rows.last?.newUsers
         else { return }
         _latestActiveTotal = latestAct

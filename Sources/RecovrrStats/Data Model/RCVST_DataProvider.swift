@@ -317,4 +317,40 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
         active30DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 30)
         active90DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 90)
     }
+    
+    /* ################################################################## */
+    /**
+     This is the total number of signup requests, since the start of data.
+     */
+    var totalRequests: Int { statusDataFrame.rows.reduce(0) { $0 + ($1["total_requests"] as? Int ?? 0) } }
+    
+    /* ################################################################## */
+    /**
+     This is the total number of accepted signup requests, since the start of data.
+     */
+    var totalApprovals: Int { statusDataFrame.rows.reduce(0) { $0 + ($1["accepted_requests"] as? Int ?? 0) } }
+    
+    /* ################################################################## */
+    /**
+     This is the total number of rejected signup requests, since the start of data.
+     */
+    var totalRejections: Int { statusDataFrame.rows.reduce(0) { $0 + ($1["rejected_requests"] as? Int ?? 0) } }
+    
+    /* ################################################################## */
+    /**
+     The total number of admin deleted accounts, since the start of data.
+     */
+    var totalAdminDeleted: Int { (statusDataFrame.rows.last?["deleted_active"] as? Int ?? 0) + (statusDataFrame.rows.last?["deleted_inactive"] as? Int ?? 0) }
+    
+    /* ################################################################## */
+    /**
+     The total number of admin deleted active accounts, since the start of data.
+     */
+    var totalAdminActiveDeleted: Int { (statusDataFrame.rows.last?["deleted_active"] as? Int ?? 0) }
+    
+    /* ################################################################## */
+    /**
+     The total number of admin deleted inactive accounts, since the start of data.
+     */
+    var totalAdminInactiveDeleted: Int { (statusDataFrame.rows.last?["deleted_inactive"] as? Int ?? 0) }
 }
