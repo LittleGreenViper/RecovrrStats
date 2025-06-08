@@ -251,7 +251,7 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
     /**
      This stores the dataframe info.
      */
-    var numberOfDays: Int { return (statusDataFrame.rows.count + 1) / 2 }
+    var numberOfDays: Int { return (self.statusDataFrame.rows.count + 1) / 2 }
 
     /* ################################################################## */
     /**
@@ -308,39 +308,39 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
      - parameter statusDataFrame: The actual data frame that was fetched and intialized, from the CSV data.
      */
     init(statusDataFrame inDataFrame: DataFrame) {
-        statusDataFrame = inDataFrame
-        userDataProvider = RCVST_UserTypesDataProvider(with: inDataFrame, chartName: "SLUG-USER-TOTALS-CHART-TITLE".localizedVariant)
-        signupsDataProvider = RCVST_SignupsDataProvider(with: inDataFrame, chartName: "SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant)
-        deletionsDataProvider = RCVST_DeletionsDataProvider(with: inDataFrame, chartName: "SLUG-CHART-4-TITLE".localizedVariant)
-        active1DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 1)
-        active7DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 7)
-        active30DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 30)
-        active90DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 90)
+        self.statusDataFrame = inDataFrame
+        self.userDataProvider = RCVST_UserTypesDataProvider(with: inDataFrame, chartName: "SLUG-USER-TOTALS-CHART-TITLE".localizedVariant)
+        self.signupsDataProvider = RCVST_SignupsDataProvider(with: inDataFrame, chartName: "SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant)
+        self.deletionsDataProvider = RCVST_DeletionsDataProvider(with: inDataFrame, chartName: "SLUG-CHART-4-TITLE".localizedVariant)
+        self.active1DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 1)
+        self.active7DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 7)
+        self.active30DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 30)
+        self.active90DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 90)
     }
     
     /* ################################################################## */
     /**
      This is the total number of signup requests, since the start of data.
      */
-    var totalRequests: Int { statusDataFrame.rows.reduce(0) { $0 + ($1["total_requests"] as? Int ?? 0) } }
+    var totalRequests: Int { self.statusDataFrame.rows.reduce(0) { $0 + ($1["total_requests"] as? Int ?? 0) } }
     
     /* ################################################################## */
     /**
      This is the total number of accepted signup requests, since the start of data.
      */
-    var totalApprovals: Int { statusDataFrame.rows.reduce(0) { $0 + ($1["accepted_requests"] as? Int ?? 0) } }
+    var totalApprovals: Int { self.statusDataFrame.rows.reduce(0) { $0 + ($1["accepted_requests"] as? Int ?? 0) } }
     
     /* ################################################################## */
     /**
      This is the total number of rejected signup requests, since the start of data.
      */
-    var totalRejections: Int { statusDataFrame.rows.reduce(0) { $0 + ($1["rejected_requests"] as? Int ?? 0) } }
+    var totalRejections: Int { self.statusDataFrame.rows.reduce(0) { $0 + ($1["rejected_requests"] as? Int ?? 0) } }
     
     /* ################################################################## */
     /**
      The total number of admin deleted accounts, since the start of data.
      */
-    var totalAdminDeleted: Int { (statusDataFrame.rows.last?["deleted_active"] as? Int ?? 0) + (statusDataFrame.rows.last?["deleted_inactive"] as? Int ?? 0) }
+    var totalAdminDeleted: Int { self.totalAdminActiveDeleted + self.totalAdminInactiveDeleted }
     
     /* ################################################################## */
     /**
@@ -353,4 +353,34 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
      The total number of admin deleted inactive accounts, since the start of data.
      */
     var totalAdminInactiveDeleted: Int { (statusDataFrame.rows.last?["deleted_inactive"] as? Int ?? 0) }
+    
+    /* ################################################################## */
+    /**
+     The average number of signups per day (simple average), since the start of data
+     */
+    var averageSignupsPerDay: Double { Double(self.totalRequests) / (Double(self.statusDataFrame.rows.count) / 2) }
+    
+    /* ################################################################## */
+    /**
+     The average number of rejected signups per day (simple average), since the start of data
+     */
+    var averageRejectedSignupsPerDay: Double { Double(self.totalRejections) / (Double(self.statusDataFrame.rows.count) / 2) }
+    
+    /* ################################################################## */
+    /**
+     The average number of rejected signups per day (simple average), since the start of data
+     */
+    var averageAcceptedSignupsPerDay: Double { Double(self.totalApprovals) / (Double(self.statusDataFrame.rows.count) / 2) }
+    
+    /* ################################################################## */
+    /**
+     The average number of deletions (both active and inactive) per day (simple average), since the start of data
+     */
+    var averageDeletionsPerDay: Double { Double(self.totalAdminDeleted) / (Double(self.statusDataFrame.rows.count) / 2) }
+    
+    /* ################################################################## */
+    /**
+     The average "growth" per day, since the start of the data.
+     */
+    var averageGrowthPerDay: Double { self.averageAcceptedSignupsPerDay - self.averageDeletionsPerDay }
 }
