@@ -246,12 +246,39 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
             }
         }
     }
+    
+    /* ################################################################## */
+    /**
+     This finds the last index of the main dataframe rows, based on our endDate.
+     */
+    private var _lastIndex: Int {
+        for item in self.statusDataFrame.rows.enumerated() where (item.element["sample_date"] as? Date ?? .now) > self.endDate {
+            return max(0, item.offset - 1)
+        }
+        
+        return self.statusDataFrame.rows.count - 1
+    }
+    
+    /* ################################################################## */
+    /**
+     This "slices" the dataframe rows, to include any end date.
+     */
+    private var _rows: DataFrame.Rows {
+        let subset = self.statusDataFrame.prefix(self._lastIndex)
+        return DataFrame(subset).rows
+    }
+
+    /* ################################################################## */
+    /**
+     This is the "end date" of the dataframe. Defaults to now.
+     */
+    var endDate: Date = .now { didSet { self.endDate = max((self.statusDataFrame.rows.first?["sample_date"] as? Date ?? .now), min(self.endDate, .now)) } }
 
     /* ################################################################## */
     /**
      This stores the dataframe info.
      */
-    var numberOfDays: Int { return (self.statusDataFrame.rows.count + 1) / 2 }
+    var numberOfDays: Int { return (self._rows.count + 1) / 2 }
 
     /* ################################################################## */
     /**
@@ -307,7 +334,8 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
      
      - parameter statusDataFrame: The actual data frame that was fetched and intialized, from the CSV data.
      */
-    init(statusDataFrame inDataFrame: DataFrame) {
+    init(statusDataFrame inDataFrame: DataFrame, lastDate inLastDate: Date? = nil) {
+        self.endDate = inLastDate ?? .now
         self.statusDataFrame = inDataFrame
         self.userDataProvider = RCVST_UserTypesDataProvider(with: inDataFrame, chartName: "SLUG-USER-TOTALS-CHART-TITLE".localizedVariant)
         self.signupsDataProvider = RCVST_SignupsDataProvider(with: inDataFrame, chartName: "SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant)
@@ -322,19 +350,19 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
     /**
      This is the total number of signup requests, since the start of data.
      */
-    var totalRequests: Int { self.statusDataFrame.rows.reduce(0) { $0 + ($1["total_requests"] as? Int ?? 0) } }
+    var totalRequests: Int { self._rows.reduce(0) { $0 + ($1["total_requests"] as? Int ?? 0) } }
     
     /* ################################################################## */
     /**
      This is the total number of accepted signup requests, since the start of data.
      */
-    var totalApprovals: Int { self.statusDataFrame.rows.reduce(0) { $0 + ($1["accepted_requests"] as? Int ?? 0) } }
+    var totalApprovals: Int { self._rows.reduce(0) { $0 + ($1["accepted_requests"] as? Int ?? 0) } }
     
     /* ################################################################## */
     /**
      This is the total number of rejected signup requests, since the start of data.
      */
-    var totalRejections: Int { self.statusDataFrame.rows.reduce(0) { $0 + ($1["rejected_requests"] as? Int ?? 0) } }
+    var totalRejections: Int { self._rows.reduce(0) { $0 + ($1["rejected_requests"] as? Int ?? 0) } }
     
     /* ################################################################## */
     /**
@@ -346,37 +374,37 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
     /**
      The total number of admin deleted active accounts, since the start of data.
      */
-    var totalAdminActiveDeleted: Int { (statusDataFrame.rows.last?["deleted_active"] as? Int ?? 0) }
+    var totalAdminActiveDeleted: Int { (self._rows.last?["deleted_active"] as? Int ?? 0) }
     
     /* ################################################################## */
     /**
      The total number of admin deleted inactive accounts, since the start of data.
      */
-    var totalAdminInactiveDeleted: Int { (statusDataFrame.rows.last?["deleted_inactive"] as? Int ?? 0) }
+    var totalAdminInactiveDeleted: Int { (self._rows.last?["deleted_inactive"] as? Int ?? 0) }
     
     /* ################################################################## */
     /**
      The average number of signups per day (simple average), since the start of data
      */
-    var averageSignupsPerDay: Double { Double(self.totalRequests) / (Double(self.statusDataFrame.rows.count) / 2) }
+    var averageSignupsPerDay: Double { Double(self.totalRequests) / (Double(self._rows.count) / 2) }
     
     /* ################################################################## */
     /**
      The average number of rejected signups per day (simple average), since the start of data
      */
-    var averageRejectedSignupsPerDay: Double { Double(self.totalRejections) / (Double(self.statusDataFrame.rows.count) / 2) }
+    var averageRejectedSignupsPerDay: Double { Double(self.totalRejections) / (Double(self._rows.count) / 2) }
     
     /* ################################################################## */
     /**
      The average number of rejected signups per day (simple average), since the start of data
      */
-    var averageAcceptedSignupsPerDay: Double { Double(self.totalApprovals) / (Double(self.statusDataFrame.rows.count) / 2) }
+    var averageAcceptedSignupsPerDay: Double { Double(self.totalApprovals) / (Double(self._rows.count) / 2) }
     
     /* ################################################################## */
     /**
      The average number of deletions (both active and inactive) per day (simple average), since the start of data
      */
-    var averageDeletionsPerDay: Double { Double(self.totalAdminDeleted) / (Double(self.statusDataFrame.rows.count) / 2) }
+    var averageDeletionsPerDay: Double { Double(self.totalAdminDeleted) / (Double(self._rows.count) / 2) }
     
     /* ################################################################## */
     /**
