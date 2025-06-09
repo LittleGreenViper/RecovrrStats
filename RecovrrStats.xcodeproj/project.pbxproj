@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D41159102DF71A03007D87E3 /* RCVST_SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D411590F2DF71A03007D87E3 /* RCVST_SummaryView.swift */; };
 		D4183B802D287F0600862A80 /* RCVST_DeletionsDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4183B7F2D287F0600862A80 /* RCVST_DeletionsDataProvider.swift */; };
 		D433ED262CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox in Frameworks */ = {isa = PBXBuildFile; productRef = D433ED252CC704FB00E7AA4A /* RVS_Generic_Swift_Toolbox */; };
 		D47403882D28D09700F08C0A /* RCVST_UserActivityDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47403872D28D09700F08C0A /* RCVST_UserActivityDataProvider.swift */; };
@@ -25,6 +26,7 @@
 
 /* Begin PBXFileReference section */
 		D40D8F8F2CFBCCAA000F1FB4 /* RCVST_ZoomControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_ZoomControl.swift; sourceTree = "<group>"; };
+		D411590F2DF71A03007D87E3 /* RCVST_SummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_SummaryView.swift; sourceTree = "<group>"; };
 		D4183B7F2D287F0600862A80 /* RCVST_DeletionsDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_DeletionsDataProvider.swift; sourceTree = "<group>"; };
 		D4484A452CBEA80B0019BC0E /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Warnings.xcconfig; sourceTree = "<group>"; };
 		D47403872D28D09700F08C0A /* RCVST_UserActivityDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCVST_UserActivityDataProvider.swift; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 			children = (
 				D4ADD81D2CF5F13E0030B789 /* RCVST_App.swift */,
 				D4ADD8232CF5F13E0030B789 /* RCVST_InitialContentView.swift */,
+				D411590F2DF71A03007D87E3 /* RCVST_SummaryView.swift */,
 				D40D8F8F2CFBCCAA000F1FB4 /* RCVST_ZoomControl.swift */,
 			);
 			path = "Main App Container";
@@ -248,6 +251,7 @@
 				D4ADD8302CF5F13E0030B789 /* Localizable.strings in Sources */,
 				D4FDE7F92D2590E2007C74A4 /* RCVST_UserDateBarChartDisplay.swift in Sources */,
 				D4ADD82E2CF5F13E0030B789 /* RCVST_DataProvider.swift in Sources */,
+				D41159102DF71A03007D87E3 /* RCVST_SummaryView.swift in Sources */,
 				D4ADD82F2CF5F13E0030B789 /* RCVST_InitialContentView.swift in Sources */,
 				D4183B802D287F0600862A80 /* RCVST_DeletionsDataProvider.swift in Sources */,
 				D495CF872D2A1CC90041ECB9 /* RCVST_ZoomControl.swift in Sources */,

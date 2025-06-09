@@ -1,6 +1,21 @@
 /*
- © Copyright 2024, Little Green Viper Software Development LLC
-*/
+ © Copyright 2024-2025, Little Green Viper Software Development LLC
+ LICENSE:
+ 
+ MIT License
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
+ modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import SwiftUI
 import TabularData
@@ -350,25 +365,19 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
     /**
      This is the total number of signup requests, since the start of data.
      */
-    var totalRequests: Int { self._rows.reduce(0) { $0 + ($1["total_requests"] as? Int ?? 0) } }
+    var totalRequests: Int { self._rows.last?["total_requests"] as? Int ?? 0 }
     
     /* ################################################################## */
     /**
      This is the total number of accepted signup requests, since the start of data.
      */
-    var totalApprovals: Int { self._rows.reduce(0) { $0 + ($1["accepted_requests"] as? Int ?? 0) } }
+    var totalApprovals: Int { self._rows.last?["accepted_requests"] as? Int ?? 0 }
     
     /* ################################################################## */
     /**
      This is the total number of rejected signup requests, since the start of data.
      */
-    var totalRejections: Int { self._rows.reduce(0) { $0 + ($1["rejected_requests"] as? Int ?? 0) } }
-    
-    /* ################################################################## */
-    /**
-     The total number of admin deleted accounts, since the start of data.
-     */
-    var totalAdminDeleted: Int { self.totalAdminActiveDeleted + self.totalAdminInactiveDeleted }
+    var totalRejections: Int { self._rows.last?["rejected_requests"] as? Int ?? 0 }
     
     /* ################################################################## */
     /**
@@ -382,6 +391,12 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
      */
     var totalAdminInactiveDeleted: Int { (self._rows.last?["deleted_inactive"] as? Int ?? 0) }
     
+    /* ################################################################## */
+    /**
+     The total number of admin deleted accounts, since the start of data.
+     */
+    var totalAdminDeleted: Int { self.totalAdminActiveDeleted + self.totalAdminInactiveDeleted }
+
     /* ################################################################## */
     /**
      The average number of signups per day (simple average), since the start of data
