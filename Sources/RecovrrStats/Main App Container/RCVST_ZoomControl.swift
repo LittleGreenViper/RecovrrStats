@@ -74,7 +74,8 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
                                                 if 0 != inValue.translation.width || 0 != inValue.translation.height {
                                                     _startLocation = _startLocation ?? data.dataWindowRange.lowerBound.timeIntervalSinceReferenceDate
                                                     if let startLocation = _startLocation {
-                                                        let maxChange = max(Double(inValue.location.x - inValue.startLocation.x), Double(inValue.location.y - inValue.startLocation.y))
+                                                        let isXAxis = abs(inValue.location.x - inValue.startLocation.x) > abs(inValue.location.y - inValue.startLocation.y)
+                                                        let maxChange = isXAxis ? Double(inValue.location.x - inValue.startLocation.x) : Double(inValue.location.y - inValue.startLocation.y)
                                                         let dateChangeInSeconds = Int((maxChange / globalMagnificationFactor) / 86400) * 86400
                                                         let newLowerBound = startLocation + Double(dateChangeInSeconds)
                                                         let finalLowerBound = max(data.totalDateRange.lowerBound.timeIntervalSinceReferenceDate,
