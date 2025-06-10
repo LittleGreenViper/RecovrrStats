@@ -42,23 +42,27 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
         override var plottableData: [RCVST_BasePlottableData] {
             get {
                 var activity: Float = 0
+                let day = Float(self.activeInLast24Hours)
+                let week = Float(self.activeInLastWeek) - day
+                let month = Float(self.activeInLast30Days) - (week + day)
+                let quarter = Float(self.activeInLast90Days) - (week + day + month)
                 switch days {
                 case 0..<2:
-                    activity = Float(activeInLast24Hours)
+                    activity = day
                 case 2..<8:
-                    activity = Float(activeInLastWeek)
+                    activity = week
                 case 8..<89:
-                    activity = Float(activeInLast30Days)
+                    activity = month
                 default:
-                    activity = Float(activeInLast90Days)
+                    activity = quarter
                 }
                 
-                activity = Float(Int(activity * 100)) / Float(activeUsers)
+                activity = Float(Int(activity * 100)) / Float(self.activeUsers)
                 
                 return [
                     RCVST_Row.RCVST_BasePlottableData(description: "SLUG-USER-COLUMN-NAME-active".localizedVariant,
-                                                      color: isSelected ? RCVS_LegendSelectionColor : .green,
-                                                      value: activity, isSelected: isSelected)
+                                                      color: self.isSelected ? RCVS_LegendSelectionColor : .green,
+                                                      value: activity, isSelected: self.isSelected)
                 ]
             }
             
@@ -82,7 +86,7 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
          */
         public init(dataRow inDataRow: DataFrame.Row, previousDataRow inPreviousDataRow: DataFrame.Row?, rowIndex inIndex: Int, days inDays: Int = 1) {
             super.init(dataRow: inDataRow, previousDataRow: inPreviousDataRow, rowIndex: inIndex)
-            days = inDays
+            self.days = inDays
         }
     }
     
@@ -135,12 +139,12 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
             rowTypes.append(value)
         }
         
-        days = inDays
-        rows = rowTypes
-        chartName = 1 < inDays ? String(format: "SLUG-BAR-CHART-ACTIVE-TITLE-FORMAT".localizedVariant, inDays) : "SLUG-BAR-CHART-ACTIVE-TITLE-SHORT".localizedVariant
+        self.days = inDays
+        self.rows = rowTypes
+        self.chartName = 1 < inDays ? String(format: "SLUG-BAR-CHART-ACTIVE-TITLE-FORMAT".localizedVariant, inDays) : "SLUG-BAR-CHART-ACTIVE-TITLE-SHORT".localizedVariant
         if let lowerBound = rowTypes.first?.sampleDate,
            let upperBound = rowTypes.last?.sampleDate {
-            dataWindowRange = Calendar.current.startOfDay(for: lowerBound) ... Calendar.current.startOfDay(for: upperBound)
+            self.dataWindowRange = Calendar.current.startOfDay(for: lowerBound) ... Calendar.current.startOfDay(for: upperBound)
         }
     }
     
@@ -150,7 +154,7 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
      */
     var selectionString: String {
         get {
-            if let selectedValue = selectedRow as? _RCVST_UserActivityDataRow {
+            if let selectedValue = self.selectedRow as? _RCVST_UserActivityDataRow {
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateStyle = .short
                 dateFormatter.timeStyle = .none

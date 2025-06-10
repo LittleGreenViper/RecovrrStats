@@ -290,29 +290,27 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                                     }
                                                     .onEnded { _ in _selectedValue = nil }
                                             )
-                                        )
-                                    
-                                    .gesture(                   // This is the gesture context that is attached to the overlay (for the pinch-to-zoom).
-                                        // This is the actual gesture that handles magnification.
-                                        MagnifyGesture()
-                                            // This is where the magic happens. This closure is called, whenever the gesture changes.
-                                            .onChanged { inValue in
-                                                _firstRange = _firstRange ?? data.dataWindowRange   // We take a snapshot of the initial range, when we start, so we aren't changing the goalposts as we go.
-                                                
-                                                if let firstRange = _firstRange {
-                                                    // What we are doing here, is applying our initial range, to figure out where the center of the zoom will be, and we'll be setting the new range, to either side of that.
-                                                    let rangeInSeconds = (firstRange.upperBound.timeIntervalSinceReferenceDate - firstRange.lowerBound.timeIntervalSinceReferenceDate) / 2
-                                                    let centerDateInSeconds = (TimeInterval(inValue.startAnchor.x) * (rangeInSeconds * 2)) + firstRange.lowerBound.timeIntervalSinceReferenceDate
-                                                    let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
-                                                    
-                                                    // No less than 2 days (by setting to 1 day for halfsies). The 1.2 is to "slow down" the magnification a bit, so it's not too intense.
-                                                    let newRange = max(86400, (rangeInSeconds * 1.2) / inValue.magnification)
-                                                    triggerHaptic()
-                                                    // By changing this, we force a redraw of the chart, with the new limits.
-                                                    data.setDataWindowRange((centerDate.addingTimeInterval(-newRange)...centerDate.addingTimeInterval(newRange)).clamped(to: data.totalDateRange))
-                                                }
-                                            }
-                                            .onEnded { _ in _firstRange = nil } // We reset the initial range, when we're done.
+                                            .simultaneously(with:
+                                                MagnifyGesture()
+                                                    // This is where the magic happens. This closure is called, whenever the gesture changes.
+                                                    .onChanged { inValue in
+                                                        _firstRange = _firstRange ?? data.dataWindowRange   // We take a snapshot of the initial range, when we start, so we aren't changing the goalposts as we go.
+                                                        
+                                                        if let firstRange = _firstRange {
+                                                            // What we are doing here, is applying our initial range, to figure out where the center of the zoom will be, and we'll be setting the new range, to either side of that.
+                                                            let rangeInSeconds = (firstRange.upperBound.timeIntervalSinceReferenceDate - firstRange.lowerBound.timeIntervalSinceReferenceDate) / 2
+                                                            let centerDateInSeconds = (TimeInterval(inValue.startAnchor.x) * (rangeInSeconds * 2)) + firstRange.lowerBound.timeIntervalSinceReferenceDate
+                                                            let centerDate = Calendar.current.startOfDay(for: Date(timeIntervalSinceReferenceDate: centerDateInSeconds)).addingTimeInterval(43200)
+                                                            
+                                                            // No less than 2 days (by setting to 1 day for halfsies). The 1.2 is to "slow down" the magnification a bit, so it's not too intense.
+                                                            let newRange = max(86400, (rangeInSeconds * 1.2) / inValue.magnification)
+                                                            triggerHaptic()
+                                                            // By changing this, we force a redraw of the chart, with the new limits.
+                                                            data.setDataWindowRange((centerDate.addingTimeInterval(-newRange)...centerDate.addingTimeInterval(newRange)).clamped(to: data.totalDateRange))
+                                                        }
+                                                    }
+                                                    .onEnded { _ in _firstRange = nil } // We reset the initial range, when we're done.
+                                            )
                                     )
                             }
                         }
