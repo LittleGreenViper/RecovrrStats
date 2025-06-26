@@ -157,12 +157,6 @@ struct RootStackView: View {
         VStack {
             Text(title)
                 .font(.headline)
-            Text(String(format: "SLUG-MAIN-CURRENT-ACTIVE".localizedVariant, _latestActiveTotal))
-                .foregroundColor(.green)
-                .font(.caption)
-            Text(String(format: "SLUG-MAIN-CURRENT-INACTIVE".localizedVariant, _latestInactiveTotal))
-                .foregroundColor(.blue)
-                .font(.caption)
             NavigationStack {
                 List {
                     NavigationLink("SLUG-SUMMARY-HEADER".localizedVariant) { RCVST_SummaryView(data: self._data) }

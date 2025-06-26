@@ -45,6 +45,10 @@
 "SLUG-MAIN-CURRENT-INACTIVE"                =   "Current Inactive Users: %d";
 "SLUG-SUMMARY-HEADER"                       =   "Summary";
 
+"SLUG-FIRST-SAMPLE-PROMPT"                  =   "First Sample:";
+"SLUG-LAST-SAMPLE-PROMPT"                   =   "Last Sample:";
+"SLUG-TOTAL-ACTIVE-PROMPT"                  =   "Total Active Users:";
+"SLUG-TOTAL-INACTIVE-PROMPT"                =   "Total Inactive Users:";
 "SLUG-TOTAL-SIGNUP-PROMPT"                  =   "Total Signup Requests:";
 "SLUG-TOTAL-REJECTION-PROMPT"               =   "Total Rejections:";
 "SLUG-TOTAL-DELETED-PROMPT"                 =   "Total Deleted:";

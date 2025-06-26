@@ -285,10 +285,22 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
 
     /* ################################################################## */
     /**
-     This is the "end date" of the dataframe. Defaults to now.
+     This is the "start date" of the dataframe.
      */
-    var endDate: Date = .now { didSet { self.endDate = max((self.statusDataFrame.rows.first?["sample_date"] as? Date ?? .now), min(self.endDate, .now)) } }
+    var startDate: Date { self.statusDataFrame.rows.first?["sample_date"] as? Date ?? .now }
 
+    /* ################################################################## */
+    /**
+     This is the "end date" of the dataframe.
+     */
+    var endDate: Date { self.statusDataFrame.rows.last?["sample_date"] as? Date ?? .now }
+
+    /* ################################################################## */
+    /**
+     This is the total date range of the sample set.
+     */
+    var dateRange: ClosedRange<Date> { return self.startDate...self.endDate }
+    
     /* ################################################################## */
     /**
      This stores the dataframe info.
@@ -350,7 +362,6 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
      - parameter statusDataFrame: The actual data frame that was fetched and intialized, from the CSV data.
      */
     init(statusDataFrame inDataFrame: DataFrame, lastDate inLastDate: Date? = nil) {
-        self.endDate = inLastDate ?? .now
         self.statusDataFrame = inDataFrame
         self.userDataProvider = RCVST_UserTypesDataProvider(with: inDataFrame, chartName: "SLUG-USER-TOTALS-CHART-TITLE".localizedVariant)
         self.signupsDataProvider = RCVST_SignupsDataProvider(with: inDataFrame, chartName: "SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant)
@@ -363,10 +374,28 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
     
     /* ################################################################## */
     /**
+     This is the total number of active users, at the end of the sample
+     */
+    var totalUsers: Int { self._rows.last?["total_users"] as? Int ?? 0 }
+    
+    /* ################################################################## */
+    /**
+     This is the total number of active users, at the end of the sample
+     */
+    var totalActive: Int { self.totalUsers - totalInactive }
+
+    /* ################################################################## */
+    /**
+     This is the total number of inactive users, at the end of the sample
+     */
+    var totalInactive: Int { self._rows.last?["new_users"] as? Int ?? 0 }
+
+    /* ################################################################## */
+    /**
      This is the total number of signup requests, since the start of data.
      */
     var totalRequests: Int { self._rows.last?["total_requests"] as? Int ?? 0 }
-    
+
     /* ################################################################## */
     /**
      This is the total number of accepted signup requests, since the start of data.

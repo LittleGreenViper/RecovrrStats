@@ -37,53 +37,83 @@ struct RCVST_SummaryView: View {
     /**
      */
     var body: some View {
-        Text("SLUG-SUMMARY-HEADER".localizedVariant)
-            .bold()
-        List {
-            HStack {
-                Text("SLUG-TOTAL-SIGNUP-PROMPT".localizedVariant)
-                Spacer()
-                Text("\(self.data?.totalRequests ?? 0)")
+        if let data = self.data {
+            Text("SLUG-SUMMARY-HEADER".localizedVariant)
+                .bold()
+            List {
+                HStack {
+                    Text("SLUG-FIRST-SAMPLE-PROMPT".localizedVariant)
+                    Spacer()
+                    Text(data.startDate, format: .dateTime.day().month().year())
+                }
+                HStack {
+                    Text("SLUG-LAST-SAMPLE-PROMPT".localizedVariant)
+                    Spacer()
+                    Text(data.endDate, format: .dateTime.day().month().year())
+                }
+                HStack {
+                    Text("SLUG-TOTAL-ACTIVE-PROMPT".localizedVariant)
+                        .foregroundColor(.green)
+                    Spacer()
+                    Text("\(data.totalActive)")
+                        .foregroundColor(.green)
+                }
+                HStack {
+                    Text("SLUG-TOTAL-INACTIVE-PROMPT".localizedVariant)
+                        .foregroundColor(.blue)
+                    Spacer()
+                    Text("\(data.totalInactive)")
+                        .foregroundColor(.blue)
+                }
+                HStack {
+                    Text("SLUG-TOTAL-SIGNUP-PROMPT".localizedVariant)
+                    Spacer()
+                    Text("\(data.totalRequests)")
+                }
+                HStack {
+                    Text("SLUG-AVERAGE-RATE-PROMPT".localizedVariant)
+                    Spacer()
+                    let displ = String(format: "%.2g", data.averageSignupsPerDay)
+                    Text(displ)
+                }
+                HStack {
+                    Text("SLUG-TOTAL-REJECTION-PROMPT".localizedVariant)
+                    Spacer()
+                    Text("\(data.totalRejections)")
+                }
+                HStack {
+                    Text("SLUG-AVERAGE-REJ-PROMPT".localizedVariant)
+                    Spacer()
+                    let displ = String(format: "%.2g", data.averageRejectedSignupsPerDay)
+                    Text(displ)
+                }
+                HStack {
+                    Text("SLUG-TOTAL-DELETED-PROMPT".localizedVariant)
+                    Spacer()
+                    Text("\(data.totalAdminDeleted)")
+                }
+                HStack {
+                    Text("SLUG-AVERAGE-DEL-PROMPT".localizedVariant)
+                    Spacer()
+                    let displ = String(format: "%.2g", data.averageDeletionsPerDay)
+                    Text(displ)
+                }
+                HStack {
+                    Text("SLUG-TOTAL-DEL-ACT-PROMPT".localizedVariant)
+                        .foregroundColor(.green)
+                    Spacer()
+                    Text("\(data.totalAdminActiveDeleted)")
+                        .foregroundColor(.green)
+                }
+                HStack {
+                    Text("SLUG-TOTAL-DEL-INACT-PROMPT".localizedVariant)
+                        .foregroundColor(.blue)
+                    Spacer()
+                    Text("\(data.totalAdminInactiveDeleted)")
+                        .foregroundColor(.blue)
+                }
             }
-            HStack {
-                Text("SLUG-AVERAGE-RATE-PROMPT".localizedVariant)
-                Spacer()
-                let displ = String(format: "%.2g", self.data?.averageSignupsPerDay ?? 0)
-                Text(displ)
-            }
-            HStack {
-                Text("SLUG-TOTAL-REJECTION-PROMPT".localizedVariant)
-                Spacer()
-                Text("\(self.data?.totalRejections ?? 0)")
-            }
-            HStack {
-                Text("SLUG-AVERAGE-REJ-PROMPT".localizedVariant)
-                Spacer()
-                let displ = String(format: "%.2g", self.data?.averageRejectedSignupsPerDay ?? 0)
-                Text(displ)
-            }
-            HStack {
-                Text("SLUG-TOTAL-DELETED-PROMPT".localizedVariant)
-                Spacer()
-                Text("\(self.data?.totalAdminDeleted ?? 0)")
-            }
-            HStack {
-                Text("SLUG-AVERAGE-DEL-PROMPT".localizedVariant)
-                Spacer()
-                let displ = String(format: "%.2g", self.data?.averageDeletionsPerDay ?? 0)
-                Text(displ)
-            }
-            HStack {
-                Text("SLUG-TOTAL-DEL-ACT-PROMPT".localizedVariant)
-                Spacer()
-                Text("\(self.data?.totalAdminActiveDeleted ?? 0)")
-            }
-            HStack {
-                Text("SLUG-TOTAL-DEL-INACT-PROMPT".localizedVariant)
-                Spacer()
-                Text("\(self.data?.totalAdminInactiveDeleted ?? 0)")
-            }
+            Spacer()
         }
-        Spacer()
     }
 }
