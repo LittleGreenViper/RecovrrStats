@@ -143,7 +143,11 @@ struct RootStackView: View {
      */
     var title: String {
         if let dayCount = dayCount {
-            return String(format: "SLUG-MAIN-SCREEN-TITLE-FORMAT".localizedVariant, dayCount)
+            if -1 == dayCount {
+                return "SLUG-SUMMARY-HEADER".localizedVariant
+            } else {
+                return String(format: "SLUG-MAIN-SCREEN-TITLE-FORMAT".localizedVariant, dayCount)
+            }
         } else {
             return "SLUG-MAIN-SCREEN-TITLE".localizedVariant
         }
@@ -159,9 +163,10 @@ struct RootStackView: View {
                 .font(.headline)
             NavigationStack {
                 List {
-                    NavigationLink("SLUG-SUMMARY-HEADER".localizedVariant) { RCVST_SummaryView(data: self._data) }
+                    NavigationLink("SLUG-SUMMARY-HEADER".localizedVariant) { RCVST_SummaryView(data: self._data, dayCount: $dayCount) }
                     ForEach(_dataItems, id: \.chartName) { inData in NavigationLink(inData.chartName) { _loadView(for: inData) } }
                 }
+                    .onAppear { dayCount = nil }
                     // Reacts to "pull to refresh," to reload the file.
                     .refreshable { RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in _data = inDataProvider } }
             }

@@ -33,13 +33,17 @@ struct RCVST_SummaryView: View {
      */
     @State var data: RCVST_DataProvider?
     
+    /* ################################################################## */
+    /**
+     The number of days, covered by the data window.
+     */
+    @Binding var dayCount: Int?
+
     /* ##################################################### */
     /**
      */
     var body: some View {
         if let data = self.data {
-            Text("SLUG-SUMMARY-HEADER".localizedVariant)
-                .bold()
             List {
                 HStack {
                     Text("SLUG-FIRST-SAMPLE-PROMPT".localizedVariant)
@@ -113,6 +117,7 @@ struct RCVST_SummaryView: View {
                         .foregroundColor(.blue)
                 }
             }
+            .onAppear { self.dayCount = -1 }
             Spacer()
         }
     }
