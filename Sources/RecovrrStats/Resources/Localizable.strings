@@ -46,7 +46,8 @@
 "SLUG-SUMMARY-HEADER"                       =   "Summary";
 
 "SLUG-FIRST-SAMPLE-PROMPT"                  =   "First Sample:";
-"SLUG-LAST-SAMPLE-PROMPT"                   =   "Last Sample:";
+"SLUG-LAST-SAMPLE-PROMPT"                   =   "Last Sample (Noon):";
+"SLUG-LAST-SAMPLE-PROMPT-2"                 =   "Last Sample (Midnight):";
 "SLUG-TOTAL-ACTIVE-PROMPT"                  =   "Total Active Users:";
 "SLUG-TOTAL-INACTIVE-PROMPT"                =   "Total Inactive Users:";
 "SLUG-TOTAL-SIGNUP-PROMPT"                  =   "Total Signup Requests:";

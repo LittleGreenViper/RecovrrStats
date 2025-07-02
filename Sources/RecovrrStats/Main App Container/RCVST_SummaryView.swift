@@ -51,7 +51,7 @@ struct RCVST_SummaryView: View {
                     Text(data.startDate, format: .dateTime.day().month().year())
                 }
                 HStack {
-                    Text("SLUG-LAST-SAMPLE-PROMPT".localizedVariant)
+                    Text("SLUG-LAST-SAMPLE-PROMPT\(data.lastSampleWasNoon ? "" : "-2")".localizedVariant)
                     Spacer()
                     Text(data.endDate, format: .dateTime.day().month().year())
                 }
@@ -70,39 +70,6 @@ struct RCVST_SummaryView: View {
                         .foregroundColor(.blue)
                 }
                 HStack {
-                    Text("SLUG-TOTAL-SIGNUP-PROMPT".localizedVariant)
-                    Spacer()
-                    Text("\(data.totalRequests)")
-                }
-                HStack {
-                    Text("SLUG-AVERAGE-RATE-PROMPT".localizedVariant)
-                    Spacer()
-                    let displ = String(format: "%.2g", data.averageSignupsPerDay)
-                    Text(displ)
-                }
-                HStack {
-                    Text("SLUG-TOTAL-REJECTION-PROMPT".localizedVariant)
-                    Spacer()
-                    Text("\(data.totalRejections)")
-                }
-                HStack {
-                    Text("SLUG-AVERAGE-REJ-PROMPT".localizedVariant)
-                    Spacer()
-                    let displ = String(format: "%.2g", data.averageRejectedSignupsPerDay)
-                    Text(displ)
-                }
-                HStack {
-                    Text("SLUG-TOTAL-DELETED-PROMPT".localizedVariant)
-                    Spacer()
-                    Text("\(data.totalAdminDeleted)")
-                }
-                HStack {
-                    Text("SLUG-AVERAGE-DEL-PROMPT".localizedVariant)
-                    Spacer()
-                    let displ = String(format: "%.2g", data.averageDeletionsPerDay)
-                    Text(displ)
-                }
-                HStack {
                     Text("SLUG-TOTAL-DEL-ACT-PROMPT".localizedVariant)
                         .foregroundColor(.green)
                     Spacer()
@@ -115,6 +82,39 @@ struct RCVST_SummaryView: View {
                     Spacer()
                     Text("\(data.totalAdminInactiveDeleted)")
                         .foregroundColor(.blue)
+                }
+                HStack {
+                    Text("SLUG-TOTAL-SIGNUP-PROMPT".localizedVariant)
+                    Spacer()
+                    Text("\(data.totalRequests)")
+                }
+                HStack {
+                    Text("SLUG-TOTAL-REJECTION-PROMPT".localizedVariant)
+                    Spacer()
+                    Text("\(data.totalRejections)")
+                }
+                HStack {
+                    Text("SLUG-TOTAL-DELETED-PROMPT".localizedVariant)
+                    Spacer()
+                    Text("\(data.totalAdminDeleted)")
+                }
+                HStack {
+                    Text("SLUG-AVERAGE-RATE-PROMPT".localizedVariant)
+                    Spacer()
+                    let displ = String(format: "%.2g", data.averageSignupsPerDay)
+                    Text(displ)
+                }
+                HStack {
+                    Text("SLUG-AVERAGE-REJ-PROMPT".localizedVariant)
+                    Spacer()
+                    let displ = String(format: "%.2g", data.averageRejectedSignupsPerDay)
+                    Text(displ)
+                }
+                HStack {
+                    Text("SLUG-AVERAGE-DEL-PROMPT".localizedVariant)
+                    Spacer()
+                    let displ = String(format: "%.2g", data.averageDeletionsPerDay)
+                    Text(displ)
                 }
             }
             .onAppear { self.dayCount = -1 }

@@ -285,6 +285,12 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
 
     /* ################################################################## */
     /**
+     Returns true, if the last sample was a full day (at noon). We do two samples per day.
+     */
+    var lastSampleWasNoon: Bool { 0 == self.statusDataFrame.rows.count % 2 }
+    
+    /* ################################################################## */
+    /**
      This is the "start date" of the dataframe.
      */
     var startDate: Date { self.statusDataFrame.rows.first?["sample_date"] as? Date ?? .now }
