@@ -40,7 +40,7 @@ struct RCVST_ChartLegend: View {
      */
     var body: some View {
         HStack(spacing: 8) {
-            ForEach(_legendElements) { inLegendElement in
+            ForEach(self._legendElements) { inLegendElement in
                 HStack(spacing: 2) {
                     Circle()
                         .fill(inLegendElement.color)
@@ -62,7 +62,7 @@ struct RCVST_ChartLegend: View {
      - parameter legendElements: an array of legend elements that will be used to build the view.
      */
     init(legendElements inLegendElements: [RCVS_LegendElement]) {
-        _legendElements = inLegendElements
+        self._legendElements = inLegendElements
     }
 }
 
@@ -135,7 +135,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
      
      It's somewhat mutable (we can set observational state, like marking rows as selected, or setting a "window" of dates to examine).
      */
-    @State var data: any DataProviderProtocol { didSet { dayCount = data.numberOfDays } }
+    @State var data: any DataProviderProtocol { didSet { _dayCount = data.numberOfDays } }
     
     // MARK: Private Properties
 
@@ -155,13 +155,13 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
      */
     @State private var _selectedValue: RCVST_Row? {
         didSet {
-            if let selectedValue = _selectedValue,
+            if let selectedValue = self._selectedValue,
                !selectedValue.plottableData.isEmpty {
                 data.selectRow(selectedValue)
-                _selectedValuesString = data.selectionString
+                self._selectedValuesString = self.data.selectionString
             } else {
-                _selectedValuesString = " "
-                data.deselectAllRows()
+                self._selectedValuesString = " "
+                self.data.deselectAllRows()
             }
         }
     }
@@ -176,7 +176,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
     /**
      The number of days, covered by the data window.
      */
-    @State var dayCount: Int?
+    @State private var _dayCount: Int?
 
     /* ################################################################## */
     /**
@@ -193,9 +193,9 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
               let hapticEngineTemp = try? CHHapticEngine()
         else { return }
         
-        hapticEngine = hapticEngineTemp
+        self.hapticEngine = hapticEngineTemp
         
-        try? hapticEngine?.start()
+        try? hapticEngineTemp.start()
     }
 
     // MARK: Computed Properties
@@ -207,17 +207,17 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
     var body: some View {
         GeometryReader { inGeometry in
             ScrollView {
-                GroupBox(data.chartName) {
+                GroupBox(self.data.chartName) {
                     // We need to add a `VStack`, so that the text item, the legend, the scrubber, and chart play well together.
                     VStack {
                         // This displays the value of the selected bar. It is one line of red text, so we make it small enough to fit.
-                        Text(_selectedValuesString)
+                        Text(self._selectedValuesString)
                             .font(.system(size: 500 > inGeometry.frame(in: .local).width ? 13 : 20))
                             .minimumScaleFactor(0.5)
                             .foregroundStyle(RCVS_LegendSelectionColor)
                         
                         // This builds bars. The date determines the X-axis, and the Y-axis has the number of each type of user, stacked.
-                        Chart(data.windowedRows as? [RCVST_Row] ?? []) { inRow in // Note that we use the `windowedRows` computed property. This comes into play, when we implement pinch-to-zoom.
+                        Chart(self.data.windowedRows as? [RCVST_Row] ?? []) { inRow in // Note that we use the `windowedRows` computed property. This comes into play, when we implement pinch-to-zoom.
                             ForEach(inRow.plottableData) { inPlottableData in
                                 BarMark(
                                     x: .value("Date", inRow.sampleDate, unit: .day),    // The date is the same, for each component. Each bar represents one day.
@@ -242,7 +242,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                 AxisValueLabel(anchor: .trailing)               // This draws the value for this Y-axis level, as a label. It is set to anchor its trailing edge to the axis tick.
                             }
                         }
-                        .chartYAxisLabel(data.yAxisLabel)                       // This displays the axis title, above the upper, left corner of the chart, over the Y-axis labels.
+                        .chartYAxisLabel(self.data.yAxisLabel)                       // This displays the axis title, above the upper, left corner of the chart, over the Y-axis labels.
                         
                         // This moves the X-axis labels down, and centers them on the tick marks. It also sets up a range of values to display, and aligns them with the start of the data range.
                         // Default, is for the X-axis to display to the right of the tickmark, and the gridlines seem to radiate from the middle.
@@ -255,7 +255,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                 }
                             }
                         }
-                        .chartXAxisLabel(data.xAxisLabel, alignment: .center)   // This displays the axis title, under the labels, which are under the center of the X-axis.
+                        .chartXAxisLabel(self.data.xAxisLabel, alignment: .center)   // This displays the axis title, under the labels, which are under the center of the X-axis.
                         
                         // This implements tap/swipe to select.
                         // We start, by covering the chart with an overlay.
@@ -269,10 +269,10 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                         // This gesture will set the data window to full spread, if double-tapped.
                                         TapGesture(count: 2)
                                             .onEnded {
-                                                if data.dataWindowRange != data.totalDateRange {
-                                                    _selectedValue = nil
-                                                    triggerHaptic(intensity: 0.5, sharpness: 0.5)
-                                                    data.setDataWindowRange(data.totalDateRange)
+                                                if self.data.dataWindowRange != data.totalDateRange {
+                                                    self._selectedValue = nil
+                                                    self.triggerHaptic(intensity: 0.5, sharpness: 0.5)
+                                                    self.data.setDataWindowRange(self.data.totalDateRange)
                                                 }
                                             }
                                             .simultaneously(with:   // We combine it with the drag, so we don't get hesitation.
@@ -284,19 +284,19 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                                             // We query the chart for the X-axis value, corresponding to the local position, given by the gesture value. We clip the gesture, to within the chart dimensions.
                                                             guard let date = inChart.value(atX: max(0, min(inChart.plotSize.width, inValue.location.x - inGeom[frame].origin.x)), as: Date.self) else { return }
                                                             // Setting this property updates the selection
-                                                            _selectedValue = data.windowedRows.nearestTo(date) as? RCVST_Row
-                                                            triggerHaptic()
+                                                            self._selectedValue = self.data.windowedRows.nearestTo(date) as? RCVST_Row
+                                                            self.triggerHaptic()
                                                         }
                                                     }
-                                                    .onEnded { _ in _selectedValue = nil }
+                                                .onEnded { _ in self._selectedValue = nil }
                                             )
                                             .simultaneously(with:
                                                 MagnifyGesture()
                                                     // This is where the magic happens. This closure is called, whenever the gesture changes.
                                                     .onChanged { inValue in
-                                                        _firstRange = _firstRange ?? data.dataWindowRange   // We take a snapshot of the initial range, when we start, so we aren't changing the goalposts as we go.
+                                                        self._firstRange = self._firstRange ?? self.data.dataWindowRange   // We take a snapshot of the initial range, when we start, so we aren't changing the goalposts as we go.
                                                         
-                                                        if let firstRange = _firstRange {
+                                                        if let firstRange = self._firstRange {
                                                             // What we are doing here, is applying our initial range, to figure out where the center of the zoom will be, and we'll be setting the new range, to either side of that.
                                                             let rangeInSeconds = (firstRange.upperBound.timeIntervalSinceReferenceDate - firstRange.lowerBound.timeIntervalSinceReferenceDate) / 2
                                                             let centerDateInSeconds = (TimeInterval(inValue.startAnchor.x) * (rangeInSeconds * 2)) + firstRange.lowerBound.timeIntervalSinceReferenceDate
@@ -304,36 +304,35 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                                             
                                                             // No less than 2 days (by setting to 1 day for halfsies). The 1.2 is to "slow down" the magnification a bit, so it's not too intense.
                                                             let newRange = max(86400, (rangeInSeconds * 1.2) / inValue.magnification)
-                                                            triggerHaptic()
+                                                            self.triggerHaptic()
                                                             // By changing this, we force a redraw of the chart, with the new limits.
-                                                            data.setDataWindowRange((centerDate.addingTimeInterval(-newRange)...centerDate.addingTimeInterval(newRange)).clamped(to: data.totalDateRange))
+                                                            self.data.setDataWindowRange((centerDate.addingTimeInterval(-newRange)...centerDate.addingTimeInterval(newRange)).clamped(to: self.data.totalDateRange))
                                                         }
                                                     }
-                                                    .onEnded { _ in _firstRange = nil } // We reset the initial range, when we're done.
+                                                .onEnded { _ in self._firstRange = nil } // We reset the initial range, when we're done.
                                             )
                                     )
                             }
                         }
                         
-                        RCVST_ChartLegend(legendElements: data.legend)          // The chart legend.
-                        RCVST_ZoomControl(data: $data, dayCount: $dayCount)     // This shows a scrubber, if we are zoomed in.
+                        RCVST_ChartLegend(legendElements: self.data.legend)             // The chart legend.
+                        RCVST_ZoomControl(data: self.$data, dayCount: self.$_dayCount)  // This shows a scrubber, if we are zoomed in.
                     }
                 }
                 // We want our box to be basically square, based on the width of the screen.
                 .frame(
-                    minWidth: inGeometry.size.width * 0.8,
+                    minWidth: inGeometry.size.width,
                     maxWidth: .infinity,
                     minHeight: inGeometry.size.width,
                     maxHeight: .infinity,
                     alignment: .top
                 )
-                .padding([.leading, .trailing], 20)
             }
         }
         .onAppear {
-            dayCount = data.numberOfDays
-            prepareHaptics()
+            self._dayCount = self.data.numberOfDays
+            self.prepareHaptics()
         }
-        .onDisappear { dayCount = nil }
+        .onDisappear { self._dayCount = nil }
     }
 }

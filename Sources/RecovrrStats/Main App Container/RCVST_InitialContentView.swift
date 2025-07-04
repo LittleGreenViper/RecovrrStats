@@ -143,12 +143,6 @@ struct RootStackView: View {
     /**
      The number of days, covered by the data window.
      */
-//    @State var dayCount: Int?
-    
-    /* ################################################################## */
-    /**
-     The number of days, covered by the data window.
-     */
     var title: String { "SLUG-MAIN-SCREEN-TITLE".localizedVariant }
     
     /* ################################################################## */
@@ -186,17 +180,16 @@ struct RootStackView: View {
                 }
                 .animation(.default, value: self._expandedChartName)
                 .onAppear {
-                    RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
-                        self._data = inDataProvider
-                    }
+                    self._expandedChartName = nil
+                    RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in self._data = inDataProvider }
                 }
                 .refreshable {
-                    RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
-                        self._data = inDataProvider
-                    }
+                    self._expandedChartName = nil
+                    RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in self._data = inDataProvider }
                 }
             }
             .onChange(of: _scenePhase, initial: true) {
+                self._expandedChartName = nil
                 if .active == self._scenePhase,
                    nil == self._data {
                     RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in self._data = inDataProvider }
