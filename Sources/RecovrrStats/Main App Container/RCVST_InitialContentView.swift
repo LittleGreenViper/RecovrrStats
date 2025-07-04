@@ -46,7 +46,7 @@ struct RootStackView: View {
      Tracks scene activity.
      */
     @Environment(\.scenePhase) private var _scenePhase
-
+    
     /* ################################################################## */
     /**
      This is the actual dataframe wrapper for the stats. Everything from here, on, will be bound to this.
@@ -70,6 +70,11 @@ struct RootStackView: View {
      The current (last sample) number of inactive (new) users.
      */
     @State private var _latestInactiveTotal: Int = 0
+    
+    /* ################################################################## */
+    /**
+     */
+    @State private var _expandedChartName: String?
 
     /* ################################################################## */
     /**
@@ -82,35 +87,38 @@ struct RootStackView: View {
         _latestInactiveTotal = latestInact
         _buildNavList()
     }
-
+    
     /* ################################################################## */
     /**
      This was inspired by [this SO answer](https://stackoverflow.com/a/71192821/879365).
      It builds a list of items for the nav
      */
     private func _buildNavList() {
-        _dataItems = [any DataProviderProtocol]()
+        var dataItems = [any DataProviderProtocol]()
+        
         if let data = _data?.userDataProvider {
-            _dataItems.append(data)
+            dataItems.append(data)
         }
         if let data = _data?.signupsDataProvider {
-            _dataItems.append(data)
+            dataItems.append(data)
         }
         if let data = _data?.deletionsDataProvider {
-            _dataItems.append(data)
+            dataItems.append(data)
         }
         if let data = _data?.active1DataProvider {
-            _dataItems.append(data)
+            dataItems.append(data)
         }
         if let data = _data?.active7DataProvider {
-            _dataItems.append(data)
+            dataItems.append(data)
         }
         if let data = _data?.active30DataProvider {
-            _dataItems.append(data)
+            dataItems.append(data)
         }
         if let data = _data?.active90DataProvider {
-            _dataItems.append(data)
+            dataItems.append(data)
         }
+        
+        self._dataItems = dataItems
     }
     
     /* ################################################################## */
@@ -125,7 +133,7 @@ struct RootStackView: View {
     @ViewBuilder
     private func _loadView(for inData: (any DataProviderProtocol)?) -> some View {
         if let data = inData {
-            RCVST_UserDateBarChartDisplay(data: data, dayCount: $dayCount)
+            RCVST_UserDateBarChartDisplay(data: data)
         } else {
             Text("ERROR")
         }
@@ -135,57 +143,67 @@ struct RootStackView: View {
     /**
      The number of days, covered by the data window.
      */
-    @State var dayCount: Int?
+//    @State var dayCount: Int?
     
     /* ################################################################## */
     /**
      The number of days, covered by the data window.
      */
-    var title: String {
-        if let dayCount = dayCount {
-            if -1 == dayCount {
-                return "SLUG-SUMMARY-HEADER".localizedVariant
-            } else {
-                return String(format: "SLUG-MAIN-SCREEN-TITLE-FORMAT".localizedVariant, dayCount)
-            }
-        } else {
-            return "SLUG-MAIN-SCREEN-TITLE".localizedVariant
-        }
-    }
-
+    var title: String { "SLUG-MAIN-SCREEN-TITLE".localizedVariant }
+    
     /* ################################################################## */
     /**
      The main navigation stack screen.
      */
     var body: some View {
         VStack {
-            Text(title)
+            Text(self.title)
                 .font(.headline)
             NavigationStack {
+                NavigationLink("SLUG-SUMMARY-HEADER".localizedVariant) {
+                    RCVST_SummaryView(data: self._data)
+                }
+                
                 List {
-                    NavigationLink("SLUG-SUMMARY-HEADER".localizedVariant) { RCVST_SummaryView(data: self._data, dayCount: $dayCount) }
-                    ForEach(_dataItems, id: \.chartName) { inData in NavigationLink(inData.chartName) { _loadView(for: inData) } }
+                    ForEach(self._dataItems, id: \.chartName) { inData in
+                        Button {
+                            withAnimation {
+                                self._expandedChartName = self._expandedChartName == inData.chartName ? nil : inData.chartName
+                            }
+                        } label: {
+                            HStack {
+                                Text(inData.chartName)
+                                Spacer()
+                                Image(systemName: self._expandedChartName == inData.chartName ? "chevron.down" : "chevron.right")
+                            }
+                        }
+                        if self._expandedChartName == inData.chartName {
+                            self._loadView(for: inData)
+                                .aspectRatio(1, contentMode: .fit)
+                                .transition(.opacity.combined(with: .move(edge: .top)))
+                        }
+                    }
                 }
-                    .onAppear { dayCount = nil }
-                    // Reacts to "pull to refresh," to reload the file.
-                    .refreshable { RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in _data = inDataProvider } }
+                .animation(.default, value: self._expandedChartName)
+                .onAppear {
+                    RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
+                        self._data = inDataProvider
+                    }
+                }
+                .refreshable {
+                    RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
+                        self._data = inDataProvider
+                    }
+                }
             }
-        }
-            // Makes sure that we load up, immediately.
-        .onAppear {
-            dayCount = nil
-            RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in
-                _data = inDataProvider
-            }
-        }
-            // Forces updates, whenever we become active.
             .onChange(of: _scenePhase, initial: true) {
-                if .active == _scenePhase,
-                   nil == _data {
-                    RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in _data = inDataProvider }
-                } else if .background == _scenePhase {
-                    _data = nil
+                if .active == self._scenePhase,
+                   nil == self._data {
+                    RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in self._data = inDataProvider }
+                } else if .background == self._scenePhase {
+                    self._data = nil
                 }
             }
+        }
     }
 }

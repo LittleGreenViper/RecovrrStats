@@ -32,12 +32,6 @@ struct RCVST_SummaryView: View {
      The data we'll be mining.
      */
     @State var data: RCVST_DataProvider?
-    
-    /* ################################################################## */
-    /**
-     The number of days, covered by the data window.
-     */
-    @Binding var dayCount: Int?
 
     /* ##################################################### */
     /**
@@ -117,7 +111,6 @@ struct RCVST_SummaryView: View {
                     Text(displ)
                 }
             }
-            .onAppear { self.dayCount = -1 }
             Spacer()
         }
     }

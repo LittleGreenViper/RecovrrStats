@@ -176,7 +176,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
     /**
      The number of days, covered by the data window.
      */
-    @Binding var dayCount: Int?
+    @State var dayCount: Int?
 
     /* ################################################################## */
     /**
