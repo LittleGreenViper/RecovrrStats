@@ -161,7 +161,7 @@ struct RootStackView: View {
                 List {
                     ForEach(self._dataItems, id: \.chartName) { inData in
                         Button {
-                            withAnimation {
+                            withAnimation(.snappy(duration: 0.5)) {
                                 self._expandedChartName = self._expandedChartName == inData.chartName ? nil : inData.chartName
                             }
                         } label: {
@@ -174,11 +174,9 @@ struct RootStackView: View {
                         if self._expandedChartName == inData.chartName {
                             self._loadView(for: inData)
                                 .aspectRatio(1, contentMode: .fit)
-                                .transition(.opacity.combined(with: .move(edge: .top)))
                         }
                     }
                 }
-                .animation(.default, value: self._expandedChartName)
                 .onAppear {
                     self._expandedChartName = nil
                     RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in self._data = inDataProvider }
