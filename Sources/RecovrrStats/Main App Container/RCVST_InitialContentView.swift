@@ -19,6 +19,7 @@
 
 import SwiftUI
 import TabularData
+import CoreHaptics
 
 /* ###################################################################################################################################### */
 // MARK: - Initial View -
@@ -40,7 +41,13 @@ struct RCVST_InitialContentView: View {
 /**
  This presents a simple navigation list, with callouts to the various charts.
  */
-struct RootStackView: View {
+struct RootStackView: View, RCVST_HapticHopper {
+    /* ################################################################## */
+    /**
+     This is used to give us haptic feedback for dragging.
+     */
+    @State var hapticEngine: CHHapticEngine?
+
     /* ################################################################## */
     /**
      Tracks scene activity.
@@ -75,6 +82,20 @@ struct RootStackView: View {
     /**
      */
     @State private var _expandedChartName: String?
+
+    /* ################################################################## */
+    /**
+     This prepares our haptic engine.
+     */
+    func prepareHaptics() {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics,
+              let hapticEngineTemp = try? CHHapticEngine()
+        else { return }
+        
+        self.hapticEngine = hapticEngineTemp
+        
+        try? hapticEngineTemp.start()
+    }
 
     /* ################################################################## */
     /**
@@ -156,12 +177,14 @@ struct RootStackView: View {
             NavigationStack {
                 NavigationLink("SLUG-SUMMARY-HEADER".localizedVariant) {
                     RCVST_SummaryView(data: self._data)
+                        .onAppear { self.triggerHaptic(intensity: 1.0) }
                 }
                 
                 List {
                     ForEach(self._dataItems, id: \.chartName) { inData in
                         Button {
                             withAnimation(.snappy(duration: 0.5)) {
+                                self.triggerHaptic(intensity: 1.0)
                                 self._expandedChartName = self._expandedChartName == inData.chartName ? nil : inData.chartName
                             }
                         } label: {
@@ -186,7 +209,7 @@ struct RootStackView: View {
                     RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in self._data = inDataProvider }
                 }
             }
-            .onChange(of: _scenePhase, initial: true) {
+            .onChange(of: self._scenePhase, initial: true) {
                 self._expandedChartName = nil
                 if .active == self._scenePhase,
                    nil == self._data {
@@ -196,5 +219,6 @@ struct RootStackView: View {
                 }
             }
         }
+        .onAppear { self.prepareHaptics() }
     }
 }
