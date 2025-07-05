@@ -115,31 +115,48 @@ struct RootStackView: View, RCVST_HapticHopper {
      It builds a list of items for the nav
      */
     private func _buildNavList() {
+        /* ################################################################## */
+        /**
+         Called when the window changes for some data. We use this to sync the windows.
+         
+         - parameter inData: The data item that had the change. We'll change all the others, to match.
+         */
+        func _reactToWindowChange(_ inData: (any DataProviderProtocol)?) {
+            
+        }
+        
         var dataItems = [any DataProviderProtocol]()
         
-        if let data = _data?.userDataProvider {
+        if var data = _data?.userDataProvider {
+            data.windowRangeCallback = _reactToWindowChange
             dataItems.append(data)
         }
-        if let data = _data?.signupsDataProvider {
+        if var data = _data?.signupsDataProvider {
+            data.windowRangeCallback = _reactToWindowChange
             dataItems.append(data)
         }
-        if let data = _data?.deletionsDataProvider {
+        if var data = _data?.deletionsDataProvider {
+            data.windowRangeCallback = _reactToWindowChange
             dataItems.append(data)
         }
-        if let data = _data?.active1DataProvider {
+        if var data = _data?.active1DataProvider {
+            data.windowRangeCallback = _reactToWindowChange
             dataItems.append(data)
         }
-        if let data = _data?.active7DataProvider {
+        if var data = _data?.active7DataProvider {
+            data.windowRangeCallback = _reactToWindowChange
             dataItems.append(data)
         }
-        if let data = _data?.active30DataProvider {
+        if var data = _data?.active30DataProvider {
+            data.windowRangeCallback = _reactToWindowChange
             dataItems.append(data)
         }
-        if let data = _data?.active90DataProvider {
+        if var data = _data?.active90DataProvider {
+            data.windowRangeCallback = _reactToWindowChange
             dataItems.append(data)
         }
         
-        self._dataItems = dataItems
+        self._dataItems = dataItems // We set this at the end, so we don't keep refreshing the screen, every time we add a data item.
     }
     
     /* ################################################################## */

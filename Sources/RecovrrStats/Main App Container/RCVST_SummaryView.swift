@@ -84,8 +84,10 @@ struct RCVST_SummaryView: View {
                 }
                 HStack {
                     Text("SLUG-TOTAL-REJECTION-PROMPT".localizedVariant)
+                        .foregroundColor(.orange)
                     Spacer()
                     Text("\(data.totalRejections)")
+                        .foregroundColor(.orange)
                 }
                 HStack {
                     Text("SLUG-TOTAL-DELETED-PROMPT".localizedVariant)
@@ -100,9 +102,11 @@ struct RCVST_SummaryView: View {
                 }
                 HStack {
                     Text("SLUG-AVERAGE-REJ-PROMPT".localizedVariant)
+                        .foregroundColor(.orange)
                     Spacer()
                     let displ = String(format: "%.2g", data.averageRejectedSignupsPerDay)
                     Text(displ)
+                        .foregroundColor(.orange)
                 }
                 HStack {
                     Text("SLUG-AVERAGE-DEL-PROMPT".localizedVariant)

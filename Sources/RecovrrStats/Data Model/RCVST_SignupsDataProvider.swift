@@ -84,6 +84,12 @@ struct RCVST_SignupsDataProvider: DataProviderProtocol {
      */
     var dataWindowRange: ClosedRange<Date> = .distantPast ... .distantPast
     
+    /* ################################################# */
+    /**
+     The callback that can be made for the data window range. Can be ignored.
+     */
+    var windowRangeCallback: WindowRangeCallback?
+
     /* ##################################################### */
     /**
      This contains the rows assigned to this instance.
@@ -108,8 +114,10 @@ struct RCVST_SignupsDataProvider: DataProviderProtocol {
      
      - parameter with: The data frame, with the data processed from the CSV.
      - parameter chartName: The name to be used to describe the chart representing this data.
+     - parameter inCompletion: A window range callback (Can be ignored).
      */
-    init(with inDataFrame: DataFrame, chartName inChartName: String) {
+    init(with inDataFrame: DataFrame, chartName inChartName: String, completion inCompletion: WindowRangeCallback? = nil) {
+        self.windowRangeCallback = inCompletion
         var rowTypes = [_RCVST_SignupsDataRow]()
     
         // We do every other one, because we have two samples per day. We will be adding them together.
