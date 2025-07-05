@@ -60,8 +60,8 @@ class RCVS_LegendElement: Identifiable {
      - parameter color: The color to associate with the name.
      */
     init(name inName: String = "SLUG-SELECTED-LEGEND-LABEL".localizedVariant, color inColor: Color = RCVS_LegendSelectionColor) {
-        self.name = inName
-        self.color = inColor
+        name = inName
+        color = inColor
     }
 }
 
@@ -161,55 +161,55 @@ public extension RCVST_RowProtocol {
     /**
      The total number of users (both active and inactive), for the previous sample.
      */
-    var previousTotalUsers: Int { self.previousDataRow?[RCVST_DataProvider.Columns.total_users.rawValue] as? Int ?? self.dataRow[RCVST_DataProvider.Columns.total_users.rawValue] as? Int ?? 0 }
+    var previousTotalUsers: Int { previousDataRow?[RCVST_DataProvider.Columns.total_users.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.total_users.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The total number of new (inactive) users, for the previous sample.
      */
-    var previousNewUsers: Int { self.previousDataRow?[RCVST_DataProvider.Columns.new_users.rawValue] as? Int ?? self.dataRow[RCVST_DataProvider.Columns.new_users.rawValue] as? Int ?? 0 }
+    var previousNewUsers: Int { previousDataRow?[RCVST_DataProvider.Columns.new_users.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.new_users.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The current number of users (both active and new), for the previous sample.
      */
-    var previousNeverSetLocation: Int { self.previousDataRow?[RCVST_DataProvider.Columns.never_set_location.rawValue] as? Int ?? self.dataRow[RCVST_DataProvider.Columns.never_set_location.rawValue] as? Int ?? 0 }
+    var previousNeverSetLocation: Int { previousDataRow?[RCVST_DataProvider.Columns.never_set_location.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.never_set_location.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative total number of signup requests, for the previous sample.
      */
-    var previousTotalRequests: Int { self.previousDataRow?[RCVST_DataProvider.Columns.total_requests.rawValue] as? Int ?? self.dataRow[RCVST_DataProvider.Columns.total_requests.rawValue] as? Int ?? 0 }
+    var previousTotalRequests: Int { previousDataRow?[RCVST_DataProvider.Columns.total_requests.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.total_requests.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative total number of signup requests approved by the administrators, for the previous sample.
      */
-    var previousAcceptedRequests: Int { self.previousDataRow?[RCVST_DataProvider.Columns.accepted_requests.rawValue] as? Int ?? self.dataRow[RCVST_DataProvider.Columns.accepted_requests.rawValue] as? Int ?? 0 }
+    var previousAcceptedRequests: Int { previousDataRow?[RCVST_DataProvider.Columns.accepted_requests.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.accepted_requests.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative total number of signup requests rejected by the administrators, for the previous sample.
      */
-    var previousRejectedRequests: Int { self.previousDataRow?[RCVST_DataProvider.Columns.rejected_requests.rawValue] as? Int ?? self.dataRow[RCVST_DataProvider.Columns.rejected_requests.rawValue] as? Int ?? 0 }
+    var previousRejectedRequests: Int { previousDataRow?[RCVST_DataProvider.Columns.rejected_requests.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.rejected_requests.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative number of active users that have been deleted by the administrators, for the previous sample.
      */
-    var previousDeletedActive: Int { self.previousDataRow?[RCVST_DataProvider.Columns.deleted_active.rawValue] as? Int ?? self.dataRow[RCVST_DataProvider.Columns.deleted_active.rawValue] as? Int ?? 0 }
+    var previousDeletedActive: Int { previousDataRow?[RCVST_DataProvider.Columns.deleted_active.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.deleted_active.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative number of new users that have been deleted by the administrators, for the previous sample.
      */
-    var previousDeletedInactive: Int { self.previousDataRow?[RCVST_DataProvider.Columns.deleted_inactive.rawValue] as? Int ?? self.dataRow[RCVST_DataProvider.Columns.deleted_inactive.rawValue] as? Int ?? 0 }
+    var previousDeletedInactive: Int { previousDataRow?[RCVST_DataProvider.Columns.deleted_inactive.rawValue] as? Int ?? dataRow[RCVST_DataProvider.Columns.deleted_inactive.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The total number of active users, for the previous sample.
      */
-    var previousActiveUsers: Int { self.previousTotalUsers - self.previousNewUsers }
+    var previousActiveUsers: Int { previousTotalUsers - previousNewUsers }
     
     // MARK: Public Data
     
@@ -217,19 +217,19 @@ public extension RCVST_RowProtocol {
     /**
      We simply use the date as an ID.
      */
-    var id: any Hashable { self.sampleDate }
+    var id: any Hashable { sampleDate }
     
     /* ################################################# */
     /**
      Default simply gets it from the attached row.
      */
-    var sampleDate: Date { self.dataRow[RCVST_DataProvider.Columns.sample_date.rawValue] as? Date ?? .distantFuture }
+    var sampleDate: Date { dataRow[RCVST_DataProvider.Columns.sample_date.rawValue] as? Date ?? .distantFuture }
     
     /* ##################################################### */
     /**
      Default simply goes through the values, and stacks them all together.
      */
-    var maxYValue: Float { self.plottableData.reduce(0) { $0 + $1.value } }
+    var maxYValue: Float { plottableData.reduce(0) { $0 + $1.value } }
     
     // MARK: Raw Data
     
@@ -237,85 +237,85 @@ public extension RCVST_RowProtocol {
     /**
      The total number of users (both active and inactive), at the time the sample was taken.
      */
-    var totalUsers: Int { self.dataRow[RCVST_DataProvider.Columns.total_users.rawValue] as? Int ?? 0 }
+    var totalUsers: Int { dataRow[RCVST_DataProvider.Columns.total_users.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The total number of new (inactive) users, at the time the sample was taken.
      */
-    var newUsers: Int { self.dataRow[RCVST_DataProvider.Columns.new_users.rawValue] as? Int ?? 0 }
+    var newUsers: Int { dataRow[RCVST_DataProvider.Columns.new_users.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The current number of users (both active and new), that have a nil location (never set one).
      */
-    var neverSetLocation: Int { self.dataRow[RCVST_DataProvider.Columns.never_set_location.rawValue] as? Int ?? 0 }
+    var neverSetLocation: Int { dataRow[RCVST_DataProvider.Columns.never_set_location.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative total number of signup requests.
      */
-    var totalRequests: Int { self.dataRow[RCVST_DataProvider.Columns.total_requests.rawValue] as? Int ?? 0 }
+    var totalRequests: Int { dataRow[RCVST_DataProvider.Columns.total_requests.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative total number of signup requests approved by the administrators.
      */
-    var acceptedRequests: Int { self.dataRow[RCVST_DataProvider.Columns.accepted_requests.rawValue] as? Int ?? 0 }
+    var acceptedRequests: Int { dataRow[RCVST_DataProvider.Columns.accepted_requests.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative total number of signup requests rejected by the administrators.
      */
-    var rejectedRequests: Int { self.dataRow[RCVST_DataProvider.Columns.rejected_requests.rawValue] as? Int ?? 0 }
+    var rejectedRequests: Int { dataRow[RCVST_DataProvider.Columns.rejected_requests.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The current number of signup requests that have not been addressed by the administrators.
      */
-    var openRequests: Int { self.dataRow[RCVST_DataProvider.Columns.open_requests.rawValue] as? Int ?? 0 }
+    var openRequests: Int { dataRow[RCVST_DataProvider.Columns.open_requests.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The current number of active (not new) users that have signed in, within the last 24 hours.
      */
-    var activeInLast24Hours: Int { self.dataRow[RCVST_DataProvider.Columns.active_1.rawValue] as? Int ?? 0 }
+    var activeInLast24Hours: Int { dataRow[RCVST_DataProvider.Columns.active_1.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The current number of active (not new) users that have signed in, within the last 7 days.
      */
-    var activeInLastWeek: Int { self.dataRow[RCVST_DataProvider.Columns.active_7.rawValue] as? Int ?? 0 }
+    var activeInLastWeek: Int { dataRow[RCVST_DataProvider.Columns.active_7.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The current number of active (not new) users that have signed in, within the last 30 days.
      */
-    var activeInLast30Days: Int { self.dataRow[RCVST_DataProvider.Columns.active_30.rawValue] as? Int ?? 0 }
+    var activeInLast30Days: Int { dataRow[RCVST_DataProvider.Columns.active_30.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The current number of active (not new) users that have signed in, within the last 90 days.
      */
-    var activeInLast90Days: Int { self.dataRow[RCVST_DataProvider.Columns.active_90.rawValue] as? Int ?? 0 }
+    var activeInLast90Days: Int { dataRow[RCVST_DataProvider.Columns.active_90.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The current simple average last activity period for all active users, in days.
      */
-    var averageLastActiveInDays: Int { self.dataRow[RCVST_DataProvider.Columns.active_avg.rawValue] as? Int ?? 0 }
+    var averageLastActiveInDays: Int { dataRow[RCVST_DataProvider.Columns.active_avg.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative number of active users that have been deleted by the administrators.
      */
-    var deletedActive: Int { self.dataRow[RCVST_DataProvider.Columns.deleted_active.rawValue] as? Int ?? 0 }
+    var deletedActive: Int { dataRow[RCVST_DataProvider.Columns.deleted_active.rawValue] as? Int ?? 0 }
 
     /* ############################################################## */
     /**
      The cumulative number of new users that have been deleted by the administrators.
      */
-    var deletedInactive: Int { self.dataRow[RCVST_DataProvider.Columns.deleted_inactive.rawValue] as? Int ?? 0 }
+    var deletedInactive: Int { dataRow[RCVST_DataProvider.Columns.deleted_inactive.rawValue] as? Int ?? 0 }
 
     // MARK: Interpreted Data
 
@@ -323,74 +323,75 @@ public extension RCVST_RowProtocol {
     /**
      The total number of active users, at the time the sample was taken.
      */
-    var activeUsers: Int { self.totalUsers - self.newUsers }
+    var activeUsers: Int { totalUsers - newUsers }
 
     /* ############################################################## */
     /**
      The change in the total number of users. Positive is users added, negative is users removed.
      */
-    var changeInTotalUsers: Int { 0 == self.previousTotalUsers ? 0 : self.totalUsers - self.previousTotalUsers }
+    var changeInTotalUsers: Int { 0 == previousTotalUsers ? 0 : totalUsers - previousTotalUsers }
 
     /* ############################################################## */
     /**
      The change in the total number of inactive users. Positive is users added, negative is users removed.
      */
-    var changeInNewUsers: Int { 0 == self.previousNewUsers ? 0 : self.newUsers - self.previousNewUsers }
+    var changeInNewUsers: Int { 0 == previousNewUsers ? 0 : newUsers - previousNewUsers }
 
     /* ############################################################## */
     /**
      The change in the total number of inactive users. Positive is users added, negative is users removed.
      */
-    var changeInActiveUsers: Int { 0 == self.previousActiveUsers ? 0 : self.activeUsers - self.previousActiveUsers }
+    var changeInActiveUsers: Int { 0 == previousActiveUsers ? 0 : activeUsers - previousActiveUsers }
 
     /* ############################################################## */
     /**
      The change in the number of users (both active and new), that have a nil location.
      */
-    var changeInNeverSetLocation: Int { 0 == self.previousNeverSetLocation ? 0 : self.neverSetLocation - self.previousNeverSetLocation }
+    var changeInNeverSetLocation: Int { 0 == previousNeverSetLocation ? 0 : neverSetLocation - previousNeverSetLocation }
 
     /* ############################################################## */
     /**
      The number of signup requests since the last sample.
      */
-    var newRequests: Int { self.totalRequests - self.previousTotalRequests }
+    var newRequests: Int { totalRequests - previousTotalRequests }
 
     /* ############################################################## */
     /**
      The number of signup requests approved by the administrators since the last sample.
      */
-    var newAcceptedRequests: Int { self.acceptedRequests - self.previousAcceptedRequests }
+    var newAcceptedRequests: Int { acceptedRequests - previousAcceptedRequests }
 
     /* ############################################################## */
     /**
      The number of signup requests rejected by the administrators since the last sample.
      */
-    var newRejectedRequests: Int { self.rejectedRequests - self.previousRejectedRequests }
+    var newRejectedRequests: Int { rejectedRequests - previousRejectedRequests }
 
     /* ############################################################## */
     /**
      The number of active users deleted by the administrators since the last sample.
      */
-    var newDeletedActive: Int { self.deletedActive - self.previousDeletedActive }
+    var newDeletedActive: Int { deletedActive - previousDeletedActive }
 
     /* ############################################################## */
     /**
      The number of inactive users deleted by the administrators since the last sample.
      */
-    var newDeletedInactive: Int { self.deletedInactive - self.previousDeletedInactive }
+    var newDeletedInactive: Int { deletedInactive - previousDeletedInactive }
     
     /* ############################################################## */
     /**
      The number of users that deleted their own accounts.
      */
     var selfDeletions: Int {
-        let adminDeletions = (self.deletedActive - self.previousDeletedActive) + (self.deletedInactive - self.previousDeletedInactive)
+        let adminDeletions = (deletedActive - previousDeletedActive) +
+                             (deletedInactive - previousDeletedInactive)
 
         // Calculate expected total users if only admin deletions happened
-        let expectedTotalUsers = self.totalUsers - adminDeletions
+        let expectedTotalUsers = totalUsers - adminDeletions
 
         // Self-deletions are the unexpected drop in totalUsers
-        return max(0, expectedTotalUsers - self.totalUsers)
+        return max(0, expectedTotalUsers - totalUsers)
     }
 }
 
@@ -409,7 +410,7 @@ extension Array where Element == any RCVST_RowProtocol {
     func nearestTo(_ inDate: Date) -> Element? {
         var ret: Element?
         let testDate = Calendar.current.startOfDay(for: inDate).addingTimeInterval(43200)
-        self.forEach {
+        forEach {
             if let compDateTemp = ret?.sampleDate {
                 let compDate = Calendar.current.startOfDay(for: compDateTemp).addingTimeInterval(43200)
                 let thisDate = Calendar.current.startOfDay(for: $0.sampleDate).addingTimeInterval(43200)
@@ -430,14 +431,6 @@ extension Array where Element == any RCVST_RowProtocol {
  This protocol describes a chart dataset, which is sent to each chart.
  */
 protocol DataProviderProtocol: Identifiable {
-    /* ##################################################### */
-    /**
-     This is the definition of the callback we can set for changes to the window range.
-     
-     - parameter: This instance.
-     */
-    typealias WindowRangeCallback = (_: (any DataProviderProtocol)?) -> Void
-    
     /* ##################################################### */
     /**
      This satisfies our ID requirements.
@@ -489,12 +482,6 @@ protocol DataProviderProtocol: Identifiable {
      This contains an explicit sub-range of the entire data X-axis range. If in error, an empty range is returned. Default means use ``totalDateRange``.
      */
     var dataWindowRange: ClosedRange<Date> { get set }
-    
-    /* ################################################# */
-    /**
-     The callback that can be made for the data window range. Can be ignored.
-     */
-    var windowRangeCallback: WindowRangeCallback? { get set }
 
     // MARK: Has Default Implementation
     
@@ -609,7 +596,7 @@ extension DataProviderProtocol {
     /**
      This satisfies our ID requirements.
      */
-    var id: String { self.chartName }
+    var id: String { chartName }
     
     /* ##################################################### */
     /**
@@ -618,8 +605,8 @@ extension DataProviderProtocol {
      If not able to compute, an empty (distant past) range is returned.
      */
     var totalDateRange: ClosedRange<Date> {
-        guard let lowerBound = self.rows.first?.sampleDate,
-              let upperBound = self.rows.last?.sampleDate
+        guard let lowerBound = rows.first?.sampleDate,
+              let upperBound = rows.last?.sampleDate
         else { return .distantPast ... .distantPast }
         
         return Calendar.current.startOfDay(for: lowerBound) ... Calendar.current.startOfDay(for: upperBound)
@@ -629,7 +616,7 @@ extension DataProviderProtocol {
     /**
      (Computed Property) Returns true, if the data window stretches across the entire range.
      */
-    var isMaxed: Bool { self.currentDataWindowRange == self.totalDateRange }
+    var isMaxed: Bool { currentDataWindowRange == totalDateRange }
     
     /* ################################################# */
     /**
@@ -637,20 +624,20 @@ extension DataProviderProtocol {
      */
     var currentDataWindowRange: ClosedRange<Date> {
         get {
-            guard !self.dataWindowRange.isEmpty,
-                  !self.totalDateRange.isEmpty
-            else { return self.totalDateRange }
+            guard !dataWindowRange.isEmpty,
+                  !totalDateRange.isEmpty
+            else { return totalDateRange }
             
-            return self.dataWindowRange.clamped(to: self.totalDateRange)
+            return dataWindowRange.clamped(to: totalDateRange)
         }
         
         set {
             guard !newValue.isEmpty
             else {
-                self.dataWindowRange = self.totalDateRange
+                dataWindowRange = totalDateRange
                 return
             }
-            self.dataWindowRange = newValue.clamped(to: self.totalDateRange)
+            dataWindowRange = newValue.clamped(to: totalDateRange)
         }
     }
 
@@ -660,7 +647,7 @@ extension DataProviderProtocol {
      */
     var legend: [RCVS_LegendElement] {
         var dictionaryLiterals = [RCVS_LegendElement]()
-        self.rows.forEach {
+        rows.forEach {
             $0.plottableData.forEach {
                 let key = $0.description
                 if let index = dictionaryLiterals.firstIndex(where: { $0.name == key }) {
@@ -679,7 +666,7 @@ extension DataProviderProtocol {
     /**
      (Computed Property) This provides the data frame rows as an array of our own ``Row`` struct, but filtered for the window date range.
      */
-    var windowedRows: [any RCVST_RowProtocol] { self.rows.filter { self.dataWindowRange.contains(Calendar.current.startOfDay(for: $0.sampleDate)) } }
+    var windowedRows: [any RCVST_RowProtocol] { rows.filter { dataWindowRange.contains(Calendar.current.startOfDay(for: $0.sampleDate)) } }
     
     /* ##################################################### */
     /**
@@ -687,13 +674,13 @@ extension DataProviderProtocol {
      
      > NOTE: This may return rows not in the window.
      */
-    var selectedRow: (any RCVST_RowProtocol)? { self.rows.first(where: { $0.isSelected }) }
+    var selectedRow: (any RCVST_RowProtocol)? { rows.first(where: { $0.isSelected }) }
     
     /* ##################################################### */
     /**
      (Computed Property) This returns the max Y value, for the whole dataset.
      */
-    var maxYValue: Float { self.rows.reduce(0) { max($0, $1.maxYValue) } }
+    var maxYValue: Float { rows.reduce(0) { max($0, $1.maxYValue) } }
     
     /* ##################################################### */
     /**
@@ -711,7 +698,7 @@ extension DataProviderProtocol {
     /**
      (Computed Property) This reports the number of days in the current data window.
      */
-    var numberOfDays: Int { (Int(self.dataWindowRange.lowerBound.distance(to: self.dataWindowRange.upperBound) + 86399) / 86400) }
+    var numberOfDays: Int { (Int(dataWindowRange.lowerBound.distance(to: dataWindowRange.upperBound) + 86399) / 86400) }
 }
 
 /* ##################################################### */
@@ -724,15 +711,15 @@ extension DataProviderProtocol {
      */
     func yAxisCountValues(numberOfValues inNumberOfValues: Int = 4) -> [Int] {
         guard 1 < inNumberOfValues,
-              0 < self.maxYValue
+              0 < maxYValue
         else { return [] }
 
         // This will be used for the "round up" operation. Crude, but sufficient for our needs.
         let divisors = [8, 16, 24, 32, 40, 80, 160, 240, 320, 400, 800, 1600]
-        let topDivisor = divisors.last(where: { $0 <= Int(ceil(self.maxYValue)) }) ?? 0
+        let topDivisor = divisors.last(where: { $0 <= Int(ceil(maxYValue)) }) ?? 0
         let divisor = max(1, topDivisor / 8)
         
-        let stepSizeStart = Int(ceil(Double(self.maxYValue) / Double(inNumberOfValues - 1)))  // We start, by getting the maximum step size necessary to reach the maximum users.
+        let stepSizeStart = Int(ceil(Double(maxYValue) / Double(inNumberOfValues - 1)))  // We start, by getting the maximum step size necessary to reach the maximum users.
         
         let stepSize = ((stepSizeStart + (divisor - 1)) / divisor) * divisor    // We then, pad that, so we get nice, even numbers.
         
@@ -751,8 +738,8 @@ extension DataProviderProtocol {
      */
     func xAxisDateValues(numberOfValues inNumberOfValues: Int = 4) -> [Date] {
         guard 1 < inNumberOfValues,
-              !self.dataWindowRange.isEmpty,
-              let numberOfDays = Calendar.current.dateComponents([.day], from: self.dataWindowRange.lowerBound, to: self.dataWindowRange.upperBound).day, // Count how many days we have in our range.
+              !dataWindowRange.isEmpty,
+              let numberOfDays = Calendar.current.dateComponents([.day], from: dataWindowRange.lowerBound, to: dataWindowRange.upperBound).day, // Count how many days we have in our range.
               0 < numberOfDays
         else { return [] }
         
@@ -760,8 +747,8 @@ extension DataProviderProtocol {
         
         var dates = [Date]()    // We start by filling an array of dates, with each day in the range.
 
-        let startingPoint = Calendar.current.startOfDay(for: self.dataWindowRange.lowerBound)                            // We start at the beginning of the first day.
-        let endingPoint = Calendar.current.startOfDay(for: self.dataWindowRange.upperBound).addingTimeInterval(86400)    // We stop at the end of the last day.
+        let startingPoint = Calendar.current.startOfDay(for: dataWindowRange.lowerBound)                            // We start at the beginning of the first day.
+        let endingPoint = Calendar.current.startOfDay(for: dataWindowRange.upperBound).addingTimeInterval(86400)    // We stop at the end of the last day.
         
         // We use the calendar to calculate the dates, because it will account for things like DST and leap years.
         Calendar.current.enumerateDates(startingAfter: startingPoint,
@@ -802,14 +789,14 @@ extension DataProviderProtocol {
      */
     @discardableResult
     mutating func selectRow(_ inIndex: Int, isSelected inIsSelected: Bool = true) -> Bool {
-        precondition((0..<self.rows.count).contains(inIndex), "Index out of bounds")
+        precondition((0..<rows.count).contains(inIndex), "Index out of bounds")
         
-        let ret = self.rows[inIndex].isSelected
+        let ret = rows[inIndex].isSelected
         
-        self.deselectAllRows()
+        deselectAllRows()
         // If we are selecting a row, we make sure to deselect all others. As Connor MacLeod would say, "There can only be one."
         
-        self.rows[inIndex].isSelected = inIsSelected
+        rows[inIndex].isSelected = inIsSelected
         
         return ret
     }
@@ -820,8 +807,8 @@ extension DataProviderProtocol {
      */
     @discardableResult
     mutating func selectRow(_ inRow: any RCVST_RowProtocol, isSelected inIsSelected: Bool = true) -> Bool {
-        guard let index = self.rows.firstIndex(where: { $0.sampleDate == inRow.sampleDate }) else { return false }
-        return self.selectRow(index, isSelected: inIsSelected)
+        guard let index = rows.firstIndex(where: { $0.sampleDate == inRow.sampleDate }) else { return false }
+        return selectRow(index, isSelected: inIsSelected)
     }
 
     /* ##################################################### */
@@ -829,7 +816,7 @@ extension DataProviderProtocol {
      This deselects all rows.
      */
     mutating func deselectAllRows() {
-        for row in self.rows.enumerated() { self.rows[row.offset].isSelected = false }
+        for row in rows.enumerated() { rows[row.offset].isSelected = false }
     }
     
     /* ##################################################### */
@@ -837,8 +824,7 @@ extension DataProviderProtocol {
      We simply set the date range.
      */
     mutating func setDataWindowRange(_ inDataWindowRange: ClosedRange<Date>) {
-        self.dataWindowRange = inDataWindowRange
-        self.windowRangeCallback?(self)
+        dataWindowRange = inDataWindowRange
     }
 }
 
@@ -929,10 +915,10 @@ public class RCVST_Row: RCVST_RowProtocol {
             - isSelected: True, if the row segment is selected.
          */
         public init(description inDescription: String, color inColor: Color, value inValue: Float, isSelected inIsSelected: Bool) {
-            self.description = inDescription
-            self.color = inColor
-            self.value = inValue
-            self.isSelected = inIsSelected
+            description = inDescription
+            color = inColor
+            value = inValue
+            isSelected = inIsSelected
         }
     }
 
@@ -981,8 +967,8 @@ public class RCVST_Row: RCVST_RowProtocol {
      - parameter rowIndex: The 0-based index (in the dataframe rows) of this row (it will also be the index of this row).
      */
     public init(dataRow inDataRow: DataFrame.Row, previousDataRow inPreviousDataRow: DataFrame.Row?, rowIndex inIndex: Int) {
-        self.dataRow = inDataRow
-        self.rowIndex = inIndex
-        self.previousDataRow = inPreviousDataRow
+        dataRow = inDataRow
+        rowIndex = inIndex
+        previousDataRow = inPreviousDataRow
     }
 }

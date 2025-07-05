@@ -63,12 +63,6 @@ struct RCVST_UserTypesDataProvider: DataProviderProtocol {
      */
     var dataWindowRange: ClosedRange<Date> = .distantPast ... .distantPast
     
-    /* ################################################# */
-    /**
-     The callback that can be made for the data window range. Can be ignored.
-     */
-    var windowRangeCallback: WindowRangeCallback?
-
     /* ##################################################### */
     /**
      This contains the rows assigned to this instance.
@@ -87,10 +81,8 @@ struct RCVST_UserTypesDataProvider: DataProviderProtocol {
      
      - parameter with: The data frame, with the data processed from the CSV.
      - parameter chartName: The name to be used to describe the chart representing this data.
-     - parameter inCompletion: A window range callback (Can be ignored).
      */
-    init(with inDataFrame: DataFrame, chartName inChartName: String, completion inCompletion: WindowRangeCallback? = nil) {
-        self.windowRangeCallback = inCompletion
+    init(with inDataFrame: DataFrame, chartName inChartName: String) {
         var rowTypes = [_RCVST_UserTypesDataRow]()
     
         // We do every other one, because we have two samples per day. We only need the last one.
@@ -100,11 +92,11 @@ struct RCVST_UserTypesDataProvider: DataProviderProtocol {
             rowTypes.append(_RCVST_UserTypesDataRow(dataRow: row, previousDataRow: previousRow, rowIndex: index))
         }
         
-        self.rows = rowTypes
-        self.chartName = inChartName
+        rows = rowTypes
+        chartName = inChartName
         if let lowerBound = rowTypes.first?.sampleDate,
            let upperBound = rowTypes.last?.sampleDate {
-            self.dataWindowRange = Calendar.current.startOfDay(for: lowerBound) ... Calendar.current.startOfDay(for: upperBound)
+            dataWindowRange = Calendar.current.startOfDay(for: lowerBound) ... Calendar.current.startOfDay(for: upperBound)
         }
     }
     

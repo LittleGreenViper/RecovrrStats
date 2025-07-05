@@ -96,12 +96,6 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
      */
     var dataWindowRange: ClosedRange<Date> = .distantPast ... .distantPast
     
-    /* ################################################# */
-    /**
-     The callback that can be made for the data window range. Can be ignored.
-     */
-    var windowRangeCallback: WindowRangeCallback?
-
     /* ##################################################### */
     /**
      This contains the rows assigned to this instance.
@@ -132,11 +126,9 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
      The initializer.
      
      - parameter with: The data frame, with the data processed from the CSV.
-     - parameter inDays: The number of days covered by this.
-     - parameter inCompletion: A window range callback (Can be ignored).
+     - parameter chartName: The name to be used to describe the chart representing this data.
      */
-    init(with inDataFrame: DataFrame, days inDays: Int = 1, completion inCompletion: WindowRangeCallback? = nil) {
-        self.windowRangeCallback = inCompletion
+    init(with inDataFrame: DataFrame, days inDays: Int = 1) {
         var rowTypes = [_RCVST_UserActivityDataRow]()
     
         // We do every other one, because we have two samples per day. We only need the last one.

@@ -207,7 +207,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
     var body: some View {
         GeometryReader { inGeometry in
             ScrollView {
-                GroupBox {
+                GroupBox(self.data.chartName) {
                     // We need to add a `VStack`, so that the text item, the legend, the scrubber, and chart play well together.
                     VStack {
                         // This displays the value of the selected bar. It is one line of red text, so we make it small enough to fit.
