@@ -122,16 +122,7 @@ struct RootStackView: View, RCVST_HapticHopper {
          - parameter inData: The data item that had the change. We'll change all the others, to match.
          */
         func _reactToWindowChange(_ inData: (any DataProviderProtocol)?) {
-            var dataItems = self._dataItems
-            guard !dataItems.isEmpty,
-                  let newRange = inData?.dataWindowRange,
-                  !newRange.isEmpty
-            else { return }
-            for item in dataItems.enumerated() {
-                dataItems[item.offset].dataWindowRange = newRange
-            }
-
-            self._dataItems = dataItems
+            
         }
         
         var dataItems = [any DataProviderProtocol]()
@@ -178,8 +169,12 @@ struct RootStackView: View, RCVST_HapticHopper {
      - returns: A View, with the chart display.
      */
     @ViewBuilder
-    private func _loadView(for inData: any DataProviderProtocol) -> some View {
-        RCVST_UserDateBarChartDisplay(data: inData)
+    private func _loadView(for inData: (any DataProviderProtocol)?) -> some View {
+        if let data = inData {
+            RCVST_UserDateBarChartDisplay(data: data)
+        } else {
+            Text("ERROR")
+        }
     }
     
     /* ################################################################## */
@@ -217,7 +212,7 @@ struct RootStackView: View, RCVST_HapticHopper {
                             }
                         }
                         if self._expandedChartName == inData.chartName {
-                            RCVST_UserDateBarChartDisplay(data: inData)
+                            self._loadView(for: inData)
                                 .aspectRatio(1, contentMode: .fit)
                         }
                     }
