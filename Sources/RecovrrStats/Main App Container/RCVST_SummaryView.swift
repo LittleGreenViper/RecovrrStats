@@ -29,90 +29,77 @@ import CoreHaptics
 struct RCVST_SummaryView: View {
     /* ##################################################### */
     /**
+     This declares a local type that will contain our list item data.
+     */
+    struct SummaryRow: Identifiable {
+        /* ################################################# */
+        /**
+         This makes it identifiable (for the ForEach).
+         */
+        let id = UUID()
+        
+        /* ################################################# */
+        /**
+         The prompt.
+         */
+        let key: String
+        
+        /* ################################################# */
+        /**
+         The value display.
+         */
+        let value: Text
+        
+        /* ################################################# */
+        /**
+         The color to use.
+         */
+        let color: Color?
+    }
+    
+    /* ##################################################### */
+    /**
      The data we'll be mining.
      */
     @State var data: RCVST_DataProvider?
 
     /* ##################################################### */
     /**
+     Displays the list of items in the summary.
      */
     var body: some View {
         if let data = self.data {
-            List {
-                HStack {
-                    Text("SLUG-FIRST-SAMPLE-PROMPT".localizedVariant)
-                    Spacer()
-                    Text(data.startDate, format: .dateTime.day().month().year())
-                }
-                HStack {
-                    Text("SLUG-LAST-SAMPLE-PROMPT\(data.lastSampleWasNoon ? "" : "-2")".localizedVariant)
-                    Spacer()
-                    Text(data.endDate, format: .dateTime.day().month().year())
-                }
-                HStack {
-                    Text("SLUG-TOTAL-ACTIVE-PROMPT".localizedVariant)
-                        .foregroundColor(.green)
-                    Spacer()
-                    Text("\(data.totalActive)")
-                        .foregroundColor(.green)
-                }
-                HStack {
-                    Text("SLUG-TOTAL-INACTIVE-PROMPT".localizedVariant)
-                        .foregroundColor(.blue)
-                    Spacer()
-                    Text("\(data.totalInactive)")
-                        .foregroundColor(.blue)
-                }
-                HStack {
-                    Text("SLUG-TOTAL-DEL-ACT-PROMPT".localizedVariant)
-                        .foregroundColor(.green)
-                    Spacer()
-                    Text("\(data.totalAdminActiveDeleted)")
-                        .foregroundColor(.green)
-                }
-                HStack {
-                    Text("SLUG-TOTAL-DEL-INACT-PROMPT".localizedVariant)
-                        .foregroundColor(.blue)
-                    Spacer()
-                    Text("\(data.totalAdminInactiveDeleted)")
-                        .foregroundColor(.blue)
-                }
-                HStack {
-                    Text("SLUG-TOTAL-SIGNUP-PROMPT".localizedVariant)
-                    Spacer()
-                    Text("\(data.totalRequests)")
-                }
-                HStack {
-                    Text("SLUG-TOTAL-REJECTION-PROMPT".localizedVariant)
-                        .foregroundColor(.orange)
-                    Spacer()
-                    Text("\(data.totalRejections)")
-                        .foregroundColor(.orange)
-                }
-                HStack {
-                    Text("SLUG-TOTAL-DELETED-PROMPT".localizedVariant)
-                    Spacer()
-                    Text("\(data.totalAdminDeleted)")
-                }
-                HStack {
-                    Text("SLUG-AVERAGE-RATE-PROMPT".localizedVariant)
-                    Spacer()
-                    let displ = String(format: "%.2g", data.averageSignupsPerDay)
-                    Text(displ)
-                }
-                HStack {
-                    Text("SLUG-AVERAGE-REJ-PROMPT".localizedVariant)
-                        .foregroundColor(.orange)
-                    Spacer()
-                    let displ = String(format: "%.2g", data.averageRejectedSignupsPerDay)
-                    Text(displ)
-                        .foregroundColor(.orange)
-                }
-                HStack {
-                    Text("SLUG-AVERAGE-DEL-PROMPT".localizedVariant)
-                    Spacer()
-                    let displ = String(format: "%.2g", data.averageDeletionsPerDay)
-                    Text(displ)
+            let rows: [SummaryRow] = [
+                SummaryRow(key: "SLUG-FIRST-SAMPLE-PROMPT", value: Text(data.startDate, format: .dateTime.day().month().year()), color: nil),
+                SummaryRow(key: "SLUG-LAST-SAMPLE-PROMPT\(data.lastSampleWasNoon ? "" : "-2")", value: Text(data.endDate, format: .dateTime.day().month().year()), color: nil),
+                SummaryRow(key: "SLUG-TOTAL-USERS-PROMPT", value: Text("\(data.totalUsers)"), color: nil),
+                SummaryRow(key: "SLUG-TOTAL-ACTIVE-PROMPT", value: Text("\(data.totalActive)"), color: .green),
+                SummaryRow(key: "SLUG-TOTAL-INACTIVE-PROMPT", value: Text("\(data.totalInactive)"), color: .blue),
+                SummaryRow(key: "SLUG-TOTAL-DEL-PROMPT", value: Text("\(data.totalAdminDeleted)"), color: nil),
+                SummaryRow(key: "SLUG-TOTAL-DEL-ACT-PROMPT", value: Text("\(data.totalAdminActiveDeleted)"), color: .green),
+                SummaryRow(key: "SLUG-TOTAL-DEL-INACT-PROMPT", value: Text("\(data.totalAdminInactiveDeleted)"), color: .blue),
+                SummaryRow(key: "SLUG-TOTAL-SIGNUP-PROMPT", value: Text("\(data.totalRequests)"), color: nil),
+                SummaryRow(key: "SLUG-TOTAL-ACCEPTED-PROMPT", value: Text("\(data.totalApprovals)"), color: .blue),
+                SummaryRow(key: "SLUG-TOTAL-REJECTION-PROMPT", value: Text("\(data.totalRejections)"), color: .orange),
+                SummaryRow(key: "SLUG-TOTAL-DELETED-PROMPT", value: Text("\(data.totalAdminDeleted)"), color: nil),
+                SummaryRow(key: "SLUG-AVERAGE-RATE-PROMPT", value: Text(String(format: "%.2g", data.averageSignupsPerDay)), color: nil),
+                SummaryRow(key: "SLUG-AVERAGE-ACCEPTED-PROMPT", value: Text(String(format: "%.2g", data.averageAcceptedSignupsPerDay)), color: .blue),
+                SummaryRow(key: "SLUG-AVERAGE-REJ-PROMPT", value: Text(String(format: "%.2g", data.averageRejectedSignupsPerDay)), color: .orange),
+                SummaryRow(key: "SLUG-AVERAGE-DEL-PROMPT", value: Text(String(format: "%.2g", data.averageDeletionsPerDay)), color: nil)
+            ]
+
+            ScrollView {
+                LazyVStack(spacing: 8) {
+                    ForEach(rows) { inRow in
+                        HStack {
+                            Text(inRow.key.localizedVariant)
+                                .foregroundColor(inRow.color ?? .primary)
+                            Spacer()
+                            inRow.value
+                                .foregroundColor(inRow.color ?? .primary)
+                        }
+                        .padding(.horizontal, 16)
+                    }
                 }
             }
             Spacer()

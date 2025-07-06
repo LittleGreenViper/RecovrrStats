@@ -181,23 +181,25 @@ struct RootStackView: View, RCVST_HapticHopper {
                 }
                 
                 List {
-                    ForEach(self._dataItems, id: \.chartName) { inData in
-                        Button {
-                            withAnimation(.snappy(duration: 0.5)) {
-                                self.triggerHaptic(intensity: 1.0)
-                                self._expandedChartName = self._expandedChartName == inData.chartName ? nil : inData.chartName
+                    Section {
+                        ForEach(self._dataItems, id: \.chartName) { inData in
+                            Button {
+                                withAnimation(.snappy(duration: 0.5)) {
+                                    self.triggerHaptic(intensity: 1.0)
+                                    self._expandedChartName = self._expandedChartName == inData.chartName ? nil : inData.chartName
+                                }
+                            } label: {
+                                HStack {
+                                    Text(inData.chartName)
+                                    Spacer()
+                                    Image(systemName: self._expandedChartName == inData.chartName ? "chevron.down" : "chevron.right")
+                                }
                             }
-                        } label: {
-                            HStack {
-                                Text(inData.chartName)
-                                Spacer()
-                                Image(systemName: self._expandedChartName == inData.chartName ? "chevron.down" : "chevron.right")
+                            if self._expandedChartName == inData.chartName {
+                                self._loadView(for: inData)
+                                    .id(UUID()) // Forces the chart to fully redraw
+                                    .aspectRatio(1, contentMode: .fit)
                             }
-                        }
-                        if self._expandedChartName == inData.chartName {
-                            self._loadView(for: inData)
-                                .id(UUID()) // Forces the chart to fully redraw
-                                .aspectRatio(1, contentMode: .fit)
                         }
                     }
                 }
@@ -212,9 +214,11 @@ struct RootStackView: View, RCVST_HapticHopper {
             }
             .onChange(of: self._scenePhase, initial: true) {
                 self._expandedChartName = nil
-                if .active == self._scenePhase,
-                   nil == self._data {
-                    RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in self._data = inDataProvider }
+                if .active == self._scenePhase {
+                    self.prepareHaptics()
+                    if nil == self._data {
+                        RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in self._data = inDataProvider }
+                    }
                 } else if .background == self._scenePhase {
                     self._data = nil
                 }

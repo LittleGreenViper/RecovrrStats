@@ -141,6 +141,12 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
 
     /* ################################################################## */
     /**
+     Tracks scene activity.
+     */
+    @Environment(\.scenePhase) private var _scenePhase
+    
+    /* ################################################################## */
+    /**
      The string that displays the data for the selected bar.
      
      This is attached to the text item that we added for the drag gesture.
@@ -332,6 +338,11 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
         .onAppear {
             self._dayCount = self.data.numberOfDays
             self.prepareHaptics()
+        }
+        .onChange(of: self._scenePhase, initial: true) {
+            if .active == self._scenePhase {
+                self.prepareHaptics()
+            }
         }
         .onDisappear { self._dayCount = nil }
     }

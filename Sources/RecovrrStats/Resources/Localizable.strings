@@ -48,16 +48,20 @@
 "SLUG-FIRST-SAMPLE-PROMPT"                  =   "First Sample:";
 "SLUG-LAST-SAMPLE-PROMPT"                   =   "Last Sample (Noon):";
 "SLUG-LAST-SAMPLE-PROMPT-2"                 =   "Last Sample (Midnight):";
+"SLUG-TOTAL-USERS-PROMPT"                   =   "Total Users:";
 "SLUG-TOTAL-ACTIVE-PROMPT"                  =   "Total Active Users:";
 "SLUG-TOTAL-INACTIVE-PROMPT"                =   "Total Inactive Users:";
 "SLUG-TOTAL-SIGNUP-PROMPT"                  =   "Total Signup Requests:";
+"SLUG-TOTAL-ACCEPTED-PROMPT"                =   "Total Approvals:";
 "SLUG-TOTAL-REJECTION-PROMPT"               =   "Total Rejections:";
 "SLUG-TOTAL-DELETED-PROMPT"                 =   "Total Deleted:";
+"SLUG-TOTAL-DEL-PROMPT"                     =   "Total Deleted Users:";
 "SLUG-TOTAL-DEL-ACT-PROMPT"                 =   "Total Deleted Active:";
 "SLUG-TOTAL-DEL-INACT-PROMPT"               =   "Total Deleted Inactive:";
 "SLUG-AVERAGE-RATE-PROMPT"                  =   "Average Signups Per Day:";
-"SLUG-AVERAGE-DEL-PROMPT"                   =   "Average Deletions Per Day:";
+"SLUG-AVERAGE-ACCEPTED-PROMPT"              =   "Average Approved Per Day:";
 "SLUG-AVERAGE-REJ-PROMPT"                   =   "Average Rejections Per Day:";
+"SLUG-AVERAGE-DEL-PROMPT"                   =   "Average Deletions Per Day:";
 
 "SLUG-SELECTED-LEGEND-LABEL"                =   "Selected";
 

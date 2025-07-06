@@ -29,6 +29,12 @@ import CoreHaptics
 struct RCVST_ZoomControl: View, RCVST_HapticHopper {
     /* ################################################################## */
     /**
+     Tracks scene activity.
+     */
+    @Environment(\.scenePhase) private var _scenePhase
+    
+    /* ################################################################## */
+    /**
      The height f the control, in display units.
      */
     private static let _frameHeightInDisplayUnits = CGFloat(18)
@@ -119,6 +125,11 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
         }
         .frame(height: Self._frameHeightInDisplayUnits)
         .onAppear { self.prepareHaptics() }
+        .onChange(of: self._scenePhase, initial: true) {
+            if .active == self._scenePhase {
+                self.prepareHaptics()
+            }
+        }
     }
     
     /* ################################################################## */
