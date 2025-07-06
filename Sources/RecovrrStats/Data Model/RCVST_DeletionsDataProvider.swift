@@ -87,10 +87,24 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
     
     /* ##################################################### */
     /**
-     The actual range of the currently displayed rows.
+     This is the displayed range of data, stored.
+     
+     The reason for this, is so we trigger redraws. The value of this is always ignored.
      */
-    var dataWindowRange: ClosedRange<Date> = .distantPast ... .distantPast
+    private var _dataWindowRange: ClosedRange<Date> = .distantPast ... .distantPast
     
+    /* ##################################################### */
+    /**
+     This is the displayed range of data. We set the singleton from here, which is the real storage.
+     */
+    var dataWindowRange: ClosedRange<Date> {
+        get { RCVST_DataProvider.singletonWindowRange }
+        set {
+            self._dataWindowRange = newValue
+            RCVST_DataProvider.singletonWindowRange = newValue
+        }
+    }
+
     /* ##################################################### */
     /**
      This contains the rows assigned to this instance.

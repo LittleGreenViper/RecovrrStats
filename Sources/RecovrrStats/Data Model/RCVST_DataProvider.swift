@@ -264,6 +264,14 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
     
     /* ################################################################## */
     /**
+     I don't like singletons, but this seems to be the best way to deal with the need for a common window range.
+     
+     We'll set this, whenever we set the window range, and then read it back. That ensures that all the data providers have the same window range.
+     */
+    static var singletonWindowRange: ClosedRange<Date> = .distantPast ... .distantPast
+    
+    /* ################################################################## */
+    /**
      This finds the last index of the main dataframe rows, based on our endDate.
      */
     private var _lastIndex: Int {
