@@ -196,6 +196,7 @@ struct RootStackView: View, RCVST_HapticHopper {
                         }
                         if self._expandedChartName == inData.chartName {
                             self._loadView(for: inData)
+                                .id(UUID()) // Forces the chart to fully redraw
                                 .aspectRatio(1, contentMode: .fit)
                         }
                     }
