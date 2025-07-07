@@ -88,36 +88,27 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
                             .frame(width: width, height: 15)
                             .position(x: leftSide + (width / 2), y: 9)
                             .gesture(
-                                TapGesture(count: 2)
-                                    .onEnded {
-                                        if self.data.dataWindowRange != self.data.totalDateRange {
-                                            self.triggerHaptic(intensity: 0.5, sharpness: 0.5)
-                                            self.data.setDataWindowRange(self.data.totalDateRange)
+                                DragGesture(minimumDistance: 0)
+                                    .onChanged { inValue in
+                                        if 0 != inValue.translation.width || 0 != inValue.translation.height {
+                                            self._startLocation = self._startLocation ?? self.data.dataWindowRange.lowerBound.timeIntervalSinceReferenceDate
+                                            if let startLocation = _startLocation {
+                                                let isXAxis = abs(inValue.location.x - inValue.startLocation.x) > abs(inValue.location.y - inValue.startLocation.y)
+                                                let maxChange = isXAxis ? Double(inValue.location.x - inValue.startLocation.x) : Double(inValue.location.y - inValue.startLocation.y)
+                                                let dateChangeInSeconds = Int((maxChange / globalMagnificationFactor) / 86400) * 86400
+                                                let newLowerBound = startLocation + Double(dateChangeInSeconds)
+                                                let finalLowerBound = max(self.data.totalDateRange.lowerBound.timeIntervalSinceReferenceDate,
+                                                                          min(self.data.totalDateRange.upperBound.timeIntervalSinceReferenceDate - timeRange,
+                                                                              newLowerBound
+                                                                             )
+                                                )
+                                                let finalUpperBound = finalLowerBound + timeRange
+                                                self.triggerHaptic()
+                                                self.data.setDataWindowRange(Date(timeIntervalSinceReferenceDate: finalLowerBound)...Date(timeIntervalSinceReferenceDate: finalUpperBound))
+                                            }
                                         }
                                     }
-                                    .simultaneously(with:   // We combine it with the drag, so we don't get hesitation.
-                                        DragGesture(minimumDistance: 0)
-                                            .onChanged { inValue in
-                                                if 0 != inValue.translation.width || 0 != inValue.translation.height {
-                                                    self._startLocation = self._startLocation ?? self.data.dataWindowRange.lowerBound.timeIntervalSinceReferenceDate
-                                                    if let startLocation = _startLocation {
-                                                        let isXAxis = abs(inValue.location.x - inValue.startLocation.x) > abs(inValue.location.y - inValue.startLocation.y)
-                                                        let maxChange = isXAxis ? Double(inValue.location.x - inValue.startLocation.x) : Double(inValue.location.y - inValue.startLocation.y)
-                                                        let dateChangeInSeconds = Int((maxChange / globalMagnificationFactor) / 86400) * 86400
-                                                        let newLowerBound = startLocation + Double(dateChangeInSeconds)
-                                                        let finalLowerBound = max(self.data.totalDateRange.lowerBound.timeIntervalSinceReferenceDate,
-                                                                                  min(self.data.totalDateRange.upperBound.timeIntervalSinceReferenceDate - timeRange,
-                                                                                      newLowerBound
-                                                                                     )
-                                                        )
-                                                        let finalUpperBound = finalLowerBound + timeRange
-                                                        self.triggerHaptic()
-                                                        self.data.setDataWindowRange(Date(timeIntervalSinceReferenceDate: finalLowerBound)...Date(timeIntervalSinceReferenceDate: finalUpperBound))
-                                                    }
-                                                }
-                                            }
-                                        .onEnded { _ in self._startLocation = nil }
-                                        )
+                                .onEnded { _ in self._startLocation = nil }
                                 )
                     }
                 }
