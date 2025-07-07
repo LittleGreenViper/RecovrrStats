@@ -41,8 +41,7 @@
 
 "SLUG-MAIN-SCREEN-TITLE"                    =   "Recovrr Stats";
 "SLUG-MAIN-SCREEN-TITLE-FORMAT"             =   "Recovrr Stats (%d days)";
-"SLUG-MAIN-CURRENT-ACTIVE"                  =   "Current Active Users: %d";
-"SLUG-MAIN-CURRENT-INACTIVE"                =   "Current Inactive Users: %d";
+"SLUG-RESET-RANGE"                          =   "Reset";
 "SLUG-SUMMARY-HEADER"                       =   "Summary";
 
 "SLUG-FIRST-SAMPLE-PROMPT"                  =   "First Sample:";

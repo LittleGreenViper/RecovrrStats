@@ -101,6 +101,7 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
         get { RCVST_DataProvider.singletonWindowRange }
         set {
             self._dataWindowRange = newValue
+            RCVST_DataProvider.singletonTotalWindowRange = self.totalDateRange
             RCVST_DataProvider.singletonWindowRange = newValue
         }
     }
@@ -147,6 +148,7 @@ struct RCVST_DeletionsDataProvider: DataProviderProtocol {
            let upperBound = rowTypes.last?.sampleDate {
             dataWindowRange = Calendar.current.startOfDay(for: lowerBound) ... Calendar.current.startOfDay(for: upperBound)
         }
+        RCVST_DataProvider.singletonTotalWindowRange = self.totalDateRange
     }
     
     /* ##################################################### */

@@ -272,6 +272,20 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
     
     /* ################################################################## */
     /**
+     This has the total range.
+     */
+    static var singletonTotalWindowRange: ClosedRange<Date> = .distantPast ... .distantPast
+
+    /* ################################################################## */
+    /**
+     This is used to access the observable object.
+     
+     It is implicit, because Bad Things Happen, if not available.
+     */
+    static var shared: RCVST_DataProvider!
+    
+    /* ################################################################## */
+    /**
      This finds the last index of the main dataframe rows, based on our endDate.
      */
     private var _lastIndex: Int {
@@ -368,7 +382,7 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
      A data provider instance, tuned to users active within the last 90 days.
      */
     var active90DataProvider: RCVST_UserActivityDataProvider?
-
+    
     /* ################################################################## */
     /**
      Default initializer. We set up our data providers, here.
@@ -384,6 +398,8 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
         self.active7DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 7)
         self.active30DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 30)
         self.active90DataProvider = RCVST_UserActivityDataProvider(with: inDataFrame, days: 90)
+        
+        Self.shared = self
     }
     
     /* ################################################################## */

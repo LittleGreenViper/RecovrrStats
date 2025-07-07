@@ -80,6 +80,7 @@ struct RootStackView: View, RCVST_HapticHopper {
     
     /* ################################################################## */
     /**
+     This is used to track which chart is open.
      */
     @State private var _expandedChartName: String?
 
@@ -99,6 +100,7 @@ struct RootStackView: View, RCVST_HapticHopper {
 
     /* ################################################################## */
     /**
+     This updates the active/new totals.
      */
     private func _updateTotals() {
         guard let latestAct = _data?.userDataProvider?.rows.last?.activeUsers,
@@ -162,18 +164,31 @@ struct RootStackView: View, RCVST_HapticHopper {
     
     /* ################################################################## */
     /**
-     The number of days, covered by the data window.
+     This displays the title of the screen (at the top).
      */
-    var title: String { "SLUG-MAIN-SCREEN-TITLE".localizedVariant }
-    
+    @State private var _screenTitle: String = "SLUG-MAIN-SCREEN-TITLE".localizedVariant
+
     /* ################################################################## */
     /**
      The main navigation stack screen.
      */
     var body: some View {
         VStack {
-            Text(self.title)
-                .font(.headline)
+            ZStack {
+                Text(self._screenTitle)
+                    .font(.headline)
+
+                if RCVST_DataProvider.singletonWindowRange != RCVST_DataProvider.singletonTotalWindowRange {
+                    HStack {
+                        Spacer()
+                        Button("SLUG-RESET-RANGE".localizedVariant) {
+                            RCVST_DataProvider.singletonWindowRange = RCVST_DataProvider.singletonTotalWindowRange
+                            self._screenTitle = "SLUG-MAIN-SCREEN-TITLE".localizedVariant
+                        }
+                    }
+                }
+            }
+
             NavigationStack {
                 NavigationLink("SLUG-SUMMARY-HEADER".localizedVariant) {
                     RCVST_SummaryView(data: self._data)
