@@ -55,14 +55,8 @@ struct RCVST_ZoomControl: View, RCVST_HapticHopper {
     /**
      This is the actual dataframe wrapper for the stats.
      */
-    @Binding var data: any DataProviderProtocol { didSet { self.dayCount = self.data.numberOfDays } }
+    @Binding var data: any DataProviderProtocol
     
-    /* ################################################################## */
-    /**
-     The number of days, covered by the data window.
-     */
-    @Binding var dayCount: Int?
-
     /* ################################################################## */
     /**
      The control, itself.

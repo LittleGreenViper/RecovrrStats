@@ -135,7 +135,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
      
      It's somewhat mutable (we can set observational state, like marking rows as selected, or setting a "window" of dates to examine).
      */
-    @State var data: any DataProviderProtocol { didSet { _dayCount = data.numberOfDays } }
+    @State var data: any DataProviderProtocol
     
     // MARK: Private Properties
 
@@ -177,12 +177,6 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
      This contains the data window, at the start of the gesture. We use this to calculate the magnification, and center of the pinch.
      */
     @State private var _firstRange: ClosedRange<Date>? { didSet { if oldValue != _firstRange { _selectedValue = nil } } }    // Make sure to nuke any selection.
-    
-    /* ################################################################## */
-    /**
-     The number of days, covered by the data window.
-     */
-    @State private var _dayCount: Int?
 
     /* ################################################################## */
     /**
@@ -303,14 +297,14 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                                                         self.data.setDataWindowRange((centerDate.addingTimeInterval(-newRange)...centerDate.addingTimeInterval(newRange)).clamped(to: self.data.totalDateRange))
                                                     }
                                                 }
-                                            .onEnded { _ in self._firstRange = nil } // We reset the initial range, when we're done.
+                                            .onEnded { _ in self._firstRange = nil }
                                         )
                                     )
                             }
                         }
                         
                         RCVST_ChartLegend(legendElements: self.data.legend)             // The chart legend.
-                        RCVST_ZoomControl(data: self.$data, dayCount: self.$_dayCount)  // This shows a scrubber, if we are zoomed in.
+                        RCVST_ZoomControl(data: self.$data)  // This shows a scrubber, if we are zoomed in.
                     }
                 }
                 // We want our box to be basically square, based on the width of the screen.
@@ -323,15 +317,11 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                 )
             }
         }
-        .onAppear {
-            self._dayCount = self.data.numberOfDays
-            self.prepareHaptics()
-        }
+        .onAppear { self.prepareHaptics() }
         .onChange(of: self._scenePhase, initial: true) {
             if .active == self._scenePhase {
                 self.prepareHaptics()
             }
         }
-        .onDisappear { self._dayCount = nil }
     }
 }
