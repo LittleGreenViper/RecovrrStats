@@ -486,3 +486,26 @@ sample_date,total_users,new_users,never_set_location,total_requests,accepted_req
      */
     var averageGrowthPerDay: Double { self.averageAcceptedSignupsPerDay - self.averageDeletionsPerDay }
 }
+
+/* ###################################################################################################################################### */
+// MARK: Hashable and Equatable Conformance
+/* ###################################################################################################################################### */
+extension RCVST_DataProvider: Hashable {
+    /* ################################################################## */
+    /**
+     Equatable Conformance
+     
+     - parameter lhs: The lafthand side
+     - parameter rhs: The righthand side
+     - returns: True, if the two match.
+     */
+    public static func == (lhs: RCVST_DataProvider, rhs: RCVST_DataProvider) -> Bool { ObjectIdentifier(lhs) == ObjectIdentifier(rhs) }
+    
+    /* ################################################################## */
+    /**
+     Hashable Conformance
+     
+     parameter inOutHasher: The customer for our hash dealer.
+     */
+    public func hash(into inOutHasher: inout Hasher) { inOutHasher.combine(ObjectIdentifier(self)) }
+}

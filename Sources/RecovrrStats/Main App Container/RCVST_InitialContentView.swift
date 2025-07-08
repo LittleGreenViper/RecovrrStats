@@ -39,9 +39,30 @@ struct RCVST_InitialContentView: View {
 // MARK: - The List of Charts -
 /* ###################################################################################################################################### */
 /**
- This presents a simple navigation list, with callouts to the various charts.
+ This presents a simple list, with disclosures for the various charts. The Summary page is a separate screen, but the charts are shown in this screen.
+ > NOTE: Zooming the chart will apply to all charts.
  */
 struct RootStackView: View, RCVST_HapticHopper {
+    /* ################################################################################################################################## */
+    // MARK: Simple Hashable Enum For Navigation Tracking
+    /* ################################################################################################################################## */
+    /**
+     We need a simple hashable enum to push onto the stack.
+     */
+    enum RCVSTDestination: Hashable {
+        /* ############################################################## */
+        /**
+         We bring in the summary screen, with this one.
+         */
+        case summary(data: RCVST_DataProvider?)
+    }
+
+    /* ################################################################## */
+    /**
+     Used to allow the summary to return to this screen.
+     */
+    @State private var _path = NavigationPath()
+    
     /* ################################################################## */
     /**
      This is used to give us haptic feedback for dragging.
@@ -171,12 +192,16 @@ struct RootStackView: View, RCVST_HapticHopper {
             Text("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
                 .font(.headline)
 
-            NavigationStack {
-                NavigationLink("SLUG-SUMMARY-HEADER".localizedVariant) {
-                    RCVST_SummaryView(data: self._data)
-                        .onAppear { self.triggerHaptic(intensity: 1.0) }
+            NavigationStack(path: self.$_path) {
+                Button("SLUG-SUMMARY-HEADER".localizedVariant) {
+                    self._path.append(RCVSTDestination.summary(data: self._data))
                 }
-                
+                .navigationDestination(for: RCVSTDestination.self) { destination in
+                    switch destination {
+                    case .summary(let data):
+                        RCVST_SummaryView(path: self.$_path, data: data)
+                    }
+                }
                 List {
                     Section {
                         ForEach(self._dataItems, id: \.chartName) { inData in

@@ -56,6 +56,18 @@ struct RCVST_SummaryView: View {
          */
         let color: Color?
     }
+
+    /* ################################################################## */
+    /**
+     Tracks scene activity.
+     */
+    @Environment(\.scenePhase) private var _scenePhase
+
+    /* ################################################################## */
+    /**
+     Used to allow the summary to return to the root screen.
+     */
+    @Binding var path: NavigationPath
     
     /* ##################################################### */
     /**
@@ -100,6 +112,11 @@ struct RCVST_SummaryView: View {
                         }
                         .padding(.horizontal, 16)
                     }
+                }
+            }
+            .onChange(of: self._scenePhase, initial: true) {    // If we background, we unwind the stack.
+                if .background == self._scenePhase {
+                    self.path.removeLast(path.count)
                 }
             }
             Spacer()
