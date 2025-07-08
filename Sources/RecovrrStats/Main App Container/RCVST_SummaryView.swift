@@ -69,7 +69,7 @@ struct RCVST_SummaryView: View {
      */
     var daysAsString: String {
         if let data = self.data {
-            let daysAsNum = Float(data.numberOfDays) - Float(data.lastSampleWasNoon ? 0.0 : 0.5)
+            let daysAsNum = Float(data.numberOfDays) + Float(data.lastSampleWasNoon ? 0.0 : 0.5)
             
             let formatter = NumberFormatter()
             formatter.minimumFractionDigits = 0
