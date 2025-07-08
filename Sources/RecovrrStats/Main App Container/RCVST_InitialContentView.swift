@@ -20,6 +20,7 @@
 import SwiftUI
 import TabularData
 import CoreHaptics
+import UIKit
 
 /* ###################################################################################################################################### */
 // MARK: - Initial View -
@@ -28,6 +29,16 @@ import CoreHaptics
  The main container view for everything else.
  */
 struct RCVST_InitialContentView: View {
+    init() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        appearance.backgroundColor = .clear
+        appearance.shadowColor = .clear
+
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+    }
+
     /* ################################################################## */
     /**
      This is the layout for this screen.
@@ -43,32 +54,80 @@ struct RCVST_InitialContentView: View {
  > NOTE: Zooming the chart will apply to all charts.
  */
 struct RootStackView: View, RCVST_HapticHopper {
-    /* ################################################################################################################################## */
-    // MARK: Simple Hashable Enum For Navigation Tracking
-    /* ################################################################################################################################## */
-    /**
-     We need a simple hashable enum to push onto the stack.
-     */
-    enum RCVSTDestination: Hashable {
-        /* ############################################################## */
-        /**
-         We bring in the summary screen, with this one.
-         */
-        case summary(data: RCVST_DataProvider?)
-    }
-
     /* ################################################################## */
     /**
-     Used to allow the summary to return to this screen.
+     This generates a UIImage that has a "graph paper" pattern, composed of translucent white lines, with a transparent background.
+     
+     - parameter inSize: The size of the image.
+     - parameter inLargeSquareSize: The size, in displayUnits, of the large squares. Default is 100 display units.
+     - parameter inLineColor: The color of the lines. Default is translucent white.
+     - returns: A new UIImage, with the pattern.
      */
-    @State private var _path = NavigationPath()
-    
+    private static func _makeGraphPaperImage(size inSize: CGSize,
+                                             largeSquareSize inLargeSquareSize: CGFloat = 100,
+                                             lineColor inLineColor: UIColor = .white.withAlphaComponent(0.125)
+    ) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: inSize, format: UIGraphicsImageRendererFormat.default())
+        
+        let smallSquareSize = inLargeSquareSize / 10
+
+        // We want the image to go past the edges, if necessary.
+        let numLargeCols = Int((inSize.width + (inLargeSquareSize - 1)) / inLargeSquareSize)
+        let numLargeRows = Int((inSize.height + (inLargeSquareSize - 1)) / inLargeSquareSize)
+        
+        let numSmallCols = numLargeCols * 10
+        let numSmallRows = numLargeRows * 10
+        
+        return renderer.image { context in
+            let cgContext = context.cgContext
+            cgContext.setFillColor(UIColor.clear.cgColor)
+            cgContext.fill(CGRect(origin: .zero, size: inSize))
+            cgContext.setShouldAntialias(false)
+            
+            // Draw small grid lines
+            cgContext.setStrokeColor(inLineColor.cgColor)
+            cgContext.setLineWidth(0.25 / UIScreen.main.scale)
+            
+            for i in 0...numSmallCols {
+                let x = CGFloat(i) * smallSquareSize
+                cgContext.move(to: CGPoint(x: x, y: 0))
+                cgContext.addLine(to: CGPoint(x: x, y: inSize.height))
+            }
+            
+            for i in 0...numSmallRows {
+                let y = CGFloat(i) * smallSquareSize
+                cgContext.move(to: CGPoint(x: 0, y: y))
+                cgContext.addLine(to: CGPoint(x: inSize.width, y: y))
+            }
+            
+            cgContext.strokePath()
+            
+            // Draw large grid lines
+            cgContext.setStrokeColor(inLineColor.cgColor)
+            cgContext.setLineWidth(1.0 / UIScreen.main.scale)
+            
+            for i in 0...numLargeCols {
+                let x = CGFloat(i) * inLargeSquareSize
+                cgContext.move(to: CGPoint(x: x, y: 0))
+                cgContext.addLine(to: CGPoint(x: x, y: inSize.height))
+            }
+            
+            for i in 0...numLargeRows {
+                let y = CGFloat(i) * inLargeSquareSize
+                cgContext.move(to: CGPoint(x: 0, y: y))
+                cgContext.addLine(to: CGPoint(x: inSize.width, y: y))
+            }
+            
+            cgContext.strokePath()
+        }
+    }
+
     /* ################################################################## */
     /**
      This is used to give us haptic feedback for dragging.
      */
     @State var hapticEngine: CHHapticEngine?
-
+    
     /* ################################################################## */
     /**
      Tracks scene activity.
@@ -104,7 +163,7 @@ struct RootStackView: View, RCVST_HapticHopper {
      This is used to track which chart is open.
      */
     @State private var _expandedChartName: String?
-
+    
     /* ################################################################## */
     /**
      This prepares our haptic engine.
@@ -118,7 +177,7 @@ struct RootStackView: View, RCVST_HapticHopper {
         
         try? hapticEngineTemp.start()
     }
-
+    
     /* ################################################################## */
     /**
      This updates the active/new totals.
@@ -188,23 +247,42 @@ struct RootStackView: View, RCVST_HapticHopper {
      The main navigation stack screen.
      */
     var body: some View {
-        VStack {
-            Text("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
-                .font(.headline)
+        ZStack {
+            GeometryReader { inGeo in
+                Image("GradientBackground")
+                    .resizable()
+                    .scaledToFill()
+                    .clipped()
+                    .ignoresSafeArea()
+                    .frame(width: inGeo.size.width, height: inGeo.size.height)
+                
+                Image(uiImage: Self._makeGraphPaperImage(size: inGeo.size))
+                    .resizable()
+                    .scaledToFill()
+                    .clipped()
+                    .ignoresSafeArea()
+                    .frame(width: inGeo.size.width, height: inGeo.size.height)
 
-            NavigationStack(path: self.$_path) {
-                Button("SLUG-SUMMARY-HEADER".localizedVariant) {
-                    self.triggerHaptic(intensity: 1.0)
-                    self._path.append(RCVSTDestination.summary(data: self._data))
-                }
-                .navigationDestination(for: RCVSTDestination.self) { destination in
-                    switch destination {
-                    case .summary(let data):
-                        RCVST_SummaryView(path: self.$_path, data: data)
-                    }
-                }
-                List {
-                    Section {
+                VStack {
+                    Text("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
+                        .font(.headline)
+
+                    List {
+                        Button {
+                            withAnimation(.snappy(duration: 0.5)) {
+                                self.triggerHaptic(intensity: 0.5, sharpness: 1.0)
+                                self._expandedChartName = self._expandedChartName == "SUMMARY" ? nil : "SUMMARY"
+                            }
+                        } label: {
+                            HStack {
+                                Text("SLUG-SUMMARY-HEADER".localizedVariant)
+                                Spacer()
+                                Image(systemName: self._expandedChartName == "SUMMARY" ? "chevron.down" : "chevron.right")
+                            }
+                        }
+                        if self._expandedChartName == "SUMMARY" {
+                            RCVST_SummaryView(data: self._data)
+                        }
                         ForEach(self._dataItems, id: \.chartName) { inData in
                             Button {
                                 withAnimation(.snappy(duration: 0.5)) {
@@ -220,33 +298,31 @@ struct RootStackView: View, RCVST_HapticHopper {
                             }
                             if self._expandedChartName == inData.chartName {
                                 self._loadView(for: inData)
-                                    .id(UUID()) // Forces the chart to fully redraw
+                                    .id(UUID())
                                     .aspectRatio(1, contentMode: .fit)
                             }
                         }
                     }
-                }
-                .onAppear {
-                    self._expandedChartName = nil
-                    RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in self._data = inDataProvider }
-                }
-                .refreshable {
-                    self._expandedChartName = nil
-                    RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in self._data = inDataProvider }
-                }
-            }
-            .onChange(of: self._scenePhase, initial: true) {
-                self._expandedChartName = nil
-                if .active == self._scenePhase {
-                    self.prepareHaptics()
-                    if nil == self._data {
+                    .background(Color.clear)
+                    .scrollContentBackground(.hidden)
+                    .onAppear {
+                        self._expandedChartName = nil
                         RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in self._data = inDataProvider }
                     }
-                } else if .background == self._scenePhase {
-                    self._data = nil
+                    .refreshable {
+                        self._expandedChartName = nil
+                        RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in self._data = inDataProvider }
+                    }
                 }
+                .background(Color.clear)
+                .onAppear { self.prepareHaptics() }
+            }
+            .background(Color.clear)
+        }
+        .onChange(of: self._scenePhase, initial: true) {
+            if .background == self._scenePhase {
+                self._expandedChartName = nil
             }
         }
-        .onAppear { self.prepareHaptics() }
     }
 }
