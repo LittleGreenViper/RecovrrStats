@@ -77,6 +77,24 @@ struct RCVST_SummaryView: View {
 
     /* ##################################################### */
     /**
+     Returns a formatted string, with the number of days we have in the date range.
+     */
+    var daysAsString: String {
+        if let data = self.data {
+            let daysAsNum = Float(data.numberOfDays) - Float(data.lastSampleWasNoon ? 0.0 : 0.5)
+            
+            let formatter = NumberFormatter()
+            formatter.minimumFractionDigits = 0
+            formatter.maximumFractionDigits = 1
+            formatter.numberStyle = .decimal
+            
+            return formatter.string(from: NSNumber(value: daysAsNum)) ?? "\(daysAsNum)"
+        }
+        return ""
+    }
+    
+    /* ##################################################### */
+    /**
      Displays the list of items in the summary.
      */
     var body: some View {
@@ -84,6 +102,7 @@ struct RCVST_SummaryView: View {
             let rows: [SummaryRow] = [
                 SummaryRow(key: "SLUG-FIRST-SAMPLE-PROMPT", value: Text(data.startDate, format: .dateTime.day().month().year()), color: nil),
                 SummaryRow(key: "SLUG-LAST-SAMPLE-PROMPT\(data.lastSampleWasNoon ? "" : "-2")", value: Text(data.endDate, format: .dateTime.day().month().year()), color: nil),
+                SummaryRow(key: "SLUG-TOTAL-DAYS-PROMPT", value: Text("\(self.daysAsString)"), color: nil),
                 SummaryRow(key: "SLUG-TOTAL-USERS-PROMPT", value: Text("\(data.totalUsers)"), color: nil),
                 SummaryRow(key: "SLUG-TOTAL-ACTIVE-PROMPT", value: Text("\(data.totalActive)"), color: .green),
                 SummaryRow(key: "SLUG-TOTAL-INACTIVE-PROMPT", value: Text("\(data.totalInactive)"), color: .blue),
@@ -93,7 +112,6 @@ struct RCVST_SummaryView: View {
                 SummaryRow(key: "SLUG-TOTAL-SIGNUP-PROMPT", value: Text("\(data.totalRequests)"), color: nil),
                 SummaryRow(key: "SLUG-TOTAL-ACCEPTED-PROMPT", value: Text("\(data.totalApprovals)"), color: .blue),
                 SummaryRow(key: "SLUG-TOTAL-REJECTION-PROMPT", value: Text("\(data.totalRejections)"), color: .orange),
-                SummaryRow(key: "SLUG-TOTAL-DELETED-PROMPT", value: Text("\(data.totalAdminDeleted)"), color: nil),
                 SummaryRow(key: "SLUG-AVERAGE-RATE-PROMPT", value: Text(String(format: "%.2g", data.averageSignupsPerDay)), color: nil),
                 SummaryRow(key: "SLUG-AVERAGE-ACCEPTED-PROMPT", value: Text(String(format: "%.2g", data.averageAcceptedSignupsPerDay)), color: .blue),
                 SummaryRow(key: "SLUG-AVERAGE-REJ-PROMPT", value: Text(String(format: "%.2g", data.averageRejectedSignupsPerDay)), color: .orange),

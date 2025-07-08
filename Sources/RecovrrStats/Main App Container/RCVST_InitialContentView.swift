@@ -194,6 +194,7 @@ struct RootStackView: View, RCVST_HapticHopper {
 
             NavigationStack(path: self.$_path) {
                 Button("SLUG-SUMMARY-HEADER".localizedVariant) {
+                    self.triggerHaptic(intensity: 1.0)
                     self._path.append(RCVSTDestination.summary(data: self._data))
                 }
                 .navigationDestination(for: RCVSTDestination.self) { destination in
@@ -207,7 +208,7 @@ struct RootStackView: View, RCVST_HapticHopper {
                         ForEach(self._dataItems, id: \.chartName) { inData in
                             Button {
                                 withAnimation(.snappy(duration: 0.5)) {
-                                    self.triggerHaptic(intensity: 1.0)
+                                    self.triggerHaptic(intensity: 0.25, sharpness: 1.0)
                                     self._expandedChartName = self._expandedChartName == inData.chartName ? nil : inData.chartName
                                 }
                             } label: {
