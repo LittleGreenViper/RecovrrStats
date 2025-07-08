@@ -208,7 +208,7 @@ struct RootStackView: View, RCVST_HapticHopper {
                         ForEach(self._dataItems, id: \.chartName) { inData in
                             Button {
                                 withAnimation(.snappy(duration: 0.5)) {
-                                    self.triggerHaptic(intensity: 0.25, sharpness: 1.0)
+                                    self.triggerHaptic(intensity: 0.5, sharpness: 1.0)
                                     self._expandedChartName = self._expandedChartName == inData.chartName ? nil : inData.chartName
                                 }
                             } label: {
