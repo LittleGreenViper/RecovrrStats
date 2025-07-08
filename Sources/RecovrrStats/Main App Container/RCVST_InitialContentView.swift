@@ -266,6 +266,7 @@ struct RootStackView: View, RCVST_HapticHopper {
                 VStack {
                     Text("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
                         .font(.headline)
+                        .foregroundStyle(Color.white)
 
                     List {
                         Button {
