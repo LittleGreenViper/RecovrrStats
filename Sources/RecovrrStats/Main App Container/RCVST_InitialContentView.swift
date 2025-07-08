@@ -50,7 +50,7 @@ struct RCVST_InitialContentView: View {
 // MARK: - The List of Charts -
 /* ###################################################################################################################################### */
 /**
- This presents a simple list, with disclosures for the various charts. The Summary page is a separate screen, but the charts are shown in this screen.
+ This presents a simple list, with disclosures for the various charts and a summary.
  > NOTE: Zooming the chart will apply to all charts.
  */
 struct RootStackView: View, RCVST_HapticHopper {
@@ -244,7 +244,7 @@ struct RootStackView: View, RCVST_HapticHopper {
     
     /* ################################################################## */
     /**
-     The main navigation stack screen.
+     The main list stack screen.
      */
     var body: some View {
         ZStack {
@@ -263,7 +263,7 @@ struct RootStackView: View, RCVST_HapticHopper {
                     .ignoresSafeArea()
                     .frame(width: inGeo.size.width, height: inGeo.size.height)
 
-                VStack {
+                VStack(spacing: 0) {
                     Text("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
                         .font(.headline)
                         .foregroundStyle(Color.white)
@@ -323,6 +323,8 @@ struct RootStackView: View, RCVST_HapticHopper {
         .onChange(of: self._scenePhase, initial: true) {
             if .background == self._scenePhase {
                 self._expandedChartName = nil
+            } else if .active == self._scenePhase {
+                self.prepareHaptics()
             }
         }
     }
