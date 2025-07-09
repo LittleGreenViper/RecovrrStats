@@ -20,7 +20,7 @@
 import SwiftUI
 import TabularData
 import CoreHaptics
-import UIKit
+import UIKit    // For building the "graph paper" background.
 
 /* ###################################################################################################################################### */
 // MARK: - Initial View -
@@ -29,31 +29,6 @@ import UIKit
  The main container view for everything else.
  */
 struct RCVST_InitialContentView: View {
-    init() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithTransparentBackground()
-        appearance.backgroundColor = .clear
-        appearance.shadowColor = .clear
-
-        UINavigationBar.appearance().standardAppearance = appearance
-        UINavigationBar.appearance().scrollEdgeAppearance = appearance
-    }
-
-    /* ################################################################## */
-    /**
-     This is the layout for this screen.
-     */
-    var body: some View { RootStackView() }
-}
-
-/* ###################################################################################################################################### */
-// MARK: - The List of Charts -
-/* ###################################################################################################################################### */
-/**
- This presents a simple list, with disclosures for the various charts and a summary.
- > NOTE: Zooming the chart will apply to all charts.
- */
-struct RootStackView: View, RCVST_HapticHopper {
     /* ################################################################## */
     /**
      This generates a UIImage that has a "graph paper" pattern, composed of translucent white lines, with a transparent background.
@@ -124,6 +99,54 @@ struct RootStackView: View, RCVST_HapticHopper {
 
     /* ################################################################## */
     /**
+     Default init. We just use this to set the navbar to transparent.
+     */
+    init() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        appearance.backgroundColor = .clear
+        appearance.shadowColor = .clear
+
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+    }
+
+    /* ################################################################## */
+    /**
+     This is the layout for this screen.
+     */
+    var body: some View {
+        ZStack {
+            GeometryReader { inGeo in
+                Image("GradientBackground")
+                    .resizable()
+                    .scaledToFill()
+                    .clipped()
+                    .ignoresSafeArea()
+                    .frame(width: inGeo.size.width, height: inGeo.size.height)
+                
+                Image(uiImage: Self._makeGraphPaperImage(size: inGeo.size))
+                    .resizable()
+                    .scaledToFill()
+                    .clipped()
+                    .ignoresSafeArea()
+                    .frame(width: inGeo.size.width, height: inGeo.size.height)
+                RootStackView()
+            }
+        }
+    }
+}
+
+/* ###################################################################################################################################### */
+// MARK: - The List of Charts -
+/* ###################################################################################################################################### */
+/**
+ This presents a simple list, with disclosures for the various charts and a summary.
+ > NOTE: Zooming the chart will apply to all charts.
+ */
+struct RootStackView: View, RCVST_HapticHopper {
+    /* ################################################################## */
+    /**
      This is used to give us haptic feedback for dragging.
      */
     @State var hapticEngine: CHHapticEngine?
@@ -138,7 +161,7 @@ struct RootStackView: View, RCVST_HapticHopper {
     /**
      This is the actual dataframe wrapper for the stats. Everything from here, on, will be bound to this.
      */
-    @State private var _data: RCVST_DataProvider? { didSet { _updateTotals() } }
+    @State private var _data: RCVST_DataProvider? { didSet { self._updateTotals() } }
     
     /* ################################################################## */
     /**
@@ -183,12 +206,12 @@ struct RootStackView: View, RCVST_HapticHopper {
      This updates the active/new totals.
      */
     private func _updateTotals() {
-        guard let latestAct = _data?.userDataProvider?.rows.last?.activeUsers,
-              let latestInact = _data?.userDataProvider?.rows.last?.newUsers
+        guard let latestAct = self._data?.userDataProvider?.rows.last?.activeUsers,
+              let latestInact = self._data?.userDataProvider?.rows.last?.newUsers
         else { return }
-        _latestActiveTotal = latestAct
-        _latestInactiveTotal = latestInact
-        _buildNavList()
+        self._latestActiveTotal = latestAct
+        self._latestInactiveTotal = latestInact
+        self._buildNavList()
     }
     
     /* ################################################################## */
@@ -199,25 +222,25 @@ struct RootStackView: View, RCVST_HapticHopper {
     private func _buildNavList() {
         var dataItems = [any DataProviderProtocol]()
         
-        if let data = _data?.userDataProvider {
+        if let data = self._data?.userDataProvider {
             dataItems.append(data)
         }
-        if let data = _data?.signupsDataProvider {
+        if let data = self._data?.signupsDataProvider {
             dataItems.append(data)
         }
-        if let data = _data?.deletionsDataProvider {
+        if let data = self._data?.deletionsDataProvider {
             dataItems.append(data)
         }
-        if let data = _data?.active1DataProvider {
+        if let data = self._data?.active1DataProvider {
             dataItems.append(data)
         }
-        if let data = _data?.active7DataProvider {
+        if let data = self._data?.active7DataProvider {
             dataItems.append(data)
         }
-        if let data = _data?.active30DataProvider {
+        if let data = self._data?.active30DataProvider {
             dataItems.append(data)
         }
-        if let data = _data?.active90DataProvider {
+        if let data = self._data?.active90DataProvider {
             dataItems.append(data)
         }
         
@@ -247,85 +270,66 @@ struct RootStackView: View, RCVST_HapticHopper {
      The main list stack screen.
      */
     var body: some View {
-        ZStack {
-            GeometryReader { inGeo in
-                Image("GradientBackground")
-                    .resizable()
-                    .scaledToFill()
-                    .clipped()
-                    .ignoresSafeArea()
-                    .frame(width: inGeo.size.width, height: inGeo.size.height)
-                
-                Image(uiImage: Self._makeGraphPaperImage(size: inGeo.size))
-                    .resizable()
-                    .scaledToFill()
-                    .clipped()
-                    .ignoresSafeArea()
-                    .frame(width: inGeo.size.width, height: inGeo.size.height)
+            VStack(spacing: 0) {
+                Text("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
+                    .font(.headline)
+                    .foregroundStyle(Color.white)
 
-                VStack(spacing: 0) {
-                    Text("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
-                        .font(.headline)
-                        .foregroundStyle(Color.white)
-
-                    List {
+                List {
+                    Button {
+                        withAnimation(.snappy(duration: 0.5)) {
+                            self.triggerHaptic(intensity: 0.5, sharpness: 1.0)
+                            self._expandedChartName = self._expandedChartName == "SUMMARY" ? nil : "SUMMARY"
+                        }
+                    } label: {
+                        HStack {
+                            Text("SLUG-SUMMARY-HEADER".localizedVariant)
+                            Spacer()
+                            Image(systemName: self._expandedChartName == "SUMMARY" ? "chevron.down" : "chevron.right")
+                        }
+                    }
+                    if self._expandedChartName == "SUMMARY" {
+                        RCVST_SummaryView(data: self._data)
+                    }
+                    ForEach(self._dataItems, id: \.chartName) { inData in
                         Button {
                             withAnimation(.snappy(duration: 0.5)) {
                                 self.triggerHaptic(intensity: 0.5, sharpness: 1.0)
-                                self._expandedChartName = self._expandedChartName == "SUMMARY" ? nil : "SUMMARY"
+                                self._expandedChartName = self._expandedChartName == inData.chartName ? nil : inData.chartName
                             }
                         } label: {
                             HStack {
-                                Text("SLUG-SUMMARY-HEADER".localizedVariant)
+                                Text(inData.chartName)
                                 Spacer()
-                                Image(systemName: self._expandedChartName == "SUMMARY" ? "chevron.down" : "chevron.right")
+                                Image(systemName: self._expandedChartName == inData.chartName ? "chevron.down" : "chevron.right")
                             }
                         }
-                        if self._expandedChartName == "SUMMARY" {
-                            RCVST_SummaryView(data: self._data)
+                        if self._expandedChartName == inData.chartName {
+                            self._loadView(for: inData)
+                                .id(UUID())
+                                .aspectRatio(1, contentMode: .fit)
                         }
-                        ForEach(self._dataItems, id: \.chartName) { inData in
-                            Button {
-                                withAnimation(.snappy(duration: 0.5)) {
-                                    self.triggerHaptic(intensity: 0.5, sharpness: 1.0)
-                                    self._expandedChartName = self._expandedChartName == inData.chartName ? nil : inData.chartName
-                                }
-                            } label: {
-                                HStack {
-                                    Text(inData.chartName)
-                                    Spacer()
-                                    Image(systemName: self._expandedChartName == inData.chartName ? "chevron.down" : "chevron.right")
-                                }
-                            }
-                            if self._expandedChartName == inData.chartName {
-                                self._loadView(for: inData)
-                                    .id(UUID())
-                                    .aspectRatio(1, contentMode: .fit)
-                            }
-                        }
-                    }
-                    .background(Color.clear)
-                    .scrollContentBackground(.hidden)
-                    .onAppear {
-                        self._expandedChartName = nil
-                        RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in self._data = inDataProvider }
-                    }
-                    .refreshable {
-                        self._expandedChartName = nil
-                        RCVST_DataProvider.factory(useDummyData: false) { inDataProvider in self._data = inDataProvider }
                     }
                 }
                 .background(Color.clear)
-                .onAppear { self.prepareHaptics() }
+                .scrollContentBackground(.hidden)
+                .onAppear {
+                    self._expandedChartName = nil
+                    RCVST_DataProvider.factory { inDataProvider in self._data = inDataProvider }
+                }
+                .refreshable {
+                    self._expandedChartName = nil
+                    RCVST_DataProvider.factory { inDataProvider in self._data = inDataProvider }
+                }
             }
             .background(Color.clear)
-        }
-        .onChange(of: self._scenePhase, initial: true) {
-            if .background == self._scenePhase {
-                self._expandedChartName = nil
-            } else if .active == self._scenePhase {
-                self.prepareHaptics()
-            }
+            .onAppear { self.prepareHaptics() }
+            .onChange(of: self._scenePhase, initial: true) {
+                if .background == self._scenePhase {
+                    self._expandedChartName = nil
+                } else if .active == self._scenePhase {
+                    self.prepareHaptics()
+                }
         }
     }
 }
