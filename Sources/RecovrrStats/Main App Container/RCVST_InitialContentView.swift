@@ -257,7 +257,7 @@ struct RootStackView: View, RCVST_HapticHopper {
      - returns: A View, with the chart display.
      */
     @ViewBuilder
-    private func _loadView(for inData: (any DataProviderProtocol)?) -> some View {
+    private func _createChartView(for inData: (any DataProviderProtocol)?) -> some View {
         if let data = inData {
             RCVST_UserDateBarChartDisplay(data: data)
         } else {
@@ -270,6 +270,15 @@ struct RootStackView: View, RCVST_HapticHopper {
      The main list stack screen.
      */
     var body: some View {
+        if nil == self._data {
+            VStack {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .onAppear { RCVST_DataProvider.factory { inDataProvider in self._data = inDataProvider } }
+        } else {
             VStack(spacing: 0) {
                 Text("SLUG-MAIN-SCREEN-TITLE".localizedVariant)
                     .font(.headline)
@@ -290,6 +299,7 @@ struct RootStackView: View, RCVST_HapticHopper {
                     }
                     if self._expandedChartName == "SUMMARY" {
                         RCVST_SummaryView(data: self._data)
+                            .onAppear { RCVST_DataProvider.singletonWindowRange = RCVST_DataProvider.singletonTotalWindowRange }
                     }
                     ForEach(self._dataItems, id: \.chartName) { inData in
                         Button {
@@ -305,7 +315,7 @@ struct RootStackView: View, RCVST_HapticHopper {
                             }
                         }
                         if self._expandedChartName == inData.chartName {
-                            self._loadView(for: inData)
+                            self._createChartView(for: inData)
                                 .id(UUID())
                                 .aspectRatio(1, contentMode: .fit)
                         }
@@ -313,23 +323,24 @@ struct RootStackView: View, RCVST_HapticHopper {
                 }
                 .background(Color.clear)
                 .scrollContentBackground(.hidden)
-                .onAppear {
-                    self._expandedChartName = nil
-                    RCVST_DataProvider.factory { inDataProvider in self._data = inDataProvider }
-                }
                 .refreshable {
                     self._expandedChartName = nil
+                    self._data = nil
                     RCVST_DataProvider.factory { inDataProvider in self._data = inDataProvider }
                 }
             }
             .background(Color.clear)
-            .onAppear { self.prepareHaptics() }
+            .onAppear {
+                self._expandedChartName = nil
+                self.prepareHaptics()
+            }
             .onChange(of: self._scenePhase, initial: true) {
-                if .background == self._scenePhase {
-                    self._expandedChartName = nil
-                } else if .active == self._scenePhase {
+                self._expandedChartName = nil
+                if .active == self._scenePhase {
+                    RCVST_DataProvider.factory { inDataProvider in self._data = inDataProvider }
                     self.prepareHaptics()
                 }
+            }
         }
     }
 }
