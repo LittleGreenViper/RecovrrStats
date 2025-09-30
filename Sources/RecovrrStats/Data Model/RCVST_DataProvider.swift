@@ -149,8 +149,7 @@ public class RCVST_DataProvider {
         /* ################################################################## */
         /**
          This fetches the current stats file, and delivers it as a dataframe.
-         
-         - parameter useMockData: If true, then we load mock data, instead of the actual file.
+
          - parameter completion: A simple completion proc, with a single argument of dataframe, containing the stats.
          */
         func _fetchStats(completion inCompletion: ((DataFrame?) -> Void)?) {
@@ -213,7 +212,7 @@ public class RCVST_DataProvider {
                 }.resume()
             } else {
                 #if DEBUG
-                    print("Unknown State. No Mock Data, No URL")
+                    print("Unknown State. No URL")
                 #endif
                 inCompletion?(nil)
             }

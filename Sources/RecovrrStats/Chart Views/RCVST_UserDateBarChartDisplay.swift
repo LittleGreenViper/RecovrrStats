@@ -59,7 +59,7 @@ struct RCVST_ChartLegend: View {
     /**
      Initializer
 
-     - parameter legendElements: an array of legend elements that will be used to build the view.
+     - parameter inLegendElements: an array of legend elements that will be used to build the view.
      */
     init(legendElements inLegendElements: [RCVS_LegendElement]) {
         self._legendElements = inLegendElements
@@ -102,6 +102,9 @@ extension RCVST_HapticHopper {
     /* ################################################################## */
     /**
      This provides a basic haptic trigger function. Probably all we need.
+
+     - parameter inIntensity: The 0 -> 1 intensity, with 0, being off, and 1 being max. Optional for protocol default. Default is 0.25 (gentle selection).
+     - parameter inSharpness: The 0 -> 1 sharpness, with 0, being soft, and 1 being hard. Optional for protocol default. Default is 0 (soft).
      */
     func triggerHaptic(intensity inIntensity: Float = 0.3, sharpness inSharpness: Float = 0) {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
@@ -202,7 +205,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
 
     /* ##################################################### */
     /**
-     (Computed Property) The main chart view. It is a simple bar chart, with each bar, segregated vertically, in some cases.
+     The main chart view. It is a simple bar chart, with each bar, segregated vertically, in some cases.
      */
     var body: some View {
         GeometryReader { inGeometry in
@@ -212,8 +215,7 @@ struct RCVST_UserDateBarChartDisplay: View, RCVST_HapticHopper {
                     VStack {
                         // This displays the value of the selected bar. It is one line of red text, so we make it small enough to fit.
                         Text(self._selectedValuesString)
-                            .font(.system(size: 500 > inGeometry.frame(in: .local).width ? 13 : 20))
-                            .minimumScaleFactor(0.5)
+                            .font(.system(size: 500 > inGeometry.frame(in: .local).width ? 12 : 20))
                             .foregroundStyle(RCVS_LegendSelectionColor)
                         
                         // This builds bars. The date determines the X-axis, and the Y-axis has the number of each type of user, stacked.

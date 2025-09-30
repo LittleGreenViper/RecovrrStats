@@ -384,8 +384,7 @@ public extension RCVST_RowProtocol {
      The number of users that deleted their own accounts.
      */
     var selfDeletions: Int {
-        let adminDeletions = (deletedActive - previousDeletedActive) +
-                             (deletedInactive - previousDeletedInactive)
+        let adminDeletions = (deletedActive - previousDeletedActive) + (deletedInactive - previousDeletedInactive)
 
         // Calculate expected total users if only admin deletions happened
         let expectedTotalUsers = totalUsers - adminDeletions

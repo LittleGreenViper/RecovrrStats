@@ -147,6 +147,12 @@ struct RCVST_InitialContentView: View {
 struct RootStackView: View, RCVST_HapticHopper {
     /* ################################################################## */
     /**
+     The string that identifies the top (summary) view.
+     */
+    private static let _summaryChartName = "SUMMARY"
+    
+    /* ################################################################## */
+    /**
      This is used to give us haptic feedback for dragging.
      */
     @State var hapticEngine: CHHapticEngine?
@@ -288,16 +294,16 @@ struct RootStackView: View, RCVST_HapticHopper {
                     Button {
                         withAnimation(.snappy(duration: 0.5)) {
                             self.triggerHaptic(intensity: 0.5, sharpness: 1.0)
-                            self._expandedChartName = self._expandedChartName == "SUMMARY" ? nil : "SUMMARY"
+                            self._expandedChartName = self._expandedChartName == Self._summaryChartName ? nil : Self._summaryChartName
                         }
                     } label: {
                         HStack {
                             Text("SLUG-SUMMARY-HEADER".localizedVariant)
                             Spacer()
-                            Image(systemName: self._expandedChartName == "SUMMARY" ? "chevron.down" : "chevron.right")
+                            Image(systemName: self._expandedChartName == Self._summaryChartName ? "chevron.down" : "chevron.right")
                         }
                     }
-                    if self._expandedChartName == "SUMMARY" {
+                    if self._expandedChartName == Self._summaryChartName {
                         RCVST_SummaryView(data: self._data)
                             .onAppear { RCVST_DataProvider.singletonWindowRange = RCVST_DataProvider.singletonTotalWindowRange }
                     }
