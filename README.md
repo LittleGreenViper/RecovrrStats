@@ -29,6 +29,7 @@ Everything is completely anonymized. No indvidual user or administrative informa
 
 <div align="center">
 
+|  |  |  |  |
 | :-: | :-: | :-: | :-: |
 | ![Figure 5](img/Fig-05.png) | ![Figure 6](img/Fig-06.png) | ![Figure 7](img/Fig-07.png) | ![Figure 8](img/Fig-08.png) |
 
