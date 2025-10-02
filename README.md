@@ -12,9 +12,15 @@ It reads [the Recovrr.org app stats file](https://recovrr.org/recovrr/log/stats.
 
 Everything is completely anonymized. No indvidual user or administrative information is stored or accessible.
 
-<div style="text-align:center"><div style="display:table;margin:auto"><div style="float:left"><img src="img/Fig-01.png" /><p>Figure 1: The App (Light Mode)</p></div><div style="margin-left:1em;float:left"><img src="img/Fig-02.png" /><p>Figure 2: The App (Dark Mode)</p></div>
+<div align="center">
 
-<div style="margin-left:1em;float:left"><img src="img/Fig-03.png" /><p>Figure 3: Summary Screen (Light Mode)</p></div><div style="margin-left:1em;float:left"><img src="img/Fig-04.png" /><p>Figure 4: Summary Screen (Dark Mode)</p></div></div></div>
+| Figure 1: The App (Light Mode) | Figure 2: The App (Dark Mode) |
+| :-: | :-: |
+| ![Figure 1](img/Fig-01.png) | ![Figure 2](img/Fig-02.png) |
+| Figure 3: The Summary Screen (Light Mode) | Figure 4: The Summary Screen (Dark Mode) |
+| ![Figure 3](img/Fig-03.png) | ![Figure 4](img/Fig-04.png) |
+
+</div>
 
 ## The Stats File
 
