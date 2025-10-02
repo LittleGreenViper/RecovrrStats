@@ -12,6 +12,8 @@ It reads [the Recovrr.org app stats file](https://recovrr.org/recovrr/log/stats.
 
 Everything is completely anonymized. No indvidual user or administrative information is stored or accessible.
 
+### The App and the Summary Screen
+
 <div align="center">
 
 | Light Mode | Dark Mode |
@@ -20,6 +22,15 @@ Everything is completely anonymized. No indvidual user or administrative informa
 | Figure 1: The App | Figure 2: The App |
 | ![Figure 3](img/Fig-03.png) | ![Figure 4](img/Fig-04.png) |
 | Figure 3: The Summary Screen | Figure 4: The Summary Screen |
+
+</div>
+
+### The Charts (All Light Mode)
+
+<div align="center">
+
+| :-: | :-: | :-: | :-: |
+| ![Figure 5](img/Fig-05.png) | ![Figure 6](img/Fig-06.png) | ![Figure 7](img/Fig-07.png) | ![Figure 8](img/Fig-08.png) |
 
 </div>
 
