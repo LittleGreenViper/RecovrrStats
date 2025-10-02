@@ -14,11 +14,12 @@ Everything is completely anonymized. No indvidual user or administrative informa
 
 <div align="center">
 
-| Figure 1: The App (Light Mode) | Figure 2: The App (Dark Mode) |
+| Light Mode | Dark Mode |
 | :-: | :-: |
 | ![Figure 1](img/Fig-01.png) | ![Figure 2](img/Fig-02.png) |
-| Figure 3: The Summary Screen (Light Mode) | Figure 4: The Summary Screen (Dark Mode) |
+| Figure 1: The App | Figure 2: The App |
 | ![Figure 3](img/Fig-03.png) | ![Figure 4](img/Fig-04.png) |
+| Figure 3: The Summary Screen | Figure 4: The Summary Screen |
 
 </div>
 
