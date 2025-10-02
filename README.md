@@ -12,7 +12,17 @@ It reads [the Recovrr.org app stats file](https://recovrr.org/recovrr/log/stats.
 
 Everything is completely anonymized. No indvidual user or administrative information is stored or accessible.
 
-### The App and the Summary Screen
+### Operation
+
+The app is quite simple. Upon opening, it reads in the latest stats file from the server, and prepares the Summary Screen, and the Stats Chart Screens, to reflect the current stats file.
+
+> NOTE: The Stats File is updated every twelve hours (at midnight and noon), so it may not reflect the app state as it is, right now. The first sample was taken at midnight, on October 15, 2024.
+
+The charts can be zoomed (pinch and spread to zoom). This zooms into the horizontal axis (date). Once a chart is zoomed, all the other charts will display in the same time window. You can zoom out (pinch in from spread), or open the Summary Screen, which resets the zoom to the full date range.
+
+### Screens
+
+#### The App and the Summary Screen
 
 <div align="center">
 
@@ -25,7 +35,7 @@ Everything is completely anonymized. No indvidual user or administrative informa
 
 </div>
 
-### The Charts (All Light Mode)
+#### The Charts (All Light Mode)
 
 <div align="center">
 
@@ -33,17 +43,29 @@ Everything is completely anonymized. No indvidual user or administrative informa
 | :-: | :-: |
 | ![Figure 5](img/Fig-05.png) | ![Figure 6](img/Fig-06.png) |
 
+This screen shows the total number of users, at the time the sample was taken. Each day is the noon measurement.
+
 | Signup Activity | Account Deletions  |
 | :-: | :-: |
 | ![Figure 7](img/Fig-07.png) | ![Figure 8](img/Fig-08.png)
+
+The first screen is a record of signup requests, and their administrative resolution. Administrators may approve a signup request (green), or deny it (orange).
+
+The second screen is a record of accounts that were deleted by administrators. We have a policy that New User accounts (not yet logged in), cannot be older than thirty days, and active user accounts must be used at least once per year.
 
 | User Activity (In the Last 24 Hours) | User Activity (In the Last Week)
 | :-: | :-: |
 | ![Figure 9](img/Fig-09.png) | ![Figure 10](img/Fig-10.png) |
 
+The first screen shows how how many users were active (logged in), at least once, during a 24-hour period.
+
+The second screen shows how many users logged in at least once, between 24 hours previous, and seven days (a week). It does not include users that logged in with the 24-hour period.
+
 | User Activity (In the Last 30 Days) | User Activity (90 Days or More)
 | :-: | :-: |
 | ![Figure 11](img/Fig-11.png) | ![Figure 12](img/Fig-12.png) |
+
+These screen behave similarly, for users that have logged in during a 30-day period, or have logged in, from 90 days, up to a year (at which time they get deleted).
 
 </div>
 
