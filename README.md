@@ -29,9 +29,21 @@ Everything is completely anonymized. No indvidual user or administrative informa
 
 <div align="center">
 
-|  |  |  |  |
-| :-: | :-: | :-: | :-: |
-| ![Figure 5](img/Fig-05.png) | ![Figure 6](img/Fig-06.png) | ![Figure 7](img/Fig-07.png) | ![Figure 8](img/Fig-08.png) |
+| User Totals | User Totals (Zoomed In) |
+| :-: | :-: |
+| ![Figure 5](img/Fig-05.png) | ![Figure 6](img/Fig-06.png) |
+
+| Signup Activity | Account Deletions  |
+| :-: | :-: |
+| ![Figure 7](img/Fig-07.png) | ![Figure 8](img/Fig-08.png)
+
+| User Activity (In the Last 24 Hours) | User Activity (In the Last Week)
+| :-: | :-: |
+| ![Figure 9](img/Fig-09.png) | ![Figure 10](img/Fig-10.png) |
+
+| User Activity (In the Last 30 Days) | User Activity (90 Days or More)
+| :-: | :-: |
+| ![Figure 11](img/Fig-11.png) | ![Figure 12](img/Fig-12.png) |
 
 </div>
 
