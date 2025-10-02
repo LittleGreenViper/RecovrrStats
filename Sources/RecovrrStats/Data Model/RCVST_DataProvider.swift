@@ -142,8 +142,7 @@ public class RCVST_DataProvider {
     /**
      This factory function will generate new model instances, and call a completion closure, after fetching the necessary data.
 
-     - parameter useDummyData: An optional (default is false) Bool. If true, then we don't fetch any data. Instead, we use a small sample of built-in CSV data.
-     - parameter completion: A tail completion block, that receives a new model instance. This may be called in any thread.
+     - parameter inCompletion: A tail completion block, that receives a new model instance. This may be called in any thread.
      */
     static func factory(completion inCompletion: @escaping (_: RCVST_DataProvider?) -> Void) {
         /* ################################################################## */
@@ -352,9 +351,9 @@ public class RCVST_DataProvider {
     /**
      Default initializer. We set up our data providers, here.
      
-     - parameter statusDataFrame: The actual data frame that was fetched and intialized, from the CSV data.
+     - parameter inDataFrame: The actual data frame that was fetched and intialized, from the CSV data.
      */
-    init(statusDataFrame inDataFrame: DataFrame, lastDate inLastDate: Date? = nil) {
+    init(statusDataFrame inDataFrame: DataFrame) {
         self.statusDataFrame = inDataFrame
         self.userDataProvider = RCVST_UserTypesDataProvider(with: inDataFrame, chartName: "SLUG-USER-TOTALS-CHART-TITLE".localizedVariant)
         self.signupsDataProvider = RCVST_SignupsDataProvider(with: inDataFrame, chartName: "SLUG-SIGNUP-TOTALS-CHART-TITLE".localizedVariant)

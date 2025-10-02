@@ -56,8 +56,8 @@ class RCVS_LegendElement: Identifiable {
     /**
      Default initializer. If you don't specify any arguments, the selection item is created.
      
-     - parameter name: The name of the legend item.
-     - parameter color: The color to associate with the name.
+     - parameter inName: The name of the legend item.
+     - parameter inColor: The color to associate with the name.
      */
     init(name inName: String = "SLUG-SELECTED-LEGEND-LABEL".localizedVariant, color inColor: Color = RCVS_LegendSelectionColor) {
         name = inName
@@ -500,7 +500,7 @@ protocol DataProviderProtocol: Identifiable {
 
     /* ##################################################### */
     /**
-     This provides the data frame rows as an array of our own ``Row`` struct, but filtered for the window date range.
+     This provides the data frame rows as an array of our own ``RCVST_RowProtocol`` struct, but filtered for the window date range.
      */
     var windowedRows: [any RCVST_RowProtocol] { get }
 
@@ -908,10 +908,10 @@ public class RCVST_Row: RCVST_RowProtocol {
          Default initializer.
          
          - parameters:
-            - description: The row segment description
-            - color: The row segment color
-            - value: The row segment value
-            - isSelected: True, if the row segment is selected.
+            - inDescription: The row segment description
+            - inColor: The row segment color
+            - inValue: The row segment value
+            - inIsSelected: True, if the row segment is selected.
          */
         public init(description inDescription: String, color inColor: Color, value inValue: Float, isSelected inIsSelected: Bool) {
             description = inDescription
@@ -961,9 +961,9 @@ public class RCVST_Row: RCVST_RowProtocol {
     /**
      initializer
      
-     - parameter dataRow: The `DataFrame.Row` for the line we're saving.
-     - parameter previousDataRow: The `DataFrame.Row` for the line prior to the one we're saving (may be nil, for the first row).
-     - parameter rowIndex: The 0-based index (in the dataframe rows) of this row (it will also be the index of this row).
+     - parameter inDataRow: The `DataFrame.Row` for the line we're saving.
+     - parameter inPreviousDataRow: The `DataFrame.Row` for the line prior to the one we're saving (may be nil, for the first row).
+     - parameter inIndex: The 0-based index (in the dataframe rows) of this row (it will also be the index of this row).
      */
     public init(dataRow inDataRow: DataFrame.Row, previousDataRow inPreviousDataRow: DataFrame.Row?, rowIndex inIndex: Int) {
         dataRow = inDataRow

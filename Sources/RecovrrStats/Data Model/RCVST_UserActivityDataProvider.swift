@@ -140,8 +140,8 @@ struct RCVST_UserActivityDataProvider: DataProviderProtocol {
     /**
      The initializer.
      
-     - parameter with: The data frame, with the data processed from the CSV.
-     - parameter chartName: The name to be used to describe the chart representing this data.
+     - parameter inDataFrame: The data frame, with the data processed from the CSV.
+     - parameter inDays: The name to be used to describe the chart representing this data.
      */
     init(with inDataFrame: DataFrame, days inDays: Int = 1) {
         var rowTypes = [_RCVST_UserActivityDataRow]()
